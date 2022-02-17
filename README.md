@@ -1,2 +1,5 @@
-# TER-M1--M1S2
-Travail encadré de recherche - Printemps 2022
+# Travail encadré de recherche - Printemps 2022
+ Fissore Davide
+
+## Encadrants
+Mme Cinzia Di Giusto et Mr Etienne Lozes
