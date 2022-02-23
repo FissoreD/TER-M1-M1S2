@@ -1,0 +1,23 @@
+{
+  "version": "3.0.3",
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "amd", // for browser
+    // "module": "commonjs", // for node
+    "removeComments": true,
+    "outFile": "./dist/out.js",
+    "baseUrl": "./",
+    "paths": {
+      "*": [
+        "node_modules/*",
+        "code_src/*"
+      ]
+    },
+    "sourceMap": true,
+    "alwaysStrict": true,
+    // "declaration": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+  },
+}
