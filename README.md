@@ -14,14 +14,27 @@ to implement them and compare them.
 ## About the project
 This project has been realized in Spring 2022 with reference to the course "Travail Encadré de Recherche" within the Master 1 in *Computer Science* at the University *Côte d'Azur* in *Biot*.
 
+## Prject launch 
 
+The first you want launch the project with node.js, 
+run the following commands
+
+1. npm install cross-env @babel/cli @babel/core @babel/preset-env @babel/preset-typescript rimraf typescript --save
+2. npm install @types/node --save-dev
+3. npm i
+
+Then you can run :
+- `npm run clean` to remove the dist folder
+- `npm run typecheck` to check statically if there are some typing errors
+- `npm run build` to clean and compile *ts* files in *js*
+- `npm run start` to run the Main.js file (if you want to run a specific file, launch the command `node ./dist/[the_js_you_want]`)
 
 ## Author 
 Fissore Davide
 
 
 
-## Encadrants
+## Supervisors
 Mme Cinzia Di Giusto et Mr Etienne Lozes
 
 ## References

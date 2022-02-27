@@ -1,23 +1,21 @@
 {
   "version": "3.0.3",
   "compilerOptions": {
-    "target": "es2015",
+    "target": "ES2021",
     "module": "amd", // for browser
     // "module": "commonjs", // for node
     "removeComments": true,
-    "outFile": "./dist/out.js",
-    "baseUrl": "./",
-    "paths": {
-      "*": [
-        "node_modules/*",
-        "code_src/*"
-      ]
-    },
+    "outFile": "./public/out.js",
+    // "baseUrl": "./",
+    "strict": true,
     "sourceMap": true,
     "alwaysStrict": true,
     // "declaration": true,
-    "esModuleInterop": true,
     "resolveJsonModule": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
   },
+  // "include": [
+  //   "src/**/*"
+  // ]
 }

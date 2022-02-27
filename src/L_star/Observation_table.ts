@@ -1,3 +1,5 @@
+import { same_vector } from "../Utilities";
+
 export class Observation_table {
   private columns: any;
   private rows: any;
@@ -42,11 +44,6 @@ export class Observation_table {
     const r1 = this.get_row(row1);
     const r2 = this.get_row(row2);
     return r1 != undefined && r2 != undefined &&
-      Observation_table.same_vector(r1, r2);
+      same_vector(r1, r2);
   }
-
-  /**
-   * @returns if v1 == v2
-   */
-  static same_vector = (v1: any[], v2: any[]): boolean => v1.map((elt, pos) => elt == v2[pos]).every(e => e);
 }

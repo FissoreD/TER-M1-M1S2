@@ -1,5 +1,32 @@
 {
+  "type": "module",
+  "name": "test",
+  "version": "1.0.0",
+  "main": "./dist/Main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run clean && npm run compile",
+    "typecheck": "tsc --p .",
+    "build-typecheck": "npm run typecheck && npm run build",
+    "start": "npm run compile && node ./dist/Main.js",
+    "clean": "rimraf dist",
+    "compile": "cross-env-shell babel src -d dist --source-maps --extensions '.ts'"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "amdefine": "^1.0.1"
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.5",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.16.7",
+    "@types/mermaid": "^8.2.7",
+    "cross-env": "^7.0.3",
+    "mermaid": "^8.14.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21"
   }
 }
