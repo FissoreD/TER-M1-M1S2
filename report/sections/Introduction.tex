@@ -1,1 +1,28 @@
-\section{This is a title}
+\section{Lerning from Teacher}
+
+\subsection{The necessity of understanding}
+
+As human we face every day new situations, new problems that we have to solve in order to accomplish a particular task.
+Imagine you are in a foreign country and you want to take a beverage from a vending machine which speaks a language you don't know, for exmple Japanese. The first thing you do is trying to make some attemps to find the right procedure to select the product you want. At the end thanks to the answers given by the vending machine you be able to understand the right path of actions you must follow in order to drink your beverage.
+
+Similarly, in computer science, it is interesting to create a system able to understand an unknown language performing actions, registering their results until it has enough information to say for sure that the language is now learnt. This process can be represented in so composed by a \lerner{}, the system willing to learn the new language, and a \teacher{}, the oracle containing the unknwon language which will answer about the validity or not of the received question.
+
+The interactions between \lerner{} and \teacher{} are various, for instance, \teacher{} may give informations to the \lerner{} without being solliceted, it can provide not relible or useless informations and so on and mutually the \lerner{} may not make well-formed questions or may not keep attention to the answers it will get. Therefore, we are going to reduce our world and allow only two main kinds of communication:
+\begin{itemize}
+  \item \textit{query(q)} $\rightarrow$ the \lerner{} asks if a sentence \textit{q} belongs to the unknown language and the \teacher{} can answer \textit{yes} or \textit{no}.
+  \item \textit{member(M)} $\rightarrow$ the \lerner{} send a prediction (in the form of an automaton) \textit{M} and the \teacher{} answers either \textit{yes} if \textit{M} equals the good language, or provides a counter-exmple invalidating \textit{M}.
+\end{itemize}
+
+\subsection{Vocabulary}
+In this section, we are going to clarify some concept used in the previous one.
+
+A language \lang{} is considered as a set of word \word{} such that a word is a concatenation of zero or more letter belonging to an alphabet, a finite set of symbols, noted \alphabet{}.
+
+An automaton \automaton{} is represented by a 5-tuple $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ :
+\begin{itemize}
+  \item \alphabet{} is the alphabet
+  \item \states{} is the set of states composing the automaton
+  \item \transition{} is a mapping \transition{} $\coloneqq {q_i \times a \rightarrow q_j | (q_i, q_j) \in Q \wedge a \in \Sigma } $ we move from $ q_i $ to $q_j$ by $a$
+  \item \qzero{} is the starting state
+  \item \qend{} is the set of accepting states in \states{}
+\end{itemize}

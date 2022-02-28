@@ -40,8 +40,10 @@
 \usepackage[colorlinks, citecolor=red!60!green, linkcolor=blue!60!green, urlcolor=magenta]{hyperref}
 
 \usepackage{algorithm}
+\usepackage{variable}
 \usepackage{algo}
 \usepackage{colorationSyntaxique}
+\usepackage{mathtools}
 
 % Bibliography
 \usepackage[
