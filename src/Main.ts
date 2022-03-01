@@ -1,15 +1,13 @@
-import { Automaton } from "./Automaton.js";
-import { L_star } from "./L_star/L_star.js";
+import { HTML_LStar } from "./L_star/HTML_L_star.js";
 import { Teacher } from "./Teacher.js";
-import * as data from "./Teacher_models/even0_1.json"
-import { listener_automaton_click_button } from "./Utilities.js";
 
 
-const L = new L_star('01', new Teacher());
+let button_next = document.getElementById("next_step") as HTMLButtonElement;
+button_next.addEventListener("click", () => A.graphic_next_step());
 
-L.define_next_questions();
+export let message = document.getElementById("message") as HTMLParagraphElement;
 
-let a = new Automaton(data.even_zero_one)
+export let tableHTML = document.getElementById("table") as HTMLTableElement;
 
-a.initiate_graph()
-
+export let automatonHTML = document.getElementById("automaton") as HTMLDivElement;
+export let A = new HTML_LStar("01", new Teacher());

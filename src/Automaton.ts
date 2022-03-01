@@ -1,3 +1,5 @@
+import { automatonHTML } from "./Main";
+
 type AutomatonJson = { transitions: string[][], startNode: string, endNodes: string[], alphabet: string[] | string, states: string[] };
 export class Automaton {
   transitions: string[][];
@@ -22,6 +24,11 @@ export class Automaton {
     this.currentNode = this.transitions[x][y];
   }
 
+
+  restart() {
+    this.currentNode = this.startNode;
+  }
+
   /** GRAPHIC PART */
 
   draw_next_step(next_char: string) {
@@ -31,15 +38,12 @@ export class Automaton {
   }
 
   initiate_graph() {
-    let div_with_automaton = document.getElementById("automaton")!;
-    div_with_automaton.removeAttribute('data-processed')
-    div_with_automaton.innerHTML = this.matrix_to_mermaid();
+
+    automatonHTML.removeAttribute('data-processed')
+    automatonHTML.innerHTML = this.matrix_to_mermaid();
 
     // @ts-ignore
     mermaid.init(document.querySelectorAll(".mermaid"));
-
-    // Mark current node = initial state
-    this.color_node(true);
 
     // Mark end nodes
     this.endNodes.forEach(n => {
@@ -49,6 +53,9 @@ export class Automaton {
       (smaller_circle).attributes['r'].value -= 3
       circle.parentNode!.insertBefore(smaller_circle, circle.nextSibling)
     });
+
+    // Mark current node = initial state
+    this.color_node(true);
   }
 
   get_current_graph_node(node: string) {

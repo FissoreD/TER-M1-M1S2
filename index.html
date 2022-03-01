@@ -21,20 +21,15 @@
     a lerner with either the L* or the NL* algorithms</h2>
 
   <script>
-    // require(['Main']);
-    require(["test/L_star_test"])
+    require(['Main']);
+    // require(["test/L_star_test"])
   </script>
 
+  <button id="next_step">Next step</button>
 
-  <p> Current string :
-  <div id="input">0110</div>
-  </p>
-  <div class="mermaid" id='automaton'>
-  </div>
-
-  <input type="text" id="id">
-  <button type="button" id="next_char">click me</button>
-
+  <table id="table"> </table>
+  <p id="message"></p>
+  <div class="mermaid" id='automaton'></div>
 </body>
 
 </html>

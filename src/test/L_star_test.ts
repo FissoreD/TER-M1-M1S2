@@ -1,6 +1,6 @@
+import { listener_automaton_click_button } from "../html_interactions/listeners.js";
 import { L_star } from "../L_star/L_star.js";
 import { Teacher } from "../Teacher.js";
-import { listener_automaton_click_button } from "../Utilities.js";
 
 let graphic = true;
 
@@ -19,7 +19,10 @@ for (let i = 0; i < 6; i++) {
       listener_automaton_click_button(automaton);
     }
     console.log(automaton);
-    lerner.make_member(automaton);
+    let answer = lerner.make_member(automaton);
+    if (answer != undefined) {
+      lerner.add_elt_in_S(answer);
+    }
     console.log("After member function : \n", lerner);
 
   } else {
