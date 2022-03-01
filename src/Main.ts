@@ -9,5 +9,6 @@ export let message = document.getElementById("message") as HTMLParagraphElement;
 
 export let tableHTML = document.getElementById("table") as HTMLTableElement;
 
-export let automatonHTML = document.getElementById("automaton") as HTMLDivElement;
+export let automatonHTML = document.getElementById("automaton-mermaid") as HTMLDivElement;
+export let automatonDiv = document.getElementById("input-automaton") as HTMLDivElement;
 export let A = new HTML_LStar("01", new Teacher());

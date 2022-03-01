@@ -11,6 +11,7 @@
 
   <script src="https://requirejs.org/docs/release/2.3.6/comments/require.js"></script>
   <script src="public/out.js"></script>
+  <link rel="stylesheet" href="src/css/htmlStyle.css">
 
   <script>mermaid.initialize({ startOnLoad: false });</script>
 </head>
@@ -26,10 +27,14 @@
   </script>
 
   <button id="next_step">Next step</button>
-
-  <table id="table"> </table>
-  <p id="message"></p>
-  <div class="mermaid" id='automaton'></div>
+  <div class="styled-div">
+    <table id="table" class="styled-table"> </table>
+    <div class="automaton-div" id="automaton-div">
+      <div class="mermaid" id='automaton-mermaid'></div>
+      <div id="input-automaton"></div>
+      <span id="message"></span>
+    </div>
+  </div>
 </body>
 
 </html>

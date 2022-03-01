@@ -1,6 +1,5 @@
-import { strictEqual } from "assert";
 import { Automaton } from "../Automaton";
-import { automatonHTML, message, tableHTML } from "../Main";
+import { automatonDiv, automatonHTML, message, tableHTML } from "../Main";
 import { Teacher } from "../Teacher";
 import { L_star } from "./L_star";
 
@@ -19,30 +18,64 @@ export class HTML_LStar extends L_star {
   }
 
   draw_table() {
-    this.add_row(this.table_header, "Table", this.E);
+    this.add_row(this.table_header, "Table", undefined, this.E, 2);
+
+    /**
+     The first {@link S}.length rows of the table start with the S symbol
+    */
+    var fst: string | undefined = "S";
     for (var s of this.S) {
-      this.add_row(this.table_body, s, Array.from(this.observation_table[s]));
+      const row = Array.from(this.observation_table[s]);
+      this.add_row(this.table_body, fst, s, row, 1, fst ? this.S.length : 1);
+      fst = undefined;
     }
+    /**
+     In the second part of the table, rows start with the SA symbol
+    */
+    var fst: string | undefined = "SA";
     for (var s of this.SA) {
-      this.add_row(this.table_body, s, Array.from(this.observation_table[s]));
+      const row = Array.from(this.observation_table[s]);
+      this.add_row(this.table_body, fst, s, row, 1, fst ? this.SA.length : 1);
+      fst = undefined;
     }
   }
 
-  add_row(parent: HTMLTableSectionElement, head: string, row_elts: string[]) {
+  set_header() {
+
+  }
+
+  add_row(
+    parent: HTMLTableSectionElement, fst: string | undefined, head: string | undefined,
+    row_elts: string[], colspan: number = 1, rowspan: number = 1
+  ) {
+
     let conver_to_epsilon = (e: string) => e == "" ? "&epsilon;" : e;
+    let create_cell_with_text = (row: HTMLTableRowElement, txt: string) => {
+      var cell = row.insertCell();
+      cell.innerHTML = `${conver_to_epsilon(txt)}`
+    };
+    console.log(head ? conver_to_epsilon(head) : "Not head", row_elts);
     var row = parent.insertRow();
-    var cell = row.insertCell();
-    cell.innerHTML = conver_to_epsilon(head);
-    for (var letter of row_elts) {
-      cell = row.insertCell();
-      cell.innerHTML = `${conver_to_epsilon(letter)}`
+    if (fst) {
+      var cell = row.insertCell();
+      cell.setAttribute("rowspan", rowspan + "");
+      cell.setAttribute("colspan", colspan + "");
+      cell.innerHTML = conver_to_epsilon(fst);
     }
+    if (head != undefined) create_cell_with_text(row, head);
+    for (var letter of row_elts)
+      create_cell_with_text(row, letter)
   }
 
   clear_table() {
     this.table_body.innerHTML = "";
     this.table_header.innerHTML = "";
     console.log("Clearing");
+  }
+
+  clear_automaton() {
+    automatonDiv.innerHTML = "";
+    automatonHTML.innerHTML = "";
   }
 
   graphic_next_step() {
@@ -105,7 +138,7 @@ export class HTML_LStar extends L_star {
         `;
         this.pile_actions.push(() => {
           message.innerHTML = "";
-          automatonHTML.innerHTML = "";
+          this.clear_automaton()
           this.add_elt_in_S(answer!);
           this.clear_table();
           this.draw_table();
@@ -123,7 +156,6 @@ export class HTML_LStar extends L_star {
     setB.addEventListener('click', () => {
       this.automaton!.restart();
       this.automaton!.initiate_graph();
-      this.add_automaton_listener();
     })
     let sendB = document.createElement("button")
     sendB.innerHTML = "Next char";
@@ -131,8 +163,8 @@ export class HTML_LStar extends L_star {
       this.automaton!.draw_next_step(input.value[0])
       input.value = input.value.slice(1);
     });
-    automatonHTML.appendChild(input);
-    automatonHTML.appendChild(sendB);
-    automatonHTML.appendChild(setB);
+    automatonDiv.appendChild(input);
+    automatonDiv.appendChild(sendB);
+    automatonDiv.appendChild(setB);
   }
 }

@@ -165,28 +165,49 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
             this.pile_actions = [() => this.draw_table()];
         }
         draw_table() {
-            this.add_row(this.table_header, "Table", this.E);
+            this.add_row(this.table_header, "Table", undefined, this.E, 2);
+            var fst = "S";
             for (var s of this.S) {
-                this.add_row(this.table_body, s, Array.from(this.observation_table[s]));
+                const row = Array.from(this.observation_table[s]);
+                this.add_row(this.table_body, fst, s, row, 1, fst ? this.S.length : 1);
+                fst = undefined;
             }
+            var fst = "SA";
             for (var s of this.SA) {
-                this.add_row(this.table_body, s, Array.from(this.observation_table[s]));
+                const row = Array.from(this.observation_table[s]);
+                this.add_row(this.table_body, fst, s, row, 1, fst ? this.SA.length : 1);
+                fst = undefined;
             }
         }
-        add_row(parent, head, row_elts) {
+        set_header() {
+        }
+        add_row(parent, fst, head, row_elts, colspan = 1, rowspan = 1) {
             let conver_to_epsilon = (e) => e == "" ? "&epsilon;" : e;
+            let create_cell_with_text = (row, txt) => {
+                var cell = row.insertCell();
+                cell.innerHTML = `${conver_to_epsilon(txt)}`;
+            };
+            console.log(head ? conver_to_epsilon(head) : "Not head", row_elts);
             var row = parent.insertRow();
-            var cell = row.insertCell();
-            cell.innerHTML = conver_to_epsilon(head);
-            for (var letter of row_elts) {
-                cell = row.insertCell();
-                cell.innerHTML = `${conver_to_epsilon(letter)}`;
+            if (fst) {
+                var cell = row.insertCell();
+                cell.setAttribute("rowspan", rowspan + "");
+                cell.setAttribute("colspan", colspan + "");
+                cell.innerHTML = conver_to_epsilon(fst);
             }
+            if (head != undefined)
+                create_cell_with_text(row, head);
+            for (var letter of row_elts)
+                create_cell_with_text(row, letter);
         }
         clear_table() {
             this.table_body.innerHTML = "";
             this.table_header.innerHTML = "";
             console.log("Clearing");
+        }
+        clear_automaton() {
+            Main_1.automatonDiv.innerHTML = "";
+            Main_1.automatonHTML.innerHTML = "";
         }
         graphic_next_step() {
             if (this.pile_actions.length > 0) {
@@ -248,7 +269,7 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
         `;
                     this.pile_actions.push(() => {
                         Main_1.message.innerHTML = "";
-                        Main_1.automatonHTML.innerHTML = "";
+                        this.clear_automaton();
                         this.add_elt_in_S(answer);
                         this.clear_table();
                         this.draw_table();
@@ -265,7 +286,6 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
             setB.addEventListener('click', () => {
                 this.automaton.restart();
                 this.automaton.initiate_graph();
-                this.add_automaton_listener();
             });
             let sendB = document.createElement("button");
             sendB.innerHTML = "Next char";
@@ -273,9 +293,9 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
                 this.automaton.draw_next_step(input.value[0]);
                 input.value = input.value.slice(1);
             });
-            Main_1.automatonHTML.appendChild(input);
-            Main_1.automatonHTML.appendChild(sendB);
-            Main_1.automatonHTML.appendChild(setB);
+            Main_1.automatonDiv.appendChild(input);
+            Main_1.automatonDiv.appendChild(sendB);
+            Main_1.automatonDiv.appendChild(setB);
         }
     }
     exports.HTML_LStar = HTML_LStar;
@@ -283,12 +303,13 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
 define("Main", ["require", "exports", "L_star/HTML_L_star", "Teacher"], function (require, exports, HTML_L_star_js_1, Teacher_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.A = exports.automatonHTML = exports.tableHTML = exports.message = void 0;
+    exports.A = exports.automatonDiv = exports.automatonHTML = exports.tableHTML = exports.message = void 0;
     let button_next = document.getElementById("next_step");
     button_next.addEventListener("click", () => exports.A.graphic_next_step());
     exports.message = document.getElementById("message");
     exports.tableHTML = document.getElementById("table");
-    exports.automatonHTML = document.getElementById("automaton");
+    exports.automatonHTML = document.getElementById("automaton-mermaid");
+    exports.automatonDiv = document.getElementById("input-automaton");
     exports.A = new HTML_L_star_js_1.HTML_LStar("01", new Teacher_js_1.Teacher());
 });
 define("Automaton", ["require", "exports", "Main"], function (require, exports, Main_2) {
@@ -357,9 +378,9 @@ define("Automaton", ["require", "exports", "Main"], function (require, exports, 
             let next_circle = current_circle.nextSibling;
             if (toFill) {
                 if (this.endNodes.includes(this.currentNode))
-                    next_circle.style.fill = 'red';
+                    next_circle.style.fill = '#009879';
                 else
-                    current_circle.style.fill = 'red';
+                    current_circle.style.fill = '#009879';
             }
             else {
                 if (this.endNodes.includes(this.currentNode))

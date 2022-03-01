@@ -95,8 +95,8 @@ export class Automaton {
     let next_circle = current_circle.nextSibling as HTMLElement;
     if (toFill) {
       if (this.endNodes.includes(this.currentNode))
-        next_circle.style.fill = 'red';
-      else current_circle.style.fill = 'red';
+        next_circle.style.fill = '#009879';
+      else current_circle.style.fill = '#009879';
     } else {
       if (this.endNodes.includes(this.currentNode))
         next_circle.removeAttribute('style');
