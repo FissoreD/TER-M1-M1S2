@@ -1,4 +1,5 @@
 // import { Observation_table } from "../L_star/Observation_table.js";
+import { emit } from "process";
 import { Automaton } from "../Automaton.js";
 import { tableHTML } from "../Main.js";
 import { Teacher } from "../Teacher.js";
@@ -59,6 +60,8 @@ export class L_star {
    */
   add_elt_in_S(new_elt: string) {
     let prefix_list = generate_prefix_list(new_elt);
+    console.log(new_elt, "is going to be added in S, it has", prefix_list);
+
     for (const prefix of prefix_list) {
       if (this.S.includes(prefix)) return;
       if (this.SA.includes(prefix)) {
@@ -74,8 +77,11 @@ export class L_star {
         this.E.forEach(e => this.make_query(prefix, e));
         this.S.push(prefix)
         this.alphabet.forEach(a => {
-          this.SA.push(prefix + a)
-          this.E.forEach(e => this.make_query(prefix + a, e));
+          let new_word = prefix + a;
+          if (!this.SA.includes(new_word) && !this.S.includes(new_word)) {
+            this.SA.push(prefix + a);
+            this.E.forEach(e => this.make_query(prefix + a, e));
+          }
         });
       }
     }
@@ -87,12 +93,20 @@ export class L_star {
     this.S.push(elt);
   }
 
-  add_column(col_name: string) {
-    this.SA.forEach(t => this.make_query(t, col_name));
-    this.S.forEach(s => {
-      this.make_query(s, col_name)
+  find_suffix_not_compatible(consistence_error: string[]) {
+    let e = this.E.find((_e, pos) => {
+      let cell = (value: number) =>
+        this.observation_table[consistence_error[value] + consistence_error[2]][pos];
+      return cell(0) != cell(1);
     });
-    this.E.push(col_name);
+    let new_col = consistence_error[2] + e;
+    return new_col;
+  }
+
+  add_column(new_col: string) {
+    let L = [this.SA, this.S];
+    L.forEach(l => l.forEach(s => this.make_query(s, new_col)));
+    this.E.push(new_col);
   }
 
   define_next_questions() {
@@ -101,7 +115,8 @@ export class L_star {
     if (close_rep != undefined) {
       this.add_elt_in_S(close_rep);
     } else if (consistence_rep != undefined) {
-      this.add_column(consistence_rep[2]);
+      let new_col = this.find_suffix_not_compatible(consistence_rep)
+      this.add_column(new_col);
     } else {
       return true;
     }

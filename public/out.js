@@ -16,22 +16,29 @@ define("Utilities", ["require", "exports"], function (require, exports) {
 define("Teacher", ["require", "exports", "Utilities"], function (require, exports, Utilities_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Teacher = void 0;
+    exports.teacherA3fromLast = exports.teacherPairZeroAndOne = exports.Teacher = void 0;
     class Teacher {
+        constructor(f, counter_exemples) {
+            this.check_function = f;
+            this.counter_exemples = counter_exemples;
+            this.counter = 0;
+        }
         query(sentence) {
-            let nb_of_zero = (0, Utilities_js_1.count_str_occurrences)(sentence, "0");
-            return this.boolToString(sentence.length % 2 == 0 && nb_of_zero % 2 == 0);
+            return this.boolToString(this.check_function(sentence));
         }
         member(automaton) {
-            let l = ["11", "011", undefined];
-            return l[Teacher.i++];
+            return this.counter_exemples[this.counter++];
         }
         boolToString(bool) {
             return bool ? "1" : "0";
         }
     }
     exports.Teacher = Teacher;
-    Teacher.i = 0;
+    exports.teacherPairZeroAndOne = new Teacher(sentence => {
+        let parity = (0, Utilities_js_1.count_str_occurrences)(sentence, "0");
+        return parity % 2 == 0 && sentence.length % 2 == 0;
+    }, ["11", "011"]);
+    exports.teacherA3fromLast = new Teacher(sentence => sentence.length >= 3 && sentence[sentence.length - 3] == 'a', ["aaa"]);
 });
 define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], function (require, exports, Automaton_js_1, Utilities_js_2) {
     "use strict";
@@ -64,6 +71,7 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
         }
         add_elt_in_S(new_elt) {
             let prefix_list = (0, Utilities_js_2.generate_prefix_list)(new_elt);
+            console.log(new_elt, "is going to be added in S, it has", prefix_list);
             for (const prefix of prefix_list) {
                 if (this.S.includes(prefix))
                     return;
@@ -81,8 +89,11 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
                     this.E.forEach(e => this.make_query(prefix, e));
                     this.S.push(prefix);
                     this.alphabet.forEach(a => {
-                        this.SA.push(prefix + a);
-                        this.E.forEach(e => this.make_query(prefix + a, e));
+                        let new_word = prefix + a;
+                        if (!this.SA.includes(new_word) && !this.S.includes(new_word)) {
+                            this.SA.push(prefix + a);
+                            this.E.forEach(e => this.make_query(prefix + a, e));
+                        }
                     });
                 }
             }
@@ -93,12 +104,18 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
                 this.SA.splice(index, 1);
             this.S.push(elt);
         }
-        add_column(col_name) {
-            this.SA.forEach(t => this.make_query(t, col_name));
-            this.S.forEach(s => {
-                this.make_query(s, col_name);
+        find_suffix_not_compatible(consistence_error) {
+            let e = this.E.find((_e, pos) => {
+                let cell = (value) => this.observation_table[consistence_error[value] + consistence_error[2]][pos];
+                return cell(0) != cell(1);
             });
-            this.E.push(col_name);
+            let new_col = consistence_error[2] + e;
+            return new_col;
+        }
+        add_column(new_col) {
+            let L = [this.SA, this.S];
+            L.forEach(l => l.forEach(s => this.make_query(s, new_col)));
+            this.E.push(new_col);
         }
         define_next_questions() {
             const close_rep = this.is_close();
@@ -107,7 +124,8 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
                 this.add_elt_in_S(close_rep);
             }
             else if (consistence_rep != undefined) {
-                this.add_column(consistence_rep[2]);
+                let new_col = this.find_suffix_not_compatible(consistence_rep);
+                this.add_column(new_col);
             }
             else {
                 return true;
@@ -160,6 +178,7 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
     class HTML_LStar extends L_star_1.L_star {
         constructor(alphabet, teacher) {
             super(alphabet, teacher);
+            this.finish = false;
             this.table_header = Main_1.tableHTML.createTHead();
             this.table_body = Main_1.tableHTML.createTBody();
             this.pile_actions = [() => this.draw_table()];
@@ -179,15 +198,12 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
                 fst = undefined;
             }
         }
-        set_header() {
-        }
         add_row(parent, fst, head, row_elts, colspan = 1, rowspan = 1) {
             let conver_to_epsilon = (e) => e == "" ? "&epsilon;" : e;
             let create_cell_with_text = (row, txt) => {
                 var cell = row.insertCell();
                 cell.innerHTML = `${conver_to_epsilon(txt)}`;
             };
-            console.log(head ? conver_to_epsilon(head) : "Not head", row_elts);
             var row = parent.insertRow();
             if (fst) {
                 var cell = row.insertCell();
@@ -203,81 +219,29 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
         clear_table() {
             this.table_body.innerHTML = "";
             this.table_header.innerHTML = "";
-            console.log("Clearing");
         }
         clear_automaton() {
             Main_1.automatonDiv.innerHTML = "";
             Main_1.automatonHTML.innerHTML = "";
         }
         graphic_next_step() {
+            if (this.finish) {
+                if (Main_1.message.innerHTML != "")
+                    Main_1.message.innerHTML = "The Teacher has accepted the automaton";
+                return;
+            }
             if (this.pile_actions.length > 0) {
-                let action = this.pile_actions.shift();
-                action();
+                this.pile_actions.shift()();
                 return;
             }
-            const close_rep = this.is_close();
-            if (close_rep != undefined) {
-                Main_1.message.innerText =
-                    `
-        The table is not closed since
-        row(${close_rep}) = ${this.observation_table[close_rep]} but there is no s in S such that row(s) = ${this.observation_table[close_rep]};
-        I'm going to move ${close_rep} from SA to S
-        `;
-                this.pile_actions.push(() => {
-                    Main_1.message.innerText = "";
-                    this.add_elt_in_S(close_rep);
-                    this.clear_table();
-                    this.draw_table();
-                });
+            console.log(1);
+            if (!this.close_action())
                 return;
-            }
-            const consistence_rep = this.is_consistent();
-            if (consistence_rep != undefined) {
-                Main_1.message.innerText =
-                    `
-        The table is not consistent : 
-        row(${consistence_rep[0]}) and row(${consistence_rep[1]}) have same value in S,
-        but their value is not the same if we add ${consistence_rep[2]} 
-        (row(${consistence_rep[0] + consistence_rep[2]}) != row(${consistence_rep[1] + consistence_rep[2]}))
-        I'm going to add the column ${consistence_rep[2]}
-        `;
-                this.pile_actions.push(() => {
-                    Main_1.message.innerText = "";
-                    this.add_column(consistence_rep[2]);
-                    this.clear_table();
-                    this.draw_table();
-                });
+            console.log(2);
+            if (!this.consistence_action())
                 return;
-            }
-            if (Main_1.message.innerHTML != "")
-                return;
-            Main_1.message.innerText =
-                `
-      The table is consistent and closed, I will send an automaton
-      `;
-            let automaton = this.make_automaton();
-            this.automaton = automaton;
-            this.pile_actions.push(() => {
-                automaton.initiate_graph();
-                this.add_automaton_listener();
-                let answer = this.make_member(automaton);
-                if (answer != undefined) {
-                    Main_1.message.innerText =
-                        `
-        The sent automaton is not valid, 
-        here is a counter-exemple ${answer}
-        `;
-                    this.pile_actions.push(() => {
-                        Main_1.message.innerHTML = "";
-                        this.clear_automaton();
-                        this.add_elt_in_S(answer);
-                        this.clear_table();
-                        this.draw_table();
-                    });
-                    return;
-                }
-                Main_1.message.innerHTML = "The Teacher has accepted the automaton";
-            });
+            console.log(3);
+            this.send_automaton_action();
         }
         add_automaton_listener() {
             let input = document.createElement("input");
@@ -297,6 +261,81 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
             Main_1.automatonDiv.appendChild(sendB);
             Main_1.automatonDiv.appendChild(setB);
         }
+        close_action() {
+            const close_rep = this.is_close();
+            if (close_rep != undefined) {
+                Main_1.message.innerText =
+                    `
+        The table is not closed since
+        row(${close_rep}) = ${this.observation_table[close_rep]} but there is no s in S such that row(s) = ${this.observation_table[close_rep]};
+        I'm going to move ${close_rep} from SA to S
+        `;
+                this.pile_actions.push(() => {
+                    Main_1.message.innerText = "";
+                    this.add_elt_in_S(close_rep);
+                    this.clear_table();
+                    this.draw_table();
+                });
+                return false;
+            }
+            return true;
+        }
+        consistence_action() {
+            const consistence_rep = this.is_consistent();
+            if (consistence_rep != undefined) {
+                let new_col = this.find_suffix_not_compatible(consistence_rep);
+                let s1 = consistence_rep[0];
+                let s2 = consistence_rep[1];
+                let a = consistence_rep[2];
+                Main_1.message.innerText =
+                    `
+        The table is not consistent : 
+        row(${s1 ? s1 : "ε"}) and row(${s2 ? s2 : "ε"}) have same value in S,
+        but their value is not the same if we add ${a} 
+        row(${s1 + a}) != row(${s2 + a})
+        I'm going to add the column ${new_col} since T(${s1 + new_col}) != T(${s2 + new_col})
+        `;
+                this.pile_actions.push(() => {
+                    Main_1.message.innerText = "";
+                    this.add_column(new_col);
+                    this.clear_table();
+                    this.draw_table();
+                });
+                return false;
+            }
+            return true;
+        }
+        send_automaton_action() {
+            Main_1.message.innerText =
+                `
+      The table is consistent and closed, I will send an automaton
+      `;
+            let automaton = this.make_automaton();
+            this.automaton = automaton;
+            this.pile_actions.push(() => {
+                Main_1.message.innerHTML = "";
+                automaton.initiate_graph();
+                this.add_automaton_listener();
+                let answer = this.make_member(automaton);
+                if (answer != undefined) {
+                    Main_1.message.innerText =
+                        `
+          The sent automaton is not valid, 
+          here is a counter-exemple ${answer}
+          `;
+                    this.pile_actions.push(() => {
+                        Main_1.message.innerHTML = "";
+                        this.clear_automaton();
+                        console.log("Adding", answer, "in S");
+                        this.add_elt_in_S(answer);
+                        this.clear_table();
+                        this.draw_table();
+                    });
+                    return;
+                }
+                this.finish = true;
+            });
+        }
     }
     exports.HTML_LStar = HTML_LStar;
 });
@@ -310,7 +349,7 @@ define("Main", ["require", "exports", "L_star/HTML_L_star", "Teacher"], function
     exports.tableHTML = document.getElementById("table");
     exports.automatonHTML = document.getElementById("automaton-mermaid");
     exports.automatonDiv = document.getElementById("input-automaton");
-    exports.A = new HTML_L_star_js_1.HTML_LStar("01", new Teacher_js_1.Teacher());
+    exports.A = new HTML_L_star_js_1.HTML_LStar("ab", Teacher_js_1.teacherA3fromLast);
 });
 define("Automaton", ["require", "exports", "Main"], function (require, exports, Main_2) {
     "use strict";
@@ -481,7 +520,7 @@ define("test/L_star_test", ["require", "exports", "html_interactions/listeners",
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let graphic = true;
-    let lerner = new L_star_js_1.L_star("01", new Teacher_js_2.Teacher());
+    let lerner = new L_star_js_1.L_star("01", Teacher_js_2.teacherPairZeroAndOne);
     console.log(lerner);
     for (let i = 0; i < 6; i++) {
         console.log(`/ ************* STEP ${i + 1} ************* /`);

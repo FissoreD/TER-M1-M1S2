@@ -1,10 +1,10 @@
 import { listener_automaton_click_button } from "../html_interactions/listeners.js";
 import { L_star } from "../L_star/L_star.js";
-import { Teacher } from "../Teacher.js";
+import { Teacher, teacherPairZeroAndOne } from "../Teacher.js";
 
 let graphic = true;
 
-let lerner = new L_star("01", new Teacher())
+let lerner = new L_star("01", teacherPairZeroAndOne)
 
 console.log(lerner);
 
