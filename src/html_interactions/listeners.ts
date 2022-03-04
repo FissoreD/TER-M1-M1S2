@@ -1,5 +1,4 @@
 import { Automaton } from "../Automaton";
-import { A, automatonHTML } from "../Main";
 
 export function listener_automaton_click_button(a: Automaton) {
   let next_char = () => {

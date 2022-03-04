@@ -16,23 +16,31 @@ This project has been realized in Spring 2022 with reference to the course "Trav
 
 ## Prject launch 
 
-The first you want launch the project with node.js, 
+### In the console
+The first time you want launch the project with node.js, 
 run the following commands
 
-1. npm install cross-env @babel/cli @babel/core @babel/preset-env @babel/preset-typescript rimraf typescript --save
-2. npm install @types/node --save-dev
-3. npm i
+1. `npm install cross-env @babel/cli @babel/core @babel/preset-env @babel/preset-typescript rimraf typescript --save`
+2. `npm install @types/node --save-dev`
+3. `npm i`
 
 Then you can run :
-- `npm run clean` to remove the dist folder
+- `npm run clean` to remove the dist folder (dist folder is the folder where ts files are compiled in js)
 - `npm run typecheck` to check statically if there are some typing errors
 - `npm run build` to clean and compile *ts* files in *js*
-- `npm run start` to run the Main.js file (if you want to run a specific file, launch the command `node ./dist/[the_js_you_want]`)
+- `npm run lstar` to run the L* algorithm in the console
+
+### In the HTML page
+The project can also be opened in the browser thanks the *index.html* file. 
+
+The html page works only if *ts* files have been compiled. By default, you don't need to compile them, since compiled files are already pushed in the GitHub repository.
+
+However if you modify some *ts* files and want to see the changes in the html page, you can run the command `tsc` and once finished, you can reload the page in the browser.
+
+*Remark*: if you run the `tsc` command with the flag `-w` the typescript compiler will run in background waiting for any modification of a *ts* file, in this case, it will automatically perform the compilation.
 
 ## Author 
 Fissore Davide
-
-
 
 ## Supervisors
 Mme Cinzia Di Giusto et Mr Etienne Lozes

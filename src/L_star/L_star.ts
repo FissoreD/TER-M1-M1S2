@@ -1,22 +1,23 @@
-// import { Observation_table } from "../L_star/Observation_table.js";
-import { emit } from "process";
 import { Automaton } from "../Automaton.js";
-import { tableHTML } from "../Main.js";
 import { Teacher } from "../Teacher.js";
 import { generate_prefix_list } from "../Utilities.js";
 export type Map_string_string = { [key: string]: string };
 
 export class L_star {
-  protected alphabet: string[];
-  protected E: string[];
-  protected S: string[];
-  protected SA: string[];
-  protected observation_table: Map_string_string;
-  protected teacher: Teacher;
+  alphabet: string[];
+  E: string[];
+  S: string[];
+  SA: string[];
+  observation_table: Map_string_string;
+  teacher: Teacher;
+  query_number: number;
+  member_number: number;
 
   constructor(alphabet: string, teacher: Teacher) {
     this.alphabet = Array.from(alphabet);
     this.teacher = teacher;
+    this.query_number = 0;
+    this.member_number = 0;
     this.E = [""];
     this.S = [""];
     this.SA = Array.from(alphabet);
@@ -39,6 +40,7 @@ export class L_star {
   make_query(pref: string, suff: string) {
     var answer = this.teacher.query(pref + suff);
     this.update_observation_table(pref, answer)
+    this.query_number++;
   }
 
   /**
@@ -50,6 +52,7 @@ export class L_star {
    */
   make_member(a: Automaton) {
     let answer = this.teacher.member(a);
+    this.member_number++;
     return answer;
   }
 

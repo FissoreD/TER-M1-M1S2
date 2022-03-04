@@ -8,7 +8,7 @@
     "build": "npm run clean && npm run compile",
     "typecheck": "tsc --p .",
     "build-typecheck": "npm run typecheck && npm run build",
-    "start": "npm run compile && node ./dist/Main.js",
+    "lstar": "npm run build && node ./dist/test_nodejs/L_star_test.js",
     "clean": "rimraf dist",
     "compile": "cross-env-shell babel src -d dist --source-maps --extensions '.ts'"
   },

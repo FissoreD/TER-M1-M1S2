@@ -1,4 +1,3 @@
-import { automatonHTML } from "./Main";
 
 type AutomatonJson = { transitions: string[][], startNode: string, endNodes: string[], alphabet: string[] | string, states: string[] };
 export class Automaton {
@@ -38,7 +37,7 @@ export class Automaton {
   }
 
   initiate_graph() {
-
+    let automatonHTML = document.getElementById("automaton-mermaid") as HTMLDivElement;
     automatonHTML.removeAttribute('data-processed')
     automatonHTML.innerHTML = this.matrix_to_mermaid();
 

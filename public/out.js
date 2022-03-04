@@ -1,3 +1,90 @@
+define("Automaton", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Automaton = void 0;
+    class Automaton {
+        constructor(json) {
+            this.transitions = json.transitions;
+            this.startNode = json.startNode;
+            this.endNodes = json.endNodes;
+            this.currentNode = this.startNode;
+            this.alphabet = Array.from(json.alphabet);
+            this.nodes = json.states;
+        }
+        next_step(next_char) {
+            let x = this.nodes.indexOf(this.currentNode);
+            let y = this.alphabet.indexOf(next_char);
+            this.currentNode = this.transitions[x][y];
+        }
+        restart() {
+            this.currentNode = this.startNode;
+        }
+        draw_next_step(next_char) {
+            this.color_node(false);
+            this.next_step(next_char);
+            this.color_node(true);
+        }
+        initiate_graph() {
+            let automatonHTML = document.getElementById("automaton-mermaid");
+            automatonHTML.removeAttribute('data-processed');
+            automatonHTML.innerHTML = this.matrix_to_mermaid();
+            mermaid.init(document.querySelectorAll(".mermaid"));
+            this.endNodes.forEach(n => {
+                let circle = this.get_current_graph_node(n);
+                let smaller_circle = circle.cloneNode();
+                (smaller_circle).attributes['r'].value -= 3;
+                circle.parentNode.insertBefore(smaller_circle, circle.nextSibling);
+            });
+            this.color_node(true);
+        }
+        get_current_graph_node(node) {
+            let elts = document.querySelectorAll('.node').values();
+            let currentNode = elts.next();
+            while (elts) {
+                if (currentNode.value.getElementsByClassName('nodeLabel')[0].innerHTML == node)
+                    break;
+                currentNode = elts.next();
+            }
+            return currentNode.value.firstChild;
+        }
+        matrix_to_mermaid() {
+            let res = "flowchart LR";
+            res = res.concat("\n" + this.create_entering_arrow());
+            for (let i = 0; i < this.nodes.length; i++) {
+                for (let j = 0; j < this.alphabet.length; j++) {
+                    res = res.concat("\n");
+                    res = res.concat(this.create_triple(this.nodes[i], this.alphabet[j], this.transitions[i][j]));
+                }
+            }
+            res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;");
+            console.log(res);
+            return res;
+        }
+        color_node(toFill) {
+            let current_circle = this.get_current_graph_node(this.currentNode);
+            let next_circle = current_circle.nextSibling;
+            if (toFill) {
+                if (this.endNodes.includes(this.currentNode))
+                    next_circle.style.fill = '#009879';
+                else
+                    current_circle.style.fill = '#009879';
+            }
+            else {
+                if (this.endNodes.includes(this.currentNode))
+                    next_circle.removeAttribute('style');
+                else
+                    current_circle.removeAttribute('style');
+            }
+        }
+        create_triple(A, transition, B) {
+            return `${A}((${A})) -->| ${transition} | ${B}((${B}))`;
+        }
+        create_entering_arrow() {
+            return `START[ ]--> ${this.startNode}`;
+        }
+    }
+    exports.Automaton = Automaton;
+});
 define("Utilities", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -16,12 +103,13 @@ define("Utilities", ["require", "exports"], function (require, exports) {
 define("Teacher", ["require", "exports", "Utilities"], function (require, exports, Utilities_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.teacherA3fromLast = exports.teacherPairZeroAndOne = exports.Teacher = void 0;
+    exports.teacherEvenAandThreeB = exports.teacherA3fromLast = exports.teacherPairZeroAndOne = exports.Teacher = void 0;
     class Teacher {
-        constructor(f, counter_exemples) {
+        constructor(description, f, counter_exemples) {
             this.check_function = f;
             this.counter_exemples = counter_exemples;
             this.counter = 0;
+            this.description = description;
         }
         query(sentence) {
             return this.boolToString(this.check_function(sentence));
@@ -34,11 +122,15 @@ define("Teacher", ["require", "exports", "Utilities"], function (require, export
         }
     }
     exports.Teacher = Teacher;
-    exports.teacherPairZeroAndOne = new Teacher(sentence => {
+    exports.teacherPairZeroAndOne = new Teacher(`Automata accepting L = {w in (0, 1)* | #(w_0) % 2 = 0 and #(w_1) % 2 = 0} 
+    → w has even nb of "0" and even nb of "1"`, sentence => {
         let parity = (0, Utilities_js_1.count_str_occurrences)(sentence, "0");
         return parity % 2 == 0 && sentence.length % 2 == 0;
     }, ["11", "011"]);
-    exports.teacherA3fromLast = new Teacher(sentence => sentence.length >= 3 && sentence[sentence.length - 3] == 'a', ["aaa"]);
+    exports.teacherA3fromLast = new Teacher(`Automata accepting L = {w in (a, b)* | w[-3] = a} 
+    → w has an 'a' in the 3rd pos from end`, sentence => sentence.length >= 3 && sentence[sentence.length - 3] == 'a', ["aaa"]);
+    exports.teacherEvenAandThreeB = new Teacher(`Automata accepting L = {w in (a, b)* | #(w_b) > 2 and #(w_a) % 2 = 0}
+    → w has at least 3 'b' and an even nb of 'a'`, sentence => (0, Utilities_js_1.count_str_occurrences)(sentence, "b") >= 3 && (0, Utilities_js_1.count_str_occurrences)(sentence, "a") % 2 == 0, ["bbb", "ababb", "bbaab", "babba"]);
 });
 define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], function (require, exports, Automaton_js_1, Utilities_js_2) {
     "use strict";
@@ -48,6 +140,8 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
         constructor(alphabet, teacher) {
             this.alphabet = Array.from(alphabet);
             this.teacher = teacher;
+            this.query_number = 0;
+            this.member_number = 0;
             this.E = [""];
             this.S = [""];
             this.SA = Array.from(alphabet);
@@ -64,9 +158,11 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
         make_query(pref, suff) {
             var answer = this.teacher.query(pref + suff);
             this.update_observation_table(pref, answer);
+            this.query_number++;
         }
         make_member(a) {
             let answer = this.teacher.member(a);
+            this.member_number++;
             return answer;
         }
         add_elt_in_S(new_elt) {
@@ -171,16 +267,16 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
     }
     exports.L_star = L_star;
 });
-define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], function (require, exports, Main_1, L_star_1) {
+define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], function (require, exports, Main_js_1, L_star_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HTML_LStar = void 0;
-    class HTML_LStar extends L_star_1.L_star {
+    class HTML_LStar extends L_star_js_1.L_star {
         constructor(alphabet, teacher) {
             super(alphabet, teacher);
             this.finish = false;
-            this.table_header = Main_1.tableHTML.createTHead();
-            this.table_body = Main_1.tableHTML.createTBody();
+            this.table_header = Main_js_1.tableHTML.createTHead();
+            this.table_body = Main_js_1.tableHTML.createTBody();
             this.pile_actions = [() => this.draw_table()];
         }
         draw_table() {
@@ -199,17 +295,19 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
             }
         }
         add_row(parent, fst, head, row_elts, colspan = 1, rowspan = 1) {
-            let conver_to_epsilon = (e) => e == "" ? "&epsilon;" : e;
+            let convert_to_epsilon = (e) => e == "" ? "&epsilon;" : e;
             let create_cell_with_text = (row, txt) => {
                 var cell = row.insertCell();
-                cell.innerHTML = `${conver_to_epsilon(txt)}`;
+                cell.innerHTML = `${convert_to_epsilon(txt)}`;
             };
             var row = parent.insertRow();
             if (fst) {
-                var cell = row.insertCell();
+                row.style.borderTop = "2px solid #009879";
+                var cell = document.createElement('th');
                 cell.setAttribute("rowspan", rowspan + "");
                 cell.setAttribute("colspan", colspan + "");
-                cell.innerHTML = conver_to_epsilon(fst);
+                cell.innerHTML = convert_to_epsilon(fst);
+                row.appendChild(cell);
             }
             if (head != undefined)
                 create_cell_with_text(row, head);
@@ -220,28 +318,21 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
             this.table_body.innerHTML = "";
             this.table_header.innerHTML = "";
         }
-        clear_automaton() {
-            Main_1.automatonDiv.innerHTML = "";
-            Main_1.automatonHTML.innerHTML = "";
-        }
         graphic_next_step() {
             if (this.finish) {
-                if (Main_1.message.innerHTML != "")
-                    Main_1.message.innerHTML = "The Teacher has accepted the automaton";
-                return;
+                if (Main_js_1.message.innerHTML != "")
+                    Main_js_1.message.innerHTML = "The Teacher has accepted the automaton";
             }
-            if (this.pile_actions.length > 0) {
+            else if (this.pile_actions.length > 0) {
                 this.pile_actions.shift()();
-                return;
             }
-            console.log(1);
-            if (!this.close_action())
-                return;
-            console.log(2);
-            if (!this.consistence_action())
-                return;
-            console.log(3);
-            this.send_automaton_action();
+            else if (!this.close_action()) { }
+            else if (!this.consistence_action()) { }
+            else
+                this.send_automaton_action();
+            Main_js_1.message.innerHTML =
+                `Queries = ${this.query_number} - Membership = ${this.member_number} <br>
+      ${Main_js_1.message.innerHTML}`;
         }
         add_automaton_listener() {
             let input = document.createElement("input");
@@ -257,21 +348,19 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
                 this.automaton.draw_next_step(input.value[0]);
                 input.value = input.value.slice(1);
             });
-            Main_1.automatonDiv.appendChild(input);
-            Main_1.automatonDiv.appendChild(sendB);
-            Main_1.automatonDiv.appendChild(setB);
+            Main_js_1.automatonDiv.appendChild(input);
+            Main_js_1.automatonDiv.appendChild(sendB);
+            Main_js_1.automatonDiv.appendChild(setB);
         }
         close_action() {
             const close_rep = this.is_close();
             if (close_rep != undefined) {
-                Main_1.message.innerText =
-                    `
-        The table is not closed since
+                Main_js_1.message.innerText =
+                    `The table is not closed since
         row(${close_rep}) = ${this.observation_table[close_rep]} but there is no s in S such that row(s) = ${this.observation_table[close_rep]};
-        I'm going to move ${close_rep} from SA to S
-        `;
+        I'm going to move ${close_rep} from SA to S`;
                 this.pile_actions.push(() => {
-                    Main_1.message.innerText = "";
+                    Main_js_1.message.innerText = "";
                     this.add_elt_in_S(close_rep);
                     this.clear_table();
                     this.draw_table();
@@ -287,16 +376,14 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
                 let s1 = consistence_rep[0];
                 let s2 = consistence_rep[1];
                 let a = consistence_rep[2];
-                Main_1.message.innerText =
-                    `
-        The table is not consistent : 
+                Main_js_1.message.innerText =
+                    `The table is not consistent : 
         row(${s1 ? s1 : "ε"}) and row(${s2 ? s2 : "ε"}) have same value in S,
         but their value is not the same if we add ${a} 
         row(${s1 + a}) != row(${s2 + a})
-        I'm going to add the column ${new_col} since T(${s1 + new_col}) != T(${s2 + new_col})
-        `;
+        I'm going to add the column ${new_col} since T(${s1 + new_col}) != T(${s2 + new_col})`;
                 this.pile_actions.push(() => {
-                    Main_1.message.innerText = "";
+                    Main_js_1.message.innerText = "";
                     this.add_column(new_col);
                     this.clear_table();
                     this.draw_table();
@@ -306,26 +393,22 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
             return true;
         }
         send_automaton_action() {
-            Main_1.message.innerText =
-                `
-      The table is consistent and closed, I will send an automaton
-      `;
+            Main_js_1.message.innerText =
+                `The table is consistent and closed, I will send an automaton`;
             let automaton = this.make_automaton();
             this.automaton = automaton;
             this.pile_actions.push(() => {
-                Main_1.message.innerHTML = "";
+                Main_js_1.message.innerHTML = "";
                 automaton.initiate_graph();
                 this.add_automaton_listener();
                 let answer = this.make_member(automaton);
                 if (answer != undefined) {
-                    Main_1.message.innerText =
-                        `
-          The sent automaton is not valid, 
-          here is a counter-exemple ${answer}
-          `;
+                    Main_js_1.message.innerText =
+                        `The sent automaton is not valid, 
+          here is a counter-exemple ${answer}`;
                     this.pile_actions.push(() => {
-                        Main_1.message.innerHTML = "";
-                        this.clear_automaton();
+                        Main_js_1.message.innerHTML = "";
+                        (0, Main_js_1.clear_automaton_HTML)();
                         console.log("Adding", answer, "in S");
                         this.add_elt_in_S(answer);
                         this.clear_table();
@@ -339,103 +422,56 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
     }
     exports.HTML_LStar = HTML_LStar;
 });
-define("Main", ["require", "exports", "L_star/HTML_L_star", "Teacher"], function (require, exports, HTML_L_star_js_1, Teacher_js_1) {
+define("Main", ["require", "exports", "Teacher", "L_star/HTML_L_star"], function (require, exports, Teacher_js_1, HTML_L_star_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.A = exports.automatonDiv = exports.automatonHTML = exports.tableHTML = exports.message = void 0;
-    let button_next = document.getElementById("next_step");
-    button_next.addEventListener("click", () => exports.A.graphic_next_step());
-    exports.message = document.getElementById("message");
-    exports.tableHTML = document.getElementById("table");
-    exports.automatonHTML = document.getElementById("automaton-mermaid");
-    exports.automatonDiv = document.getElementById("input-automaton");
-    exports.A = new HTML_L_star_js_1.HTML_LStar("ab", Teacher_js_1.teacherA3fromLast);
-});
-define("Automaton", ["require", "exports", "Main"], function (require, exports, Main_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Automaton = void 0;
-    class Automaton {
-        constructor(json) {
-            this.transitions = json.transitions;
-            this.startNode = json.startNode;
-            this.endNodes = json.endNodes;
-            this.currentNode = this.startNode;
-            this.alphabet = Array.from(json.alphabet);
-            this.nodes = json.states;
-        }
-        next_step(next_char) {
-            let x = this.nodes.indexOf(this.currentNode);
-            let y = this.alphabet.indexOf(next_char);
-            this.currentNode = this.transitions[x][y];
-        }
-        restart() {
-            this.currentNode = this.startNode;
-        }
-        draw_next_step(next_char) {
-            this.color_node(false);
-            this.next_step(next_char);
-            this.color_node(true);
-        }
-        initiate_graph() {
-            Main_2.automatonHTML.removeAttribute('data-processed');
-            Main_2.automatonHTML.innerHTML = this.matrix_to_mermaid();
-            mermaid.init(document.querySelectorAll(".mermaid"));
-            this.endNodes.forEach(n => {
-                let circle = this.get_current_graph_node(n);
-                let smaller_circle = circle.cloneNode();
-                (smaller_circle).attributes['r'].value -= 3;
-                circle.parentNode.insertBefore(smaller_circle, circle.nextSibling);
+    exports.clear_automaton_HTML = exports.initiate_global_vars = exports.automatonHTML = exports.tableHTML = exports.message = exports.current_automaton = exports.automatonDiv = void 0;
+    function initiate_global_vars() {
+        exports.automatonHTML = document.getElementById("automaton-mermaid");
+        exports.automatonDiv = document.getElementById("input-automaton");
+        let button_next = document.getElementById("next_step");
+        exports.message = document.getElementById("message");
+        exports.tableHTML = document.getElementById("table");
+        let teacher_switch_HTML = document.getElementById("teacher_switch");
+        let teacher_description_HTML = document.getElementById("teacher_description");
+        let automata = [
+            new HTML_L_star_js_1.HTML_LStar("01", Teacher_js_1.teacherPairZeroAndOne),
+            new HTML_L_star_js_1.HTML_LStar("ab", Teacher_js_1.teacherA3fromLast),
+            new HTML_L_star_js_1.HTML_LStar("ab", Teacher_js_1.teacherEvenAandThreeB)
+        ];
+        automata.forEach((a, pos) => {
+            let radio = document.createElement("input");
+            let label = document.createElement("label");
+            let span = document.createElement("span");
+            radio.type = 'radio';
+            radio.name = 'teacher_switcher';
+            span.innerHTML = pos + "";
+            radio.addEventListener("click", () => {
+                exports.current_automaton = a;
+                teacher_description_HTML.innerHTML = a.teacher.description;
             });
-            this.color_node(true);
-        }
-        get_current_graph_node(node) {
-            let elts = document.querySelectorAll('.node').values();
-            let currentNode = elts.next();
-            while (elts) {
-                if (currentNode.value.getElementsByClassName('nodeLabel')[0].innerHTML == node)
-                    break;
-                currentNode = elts.next();
+            label.appendChild(radio);
+            label.append(span);
+            teacher_switch_HTML.appendChild(label);
+            if (pos == 0) {
+                radio.click();
             }
-            return currentNode.value.firstChild;
-        }
-        matrix_to_mermaid() {
-            let res = "flowchart LR";
-            res = res.concat("\n" + this.create_entering_arrow());
-            for (let i = 0; i < this.nodes.length; i++) {
-                for (let j = 0; j < this.alphabet.length; j++) {
-                    res = res.concat("\n");
-                    res = res.concat(this.create_triple(this.nodes[i], this.alphabet[j], this.transitions[i][j]));
-                }
-            }
-            res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;");
-            console.log(res);
-            return res;
-        }
-        color_node(toFill) {
-            let current_circle = this.get_current_graph_node(this.currentNode);
-            let next_circle = current_circle.nextSibling;
-            if (toFill) {
-                if (this.endNodes.includes(this.currentNode))
-                    next_circle.style.fill = '#009879';
-                else
-                    current_circle.style.fill = '#009879';
-            }
-            else {
-                if (this.endNodes.includes(this.currentNode))
-                    next_circle.removeAttribute('style');
-                else
-                    current_circle.removeAttribute('style');
-            }
-        }
-        create_triple(A, transition, B) {
-            return `${A}((${A})) -->| ${transition} | ${B}((${B}))`;
-        }
-        create_entering_arrow() {
-            return `START[ ]--> ${this.startNode}`;
-        }
+        });
+        button_next.addEventListener("click", () => exports.current_automaton.graphic_next_step());
     }
-    exports.Automaton = Automaton;
+    exports.initiate_global_vars = initiate_global_vars;
+    function clear_automaton_HTML() {
+        exports.automatonDiv.innerHTML = "";
+        exports.automatonHTML.innerHTML = "";
+    }
+    exports.clear_automaton_HTML = clear_automaton_HTML;
+    try {
+        process == undefined;
+        console.log("HERE");
+    }
+    catch (e) {
+        initiate_global_vars();
+    }
 });
 define("MyString", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -516,11 +552,11 @@ define("html_interactions/listeners", ["require", "exports"], function (require,
     }
     exports.set_text = set_text;
 });
-define("test/L_star_test", ["require", "exports", "html_interactions/listeners", "L_star/L_star", "Teacher"], function (require, exports, listeners_js_1, L_star_js_1, Teacher_js_2) {
+define("test_nodejs/L_star_test", ["require", "exports", "html_interactions/listeners", "L_star/L_star", "Teacher"], function (require, exports, listeners_js_1, L_star_js_2, Teacher_js_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let graphic = true;
-    let lerner = new L_star_js_1.L_star("01", Teacher_js_2.teacherPairZeroAndOne);
+    let graphic = false;
+    let lerner = new L_star_js_2.L_star("01", Teacher_js_2.teacherPairZeroAndOne);
     console.log(lerner);
     for (let i = 0; i < 6; i++) {
         console.log(`/ ************* STEP ${i + 1} ************* /`);

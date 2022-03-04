@@ -13,6 +13,11 @@
     text-align: left;
 }
 
+.styled-table tbody th {
+    background-color: #00cea5;
+    color: #ffffff;
+}
+
 .styled-table th,
 .styled-table td {
   text-align: center;
@@ -38,7 +43,7 @@
 
 .styled-div{
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     /* justify-content: center; */
     align-content: center;
 }
@@ -55,6 +60,7 @@ button{
 }
 
 .automaton-div{
+  min-width: 320pt;
   padding: 10pt;
   color: #009879;
   text-align: center;

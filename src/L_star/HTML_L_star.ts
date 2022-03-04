@@ -1,8 +1,8 @@
-import { Automaton } from "../Automaton";
-import { automatonDiv, automatonHTML, message, tableHTML } from "../Main";
-import { Teacher } from "../Teacher";
-import { myFunction } from "../Utilities";
-import { L_star } from "./L_star";
+import { Automaton } from "../Automaton.js";
+import { automatonDiv, automatonHTML, clear_automaton_HTML, message, tableHTML } from "../Main.js";
+import { Teacher } from "../Teacher.js";
+import { myFunction } from "../Utilities.js";
+import { L_star } from "./L_star.js";
 
 export class HTML_LStar extends L_star {
   table_header: HTMLTableSectionElement;
@@ -45,19 +45,20 @@ export class HTML_LStar extends L_star {
     parent: HTMLTableSectionElement, fst: string | undefined, head: string | undefined,
     row_elts: string[], colspan: number = 1, rowspan: number = 1
   ) {
-
-    let conver_to_epsilon = (e: string) => e == "" ? "&epsilon;" : e;
+    let convert_to_epsilon = (e: string) => e == "" ? "&epsilon;" : e;
     let create_cell_with_text = (row: HTMLTableRowElement, txt: string) => {
       var cell = row.insertCell();
-      cell.innerHTML = `${conver_to_epsilon(txt)}`
+      cell.innerHTML = `${convert_to_epsilon(txt)}`
     };
     // console.log(head ? conver_to_epsilon(head) : "Not head", row_elts);
     var row = parent.insertRow();
     if (fst) {
-      var cell = row.insertCell();
+      row.style.borderTop = "2px solid #009879";
+      var cell = document.createElement('th');
       cell.setAttribute("rowspan", rowspan + "");
       cell.setAttribute("colspan", colspan + "");
-      cell.innerHTML = conver_to_epsilon(fst);
+      cell.innerHTML = convert_to_epsilon(fst);
+      row.appendChild(cell);
     }
     if (head != undefined) create_cell_with_text(row, head);
     for (var letter of row_elts)
@@ -69,31 +70,20 @@ export class HTML_LStar extends L_star {
     this.table_header.innerHTML = "";
   }
 
-  clear_automaton() {
-    automatonDiv.innerHTML = "";
-    automatonHTML.innerHTML = "";
-  }
-
   graphic_next_step() {
     if (this.finish) {
       if (message.innerHTML != "")
         message.innerHTML = "The Teacher has accepted the automaton";
-      return;
     }
-    if (this.pile_actions.length > 0) {
+    else if (this.pile_actions.length > 0) {
       this.pile_actions.shift()!()
-      return;
     }
-    console.log(1);
-    if (!this.close_action()) return;
-    console.log(2);
-
-    if (!this.consistence_action()) return;
-    console.log(3);
-
-    // if (message.innerHTML != "") return;
-    // console.log(4);
-    this.send_automaton_action()
+    else if (!this.close_action()) { }
+    else if (!this.consistence_action()) { }
+    else this.send_automaton_action()
+    message.innerHTML =
+      `Queries = ${this.query_number} - Membership = ${this.member_number} <br>
+      ${message.innerHTML}`
   }
 
   private add_automaton_listener() {
@@ -119,11 +109,9 @@ export class HTML_LStar extends L_star {
     const close_rep = this.is_close();
     if (close_rep != undefined) {
       message.innerText =
-        `
-        The table is not closed since
+        `The table is not closed since
         row(${close_rep}) = ${this.observation_table[close_rep]} but there is no s in S such that row(s) = ${this.observation_table[close_rep]};
-        I'm going to move ${close_rep} from SA to S
-        `
+        I'm going to move ${close_rep} from SA to S`
       this.pile_actions.push(() => {
         message.innerText = "";
         this.add_elt_in_S(close_rep);
@@ -143,13 +131,11 @@ export class HTML_LStar extends L_star {
       let s2 = consistence_rep[1];
       let a = consistence_rep[2];
       message.innerText =
-        `
-        The table is not consistent : 
+        `The table is not consistent : 
         row(${s1 ? s1 : "ε"}) and row(${s2 ? s2 : "ε"}) have same value in S,
         but their value is not the same if we add ${a} 
         row(${s1 + a}) != row(${s2 + a})
-        I'm going to add the column ${new_col} since T(${s1 + new_col}) != T(${s2 + new_col})
-        `;
+        I'm going to add the column ${new_col} since T(${s1 + new_col}) != T(${s2 + new_col})`;
       this.pile_actions.push(() => {
         message.innerText = "";
         this.add_column(new_col);
@@ -163,9 +149,7 @@ export class HTML_LStar extends L_star {
 
   send_automaton_action() {
     message.innerText =
-      `
-      The table is consistent and closed, I will send an automaton
-      `;
+      `The table is consistent and closed, I will send an automaton`;
     let automaton = this.make_automaton();
 
     this.automaton = automaton;
@@ -176,13 +160,11 @@ export class HTML_LStar extends L_star {
       let answer = this.make_member(automaton);
       if (answer != undefined) {
         message.innerText =
-          `
-          The sent automaton is not valid, 
-          here is a counter-exemple ${answer}
-          `;
+          `The sent automaton is not valid, 
+          here is a counter-exemple ${answer}`;
         this.pile_actions.push(() => {
           message.innerHTML = "";
-          this.clear_automaton()
+          clear_automaton_HTML();
           console.log("Adding", answer, "in S");
 
           this.add_elt_in_S(answer!);
