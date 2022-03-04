@@ -18,11 +18,8 @@ This project has been realized in Spring 2022 with reference to the course "Trav
 
 ### In the console
 The first time you want launch the project with node.js, 
-run the following commands
-
-1. `npm install cross-env @babel/cli @babel/core @babel/preset-env @babel/preset-typescript rimraf typescript --save`
-2. `npm install @types/node --save-dev`
-3. `npm i`
+run the following commands `npm install` to download
+all needed dependencies
 
 Then you can run :
 - `npm run clean` to remove the dist folder (dist folder is the folder where ts files are compiled in js)

@@ -56,6 +56,7 @@ export function clear_automaton_HTML() {
 
 // console.log(process.argv);
 try {
+  // @ts-ignore
   process == undefined;
   console.log("HERE");
 } catch (e) {
