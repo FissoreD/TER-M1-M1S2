@@ -422,6 +422,59 @@ define("L_star/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], fu
     }
     exports.HTML_LStar = HTML_LStar;
 });
+define("models/teacher_models", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.even_zero_one = void 0;
+    exports.even_zero_one = {
+        "transitions": [
+            ["q1", "q0"],
+            ["q1", "q0"],
+            ["q0", "q0"]
+        ],
+        "startNode": "q0",
+        "endNodes": ["q1"],
+        "alphabet": "10",
+        "states": ["q0", "q1", "q3"]
+    };
+});
+define("monoid/Monoid", ["require", "exports", "Automaton", "models/teacher_models"], function (require, exports, Automaton_js_2, teacher_models_js_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.mainMonoid = exports.Monoid = void 0;
+    class Monoid {
+        constructor(automaton) {
+            this.automaton = automaton;
+            this.state_passage = [];
+            this.letter_passage = [];
+            this.matrix_passage = [];
+            this.automaton.alphabet.forEach(l => {
+                this.letter_passage.push(l);
+                this.state_passage.push(automaton.startNode);
+            });
+        }
+        calculate_monoids() {
+            let l = this.automaton.alphabet;
+            console.log("here");
+            while (l.length > 0) {
+                let current_word = l.pop();
+                console.log(current_word);
+                this.letter_passage.push(current_word);
+                this.state_passage.push(this.automaton.currentNode);
+            }
+            console.log(this.letter_passage);
+            console.log(this.state_passage);
+        }
+    }
+    exports.Monoid = Monoid;
+    function mainMonoid() {
+        let aut = new Automaton_js_2.Automaton(teacher_models_js_1.even_zero_one);
+        let mon = new Monoid(aut);
+        mon.calculate_monoids();
+    }
+    exports.mainMonoid = mainMonoid;
+    mainMonoid();
+});
 define("Main", ["require", "exports", "Teacher", "L_star/HTML_L_star"], function (require, exports, Teacher_js_1, HTML_L_star_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -435,9 +488,9 @@ define("Main", ["require", "exports", "Teacher", "L_star/HTML_L_star"], function
         let teacher_switch_HTML = document.getElementById("teacher_switch");
         let teacher_description_HTML = document.getElementById("teacher_description");
         let automata = [
-            new HTML_L_star_js_1.HTML_LStar("01", Teacher_js_1.teacherPairZeroAndOne),
-            new HTML_L_star_js_1.HTML_LStar("ab", Teacher_js_1.teacherA3fromLast),
-            new HTML_L_star_js_1.HTML_LStar("ab", Teacher_js_1.teacherEvenAandThreeB)
+            () => new HTML_L_star_js_1.HTML_LStar("01", Teacher_js_1.teacherPairZeroAndOne),
+            () => new HTML_L_star_js_1.HTML_LStar("ab", Teacher_js_1.teacherA3fromLast),
+            () => new HTML_L_star_js_1.HTML_LStar("ab", Teacher_js_1.teacherEvenAandThreeB)
         ];
         automata.forEach((a, pos) => {
             let radio = document.createElement("input");
@@ -447,8 +500,11 @@ define("Main", ["require", "exports", "Teacher", "L_star/HTML_L_star"], function
             radio.name = 'teacher_switcher';
             span.innerHTML = pos + "";
             radio.addEventListener("click", () => {
-                exports.current_automaton = a;
-                teacher_description_HTML.innerHTML = a.teacher.description;
+                exports.tableHTML.innerHTML = "";
+                exports.message.innerHTML = "";
+                clear_automaton_HTML();
+                exports.current_automaton = a();
+                teacher_description_HTML.innerHTML = exports.current_automaton.teacher.description;
             });
             label.appendChild(radio);
             label.append(span);
@@ -470,7 +526,7 @@ define("Main", ["require", "exports", "Teacher", "L_star/HTML_L_star"], function
         console.log("HERE");
     }
     catch (e) {
-        initiate_global_vars();
+        window.onload = initiate_global_vars();
     }
 });
 define("MyString", ["require", "exports"], function (require, exports) {

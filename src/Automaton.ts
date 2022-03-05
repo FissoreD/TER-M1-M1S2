@@ -1,5 +1,12 @@
 
-type AutomatonJson = { transitions: string[][], startNode: string, endNodes: string[], alphabet: string[] | string, states: string[] };
+export type AutomatonJson =
+  {
+    transitions: string[][],
+    startNode: string,
+    endNodes: string[],
+    alphabet: string[] | string,
+    states: string[]
+  };
 export class Automaton {
   transitions: string[][];
   startNode: string;

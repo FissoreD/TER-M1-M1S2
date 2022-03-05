@@ -1,6 +1,7 @@
 import { teacherA3fromLast, teacherEvenAandThreeB, teacherPairZeroAndOne } from "./Teacher.js";
 import { L_star } from "./L_star/L_star.js";
 import { HTML_LStar } from "./L_star/HTML_L_star.js";
+import { mainMonoid, Monoid } from "./monoid/Monoid.js";
 
 export let
   automatonDiv: HTMLDivElement,
@@ -21,9 +22,9 @@ export function initiate_global_vars() {
   let teacher_description_HTML = document.getElementById("teacher_description") as HTMLParagraphElement;
 
   let automata = [
-    new HTML_LStar("01", teacherPairZeroAndOne),
-    new HTML_LStar("ab", teacherA3fromLast),
-    new HTML_LStar("ab", teacherEvenAandThreeB)];
+    () => new HTML_LStar("01", teacherPairZeroAndOne),
+    () => new HTML_LStar("ab", teacherA3fromLast),
+    () => new HTML_LStar("ab", teacherEvenAandThreeB)];
 
   automata.forEach((a, pos) => {
     let radio = document.createElement("input");
@@ -35,8 +36,12 @@ export function initiate_global_vars() {
     span.innerHTML = pos + "";
 
     radio.addEventListener("click", () => {
-      current_automaton = a;
-      teacher_description_HTML.innerHTML = a.teacher.description;
+      tableHTML.innerHTML = "";
+      message.innerHTML = "";
+      clear_automaton_HTML()
+
+      current_automaton = a();
+      teacher_description_HTML.innerHTML = current_automaton.teacher.description;
     });
 
     label.appendChild(radio);
@@ -60,5 +65,8 @@ try {
   process == undefined;
   console.log("HERE");
 } catch (e) {
-  initiate_global_vars();
+  // @ts-ignore
+  window.onload = initiate_global_vars();
 }
+
+// mainMonoid()
