@@ -26,6 +26,7 @@
 \RequirePackage{graphicx}
 \RequirePackage{enumitem}
 \RequirePackage{amsthm}
+\RequirePackage{amssymb}
 \RequirePackage{xspace}
 
 \usepackage[utf8]{inputenc}
@@ -44,6 +45,10 @@
 \usepackage{algo}
 \usepackage{colorationSyntaxique}
 \usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usepackage[capitalise,noabbrev,nameinlink]{cleveref}
+\usetikzlibrary{automata, positioning, arrows}
 
 % Bibliography
 \usepackage[
@@ -61,6 +66,11 @@ sorting=ynt
 \fancyhead[RO]{\textsl{\rightmark}}
 
 \def\etc{\textit{etc.}}
+
+
+\theoremstyle{definition}
+\newtheorem{exmp}{Example}
+\newtheorem{theorem}{Theorem}
 
 
 
@@ -138,7 +148,7 @@ sorting=ynt
 %	DATE SECTION
 %--------------------
 
-{\large Second semestre de l'année 2021-2022}\\[2cm]
+{\large Spring 2021-2022}\\[2cm]
 
 %--------------------
 

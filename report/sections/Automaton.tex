@@ -1,0 +1,123 @@
+\section{Finate State Automaton}
+
+\subsection{Description}
+An automaton \automaton{} is a computing device used in abstract computer science to understand a regular language \lang{} which can be seen as a set (potentially not finite) of words \word{} formed from the concatenation of zero or more letters \letter{} belonging to an alphabet, a finite set of symbols, noted \alphabet{}.
+
+\begin{theorem}[Kleene's theorem]
+  A language is called regular if it can be represented by a regular expression, a finite state automaton or a context free grammar.
+\end{theorem}
+
+Here are some examples of regular langauges and their corresponting automata are shown in .
+\begin{exmp}{Epsilon language}
+  \label{exmp:lang_eps}
+  $L = \{\varepsilon\}$ is the empty language.
+\end{exmp}
+
+\begin{exmp}
+  \label{exmp:lang_ab_len2}
+  $L = \{aa, ab, ba, bb\}$ is the language formed by all strings with all combinations of two characters on the alphabet $\Sigma = \{a, b\}$
+\end{exmp}
+
+\begin{exmp}
+  \label{exmp:a_plus}
+  $L = \{a, aa, ...\}$ is the language of words represented by the regular expression $a^+$.
+\end{exmp}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+      \node[state,initial, accepting, initial text=] (q_0) {$q_0$};
+    \end{tikzpicture}
+    \caption{Automaton of \cref{exmp:lang_eps}}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+      \node[state,initial text=, initial] (q_0) {$q_0$};
+      \node[state] (q_1) [right=of q_0] {$q_1$};
+      \node[state, accepting] (q_2) [right=of q_1] {$q_2$};
+      \path[->]
+      (q_0) edge  node {a,b} (q_1)
+      (q_1) edge  node {a,b} (q_2);
+    \end{tikzpicture}
+    \caption{Automaton of \cref{exmp:lang_ab_len2}}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+      \node[state,initial text=, initial] (q_0) {$q_0$};
+      \node[state, accepting] (q_1) [right=of q_0] {$q_1$};
+      \path[->]
+      (q_0) edge  node {a} (q_1)
+      (q_1) edge [loop above] node {a} ();
+    \end{tikzpicture}
+    \caption{Automaton of \cref{exmp:a_plus}}
+  \end{subfigure}
+  \caption{First automata}
+\end{figure}
+
+To test if a word \word{} belongs to a language, we place our cursor on the initial state, usually noted \qzero{}, which is the one with the entering arrow. Then we read the first letter \letter{} of \word{}, look for the transition \transitioni{} labelled with \letter{} exiting from the current state and finally move the cursor to the state \qi{} pointed by \transitioni{}. We read the second letter of \word{} and from the current state, we update the pointer relating to the corresponding transition. We do this operation recursively since we have finished the word. If the cursor is a final state (a state marked with a double circle) then the word is in \lang{}.
+
+\subsection{Technical definition}
+An automaton \automaton{} is usually represented by a 5-tuple $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ where \alphabet{} is the alphabet, \states{} is the set of states composing the automaton, \transition{} is a mapping \transition{} $\coloneqq \{q_i \times \letterN{} \rightarrow q_j | (q_i, q_j) \in \statesN{} \wedge \letterN{} \in \Sigma \} $ we move from $ q_i $ to $q_j$ by \letter{}, \qzero{} $\in \statesN{}$ is the starting state and \qend{} is the set of accepting states in \states{}
+
+If $\forall (q_i, \alpha, q_j) \in \transitionN{}, \nexists (q_i, \alpha, q_j') \in \transitionN{} \mid q_j \neq q_j'$ that is, if for all state $q_i \in \statesN{}$, there does not exist two different transition with the same label, then the automaton is said to be \textit{deterministic} and noted \textit{DFA}, on the other case the automaton is called \textit{non deterministic} and noted \textit{NFA}.
+
+DFA has important properties since at every moment we can determine the next unique state, and testing the membership of a word is in general computationally fast, on the other hand a NFA can be exponentially more succint in term of number of states than a DFA, but checking the membership of a word is in general a difficult task for an algorithm.
+
+\begin{exmp}[A DFA and an NFA for the same langauge]
+  Here an exemple of two minimum automata defining the language over the alphabet $\alphabetN{} = \{a, b\}$ for strings with an $a$ in the second letter from last.
+  \begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+      \centering
+      \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+        \node[state,initial, initial text=] (q_0) {$q_0$};
+        \node[state] (q_1) [right=of q_0] {$q_1$};
+        \node[state, accepting] (q_2) [right=of q_1] {$q_2$};
+        \path[->]
+        (q_0) edge [loop above] node {a,b} ()
+        (q_0) edge  node {a} (q_1)
+        (q_1) edge  node {a,b} (q_2);
+      \end{tikzpicture}
+      \caption{NFA}
+      \label{subfig:nfa_x_star_ax}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+      \centering
+      \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+        \node[state,initial, initial text=] (q_0) {$q_0$};
+        \node[state] (q_1) [right=of q_0] {$q_1$};
+        \node[state, accepting] (q_2) [above right=of q_1] {$q_2$};
+        \node[state, accepting] (q_3) [below right=of q_1] {$q_3$};
+        \path[->]
+        (q_0) edge [loop above] node {b} ()
+        (q_2) edge [loop above] node {a} ()
+        (q_0) edge  node {a} (q_1)
+        (q_1) edge  node {a} (q_2)
+        (q_1) edge  node {a} (q_2)
+        (q_2) edge  node {b} (q_3)
+        (q_3) edge[bend left, below]  node {b} (q_0)
+        (q_3) edge[bend left, below]  node {a} (q_1)
+        (q_1) edge[bend left, above]  node {b} (q_3);
+      \end{tikzpicture}
+      \caption{DFA}
+      \label{subfig:dfa_x_star_ax}
+    \end{subfigure}
+    \caption{NFA vs DFA}
+    \label{fig:nfa_vs_dfa}
+  \end{figure}
+  In \cref{fig:nfa_vs_dfa} you see that the NFA needs less states then the corresponding mimimum DFA, but if we are in state $q_0$ and we have to analyse an $a$ we can go either in state $q_0$ or in state $q_1$. It's this ambiguity that makes the NFA difficult to treat.
+\end{exmp}
+
+\begin{theorem}
+  Every DFA has an unique minimum DFA representing the same langauge with the minimum number of state and to know if two DFAs are equivalent, we can minimize and compare them.
+\end{theorem}
+
+\begin{theorem}
+  An NFA has not a unique minimum representation and to compare two NFAs, in general, we must transform them in DFA and then test the equality.
+\end{theorem}
+
+Since the goal of this paper is not to minimize automata, we are going to consider DFA and NFA as if they are always in the minimized form.
