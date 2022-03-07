@@ -1,25 +1,26 @@
 import { Automaton } from "../Automaton.js";
-import { automatonDiv, automatonHTML, clear_automaton_HTML, message, tableHTML } from "../Main.js";
+import { automatonDiv, clear_automaton_HTML, message, tableHTML } from "../Main.js";
 import { Teacher } from "../Teacher.js";
 import { myFunction } from "../Utilities.js";
-import { L_star } from "./L_star.js";
+import { NL_star } from "../NL_star/NL_star.js";
 
-export class HTML_LStar extends L_star {
+export class HTML_NL_star extends NL_star {
   table_header: HTMLTableSectionElement;
   table_body: HTMLTableSectionElement;
   pile_actions: myFunction<void, void>[];
   automaton: Automaton | undefined;
-  finish = false;
 
-  constructor(alphabet: string, teacher: Teacher) {
-    super(alphabet, teacher);
+  constructor(teacher: Teacher) {
+    super(teacher);
+    console.log("Creating NL* algo");
+
     this.table_header = tableHTML.createTHead();
     this.table_body = tableHTML.createTBody();
     this.pile_actions = [() => this.draw_table()];
   }
 
   draw_table() {
-    this.add_row(this.table_header, "Table", undefined, this.E, 2);
+    this.add_row_html(this.table_header, "Table", undefined, this.E, 2);
 
     /**
      The first {@link S}.length rows of the table start with the S symbol
@@ -27,7 +28,7 @@ export class HTML_LStar extends L_star {
     var fst: string | undefined = "S";
     for (var s of this.S) {
       const row = Array.from(this.observation_table[s]);
-      this.add_row(this.table_body, fst, s, row, 1, fst ? this.S.length : 1);
+      this.add_row_html(this.table_body, fst, s, row, 1, fst ? this.S.length : 1);
       fst = undefined;
     }
     /**
@@ -36,12 +37,12 @@ export class HTML_LStar extends L_star {
     var fst: string | undefined = "SA";
     for (var s of this.SA) {
       const row = Array.from(this.observation_table[s]);
-      this.add_row(this.table_body, fst, s, row, 1, fst ? this.SA.length : 1);
+      this.add_row_html(this.table_body, fst, s, row, 1, fst ? this.SA.length : 1);
       fst = undefined;
     }
   }
 
-  add_row(
+  add_row_html(
     parent: HTMLTableSectionElement, fst: string | undefined, head: string | undefined,
     row_elts: string[], colspan: number = 1, rowspan: number = 1
   ) {
@@ -165,9 +166,7 @@ export class HTML_LStar extends L_star {
         this.pile_actions.push(() => {
           message.innerHTML = "";
           clear_automaton_HTML();
-          console.log("Adding", answer, "in S");
-
-          this.add_elt_in_S(answer!);
+          this.add_elt_in_E(answer!);
           this.clear_table();
           this.draw_table();
         })

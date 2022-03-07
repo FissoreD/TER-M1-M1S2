@@ -12,24 +12,25 @@ export class L_star {
   teacher: Teacher;
   query_number: number;
   member_number: number;
+  finish = false;
 
-  constructor(alphabet: string, teacher: Teacher) {
-    this.alphabet = Array.from(alphabet);
+  constructor(teacher: Teacher) {
+    this.alphabet = Array.from(teacher.alphabet);
     this.teacher = teacher;
     this.query_number = 0;
     this.member_number = 0;
     this.E = [""];
     this.S = [""];
-    this.SA = Array.from(alphabet);
+    this.SA = Array.from(this.alphabet);
     this.observation_table = {};
-    this.make_query("", "");
-    this.SA.forEach(elt => this.make_query(elt, ""));
+    this.add_row("")
+    this.SA.forEach(elt => this.add_row(elt));
   }
 
-  update_observation_table(new_str: string, value: string) {
-    let old_value = this.observation_table[new_str];
+  update_observation_table(key: string, value: string) {
+    let old_value = this.observation_table[key];
     if (old_value != undefined) value = old_value + value
-    this.observation_table[new_str] = value;
+    this.observation_table[key] = value;
   }
 
   /**
@@ -38,7 +39,24 @@ export class L_star {
    * 3. Updates {@link observation_table} wrt the answer
    */
   make_query(pref: string, suff: string) {
-    var answer = this.teacher.query(pref + suff);
+    let word = pref + suff;
+    let answer: string;
+    // If we know already the answer, we do not query the teacher
+    for (let i = 0; i < word.length + 1; i++) {
+      let pref1 = word.substring(0, i);
+      let suff1 = word.substring(i);
+      if (this.E.includes(suff1)) {
+        if ((this.S.includes(pref1) || this.SA.includes(pref1)) && this.observation_table[pref1]) {
+          console.log(pref1, suff1);
+          answer = this.observation_table[pref1].charAt(this.E.indexOf(suff1));
+          this.update_observation_table(pref, answer)
+          return;
+        }
+      }
+    }
+    answer = this.teacher.query(word);
+    console.log("pref", pref, "suff", suff);
+
     this.update_observation_table(pref, answer)
     this.query_number++;
   }
@@ -60,34 +78,44 @@ export class L_star {
    * For all prefix p of {@link new_elt} if p is not in {@link S} :
    * remove p from {@link SA} and add it to {@link S}
    * @param new_elt the {@link new_elt} to add in {@link S}
+   * @returns the list of added elt in SA or S
    */
-  add_elt_in_S(new_elt: string) {
+  add_elt_in_S(new_elt: string): string[] {
+    let added_list: string[] = [];
     let prefix_list = generate_prefix_list(new_elt);
     console.log(new_elt, "is going to be added in S, it has", prefix_list);
 
     for (const prefix of prefix_list) {
-      if (this.S.includes(prefix)) return;
+      if (this.S.includes(prefix)) return added_list;
       if (this.SA.includes(prefix)) {
         this.move_from_SA_to_S(prefix);
         this.alphabet.forEach(a => {
           const new_word = prefix + a;
           if (!this.SA.includes(new_word) && !this.S.includes(new_word)) {
-            this.E.forEach(e => this.make_query(new_word, e));
+            this.add_row(new_word);
             this.SA.push(new_word);
+            added_list.push(new_word);
           }
         })
       } else {
-        this.E.forEach(e => this.make_query(prefix, e));
-        this.S.push(prefix)
+        this.S.push(prefix);
+        this.add_row(prefix);
+        added_list.push(prefix);
         this.alphabet.forEach(a => {
           let new_word = prefix + a;
           if (!this.SA.includes(new_word) && !this.S.includes(new_word)) {
             this.SA.push(prefix + a);
-            this.E.forEach(e => this.make_query(prefix + a, e));
+            this.add_row(prefix + a)
+            added_list.push(prefix + a)
           }
         });
       }
     }
+    return added_list;
+  }
+
+  add_row(row_name: string) {
+    this.E.forEach(e => this.make_query(row_name, e));
   }
 
   move_from_SA_to_S(elt: string) {
@@ -132,29 +160,31 @@ export class L_star {
     let first_state = this.observation_table[""];
     let keys = Object.keys(states);
     let end_states: string[] = keys.filter(k => k[0] == '1');
-    let ar = keys.map(
+    let transitions = keys.map(
       (k) => this.alphabet.map(a => {
-        return this.observation_table[states[k] + a]
+        return [this.observation_table[states[k] + a]]
       }));
     return new Automaton({
       "alphabet": this.alphabet,
-      "endNodes": end_states,
-      "startNode": first_state,
+      "endState": end_states,
+      "startState": first_state,
       "states": keys,
-      "transitions": ar
+      "transitions": transitions
     })
   }
 
 
   /**
-   * @returns the first t in SA st it dows not exist s in S st row(s) == row (s.a)
+   * @returns the first t in SA st it does not exist s in S st row(s) == row (s.a)
    */
   is_close(): string | undefined {
     return this.SA.find(t => !this.S.some(s => this.same_row(s, t)));
   }
 
   /**
-   * @returns if the {@link observation_table} is consistent
+   * @returns a list of 3 elements, 
+   * the first two are s1, s2 in {@link S} st row(s1) == row(s2)
+   * and there is an "a" in alphabet st row(s1 + a) != row(s2 + a)
    */
   is_consistent(): string[] | undefined {
     for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {

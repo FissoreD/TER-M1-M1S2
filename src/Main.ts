@@ -1,16 +1,25 @@
-import { teacherA3fromLast, teacherEvenAandThreeB, teacherPairZeroAndOne } from "./Teacher.js";
+import { Teacher, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teachers } from "./Teacher.js";
 import { L_star } from "./L_star/L_star.js";
-import { HTML_LStar } from "./L_star/HTML_L_star.js";
-import { mainMonoid, Monoid } from "./monoid/Monoid.js";
+import { HTML_L_star } from "./html_interactions/HTML_L_star.js";
+import { HTML_NL_star } from "./html_interactions/HTML_NL_star.js";
 
 export let
   automatonDiv: HTMLDivElement,
-  current_automaton: L_star | HTML_LStar,
   message: HTMLParagraphElement,
   tableHTML: HTMLTableElement,
   automatonHTML: HTMLDivElement;
 
 export function initiate_global_vars() {
+  let listener = (teacher: Teacher) => {
+    tableHTML.innerHTML = "";
+    message.innerHTML = "";
+    clear_automaton_HTML()
+
+    current_automaton = radioAlgo[0].checked ?
+      new HTML_L_star(teacher) :
+      new HTML_NL_star(teacher);
+    teacher_description_HTML.innerHTML = current_automaton.teacher.description;
+  }
 
   automatonHTML = document.getElementById("automaton-mermaid") as HTMLDivElement;
   automatonDiv = document.getElementById("input-automaton") as HTMLDivElement;
@@ -18,40 +27,39 @@ export function initiate_global_vars() {
   message = document.getElementById("message") as HTMLParagraphElement;
   tableHTML = document.getElementById("table") as HTMLTableElement;
 
+  let current_automaton: HTML_NL_star | HTML_L_star;
+
   let teacher_switch_HTML = document.getElementById("teacher_switch") as HTMLDivElement;
   let teacher_description_HTML = document.getElementById("teacher_description") as HTMLParagraphElement;
+  let radioAlgo = Array.from(document.getElementsByClassName("algo-switch")) as HTMLInputElement[];
 
-  let automata = [
-    () => new HTML_LStar("01", teacherPairZeroAndOne),
-    () => new HTML_LStar("ab", teacherA3fromLast),
-    () => new HTML_LStar("ab", teacherEvenAandThreeB)];
+  radioAlgo.forEach(e => {
+    e.addEventListener("click", () => listener(current_automaton.teacher))
+  })
 
-  automata.forEach((a, pos) => {
-    let radio = document.createElement("input");
+  teachers.forEach((teacher, pos) => {
+    let radioTeacher = document.createElement("input");
     let label = document.createElement("label");
     let span = document.createElement("span");
 
-    radio.type = 'radio';
-    radio.name = 'teacher_switcher'
+    radioTeacher.type = 'radio';
+    radioTeacher.name = 'teacher_switcher'
     span.innerHTML = pos + "";
 
-    radio.addEventListener("click", () => {
-      tableHTML.innerHTML = "";
-      message.innerHTML = "";
-      clear_automaton_HTML()
-
-      current_automaton = a();
-      teacher_description_HTML.innerHTML = current_automaton.teacher.description;
+    radioTeacher.addEventListener("click", () => {
+      listener(teacher)
     });
 
-    label.appendChild(radio);
+    label.appendChild(radioTeacher);
     label.append(span);
     teacher_switch_HTML.appendChild(label);
 
-    if (pos == 0) { radio.click(); }
+    if (pos == 1) { radioTeacher.click(); }
   });
 
-  button_next.addEventListener("click", () => (current_automaton as HTML_LStar).graphic_next_step());
+  button_next.addEventListener("click", () => {
+    current_automaton.graphic_next_step()
+  });
 }
 
 export function clear_automaton_HTML() {

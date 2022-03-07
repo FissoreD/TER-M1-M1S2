@@ -4,7 +4,7 @@ import { teacherPairZeroAndOne } from "../Teacher.js";
 
 let graphic = false;
 
-let lerner = new L_star("01", teacherPairZeroAndOne)
+let lerner = new L_star(teacherPairZeroAndOne)
 
 console.log(lerner);
 
