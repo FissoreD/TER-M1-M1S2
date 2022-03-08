@@ -112,14 +112,21 @@ export class NL_star extends L_star {
 
   make_automaton() {
     let states: Map_string_string = {}
-    this.S.forEach(e => states[this.observation_table[e]] = e);
-    let first_state = this.observation_table[""];
+    this.S.filter(e => this.prime_lines.includes(e)).forEach(e => states[this.observation_table[e]] = e);
+    console.log();
+
+    let first_state = this.S.filter(e => {
+      let row_e = this.observation_table[e];
+      return this.prime_lines.includes(e) && this.is_covered(row_e, this.observation_table[""])
+    })!.map(e => this.observation_table[e]);
     let keys = Object.keys(states);
     let end_states: string[] = keys.filter(k => k[0] == '1');
     let transitions = keys.map(
       (k) => this.alphabet.map(a => {
         return keys.filter(v => this.is_covered(v, this.observation_table[states[k] + a]));
       }));
+    console.log(first_state);
+
     return new Automaton({
       "alphabet": this.alphabet,
       "endState": end_states,

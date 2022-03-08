@@ -11,7 +11,7 @@ export let aut: AutomatonJson = {
     [['1111'], ['1101']],
     [['1110'], ['1100']]
   ],
-  startState: '0100',
+  startState: ['0100'],
   endState: ['1100', '1101', '1110', '1111'],
   alphabet: ['a', 'b'],
   states: [

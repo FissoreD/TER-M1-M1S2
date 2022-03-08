@@ -164,7 +164,7 @@ export class L_star {
     return new Automaton({
       "alphabet": this.alphabet,
       "endState": end_states,
-      "startState": first_state,
+      "startState": [first_state],
       "states": keys,
       "transitions": transitions
     })

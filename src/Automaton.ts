@@ -1,6 +1,6 @@
 export interface AutomatonJson {
   transitions: string[][][],
-  startState: string,
+  startState: string[],
   endState: string[],
   alphabet: string[] | string,
   states: string[]
@@ -8,19 +8,31 @@ export interface AutomatonJson {
 
 export class Automaton implements AutomatonJson {
   transitions: string[][][];
-  startState: string;
+  startState: string[];
   endState: string[];
   alphabet: string | string[];
   states: string[];
+  states_rename: string[];
   currentState: string;
 
   constructor(json: AutomatonJson) {
     this.transitions = json.transitions;
     this.startState = json.startState;
     this.endState = json.endState;
-    this.currentState = this.startState;
+    this.currentState = this.startState[0];
     this.alphabet = Array.from(json.alphabet);
     this.states = json.states;
+    this.states_rename = [];
+    let counter_init = [0, this.startState.length, this.states.length - this.startState.length];
+    for (let i = 0; i < this.states.length; i++) {
+      if (this.startState.includes(this.states[i])) {
+        this.states_rename.push("s" + counter_init[0]++)
+      } else if (this.endState.includes(this.states[i])) {
+        this.states_rename.push("q" + counter_init[2]++)
+      } else {
+        this.states_rename.push("q" + counter_init[1]++)
+      }
+    }
   }
 
   next_step(next_char: string) {
@@ -46,7 +58,7 @@ export class Automaton implements AutomatonJson {
         let x = this.states.indexOf(current_state);
         let y = this.alphabet.indexOf(word[index]);
         let next_states = this.transitions[x][y];
-        return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + next_state))
+        return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + this.get_state_rename(next_state)))
       } else {
         if (this.endState.includes(current_state)) {
           path = [state_path]
@@ -56,15 +68,18 @@ export class Automaton implements AutomatonJson {
         return false;
       }
     }
-
-    let is_accepted = recursive_explore(word, 0, this.startState, this.startState);
+    let is_accepted: boolean = false;
+    for (const start_state of this.startState) {
+      is_accepted = recursive_explore(word, 0, start_state, this.get_state_rename(start_state));
+      if (is_accepted) break;
+    }
 
     return [is_accepted, path];
   }
 
 
   restart() {
-    this.currentState = this.startState;
+    this.currentState = this.startState[0];
   }
 
   /** GRAPHIC PART */
@@ -85,10 +100,12 @@ export class Automaton implements AutomatonJson {
 
     // Mark end nodes
     this.endState.forEach(n => {
-      let circle = this.get_current_graph_node(n);
+      let circle = this.get_current_graph_node(n) as HTMLElement;
+      circle.style.strokeWidth = "1.1";
+      circle.style.stroke = "black"
       let smaller_circle = circle.cloneNode() as HTMLElement;
       // @ts-ignore
-      (smaller_circle).attributes['r'].value -= 3
+      smaller_circle.attributes['r'].value -= 4
       circle.parentNode!.insertBefore(smaller_circle, circle.nextSibling)
     });
 
@@ -97,20 +114,14 @@ export class Automaton implements AutomatonJson {
   }
 
   get_current_graph_node(node: string) {
-    let elts = document.querySelectorAll('.node').values();
-    let currentNode = elts.next();
+    console.log("The node to seek is :", node);
 
-    while (elts) {
-      if (currentNode.value.getElementsByClassName('nodeLabel')[0].innerHTML == node)
-        break;
-      currentNode = elts.next();
-    }
-    return currentNode.value.firstChild! as HTMLElement;
+    return Array.from(document.getElementsByClassName("node")).find(e => e.id.split("-")[1] == node)!.firstChild!;
   }
 
   matrix_to_mermaid(): string {
-    let res = "flowchart LR";
-    res = res.concat("\n" + this.create_entering_arrow() + "\n");
+    let res = "flowchart LR\n";
+    // res = res.concat("\n" + this.create_entering_arrow() + "\n");
     let triples: { [id: string]: string[] } = {}
     for (let i = 0; i < this.states.length; i++) {
       for (let j = 0; j < this.alphabet.length; j++) {
@@ -121,43 +132,55 @@ export class Automaton implements AutomatonJson {
           } else {
             triples[stateA_concat_stateB] = [this.alphabet[j]]
           }
-          // res = res.concat("\n");
-          // res = res.concat(
-          //   this.create_triple(
-          //     this.states[i],
-          //     this.alphabet[j],
-          //     state));
         }
       }
     }
     res = res.concat(Object.keys(triples).map(x => this.create_triple(x, triples[x].join(","))).join("\n"));
+    // res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;")
+    this.startState.forEach(e => {
+      res = res.concat(`\nstyle ${e} fill:#FFFF00, stroke:#FF00FF;`)
+    })
     console.log(res);
-    res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;")
     return res;
   }
 
 
   color_node(toFill: boolean) {
-    let current_circle = this.get_current_graph_node(this.currentState) as HTMLElement;
-    let next_circle = current_circle.nextSibling as HTMLElement;
+    // let current_circle = this.get_current_graph_node(this.currentState) as HTMLElement;
+    // let next_circle = current_circle.nextSibling as HTMLElement;
+    // if (toFill) {
+    //   next_circle.style.textDecoration = "underline";
+    //   // if (this.endState.includes(this.currentState))
+    //   //   next_circle.style.fill = '#009879';
+    //   // else current_circle.style.fill = '#009879';
+    // } else {
+    //   if (this.endState.includes(this.currentState))
+    //     next_circle.removeAttribute('style');
+    //   else current_circle.removeAttribute('style');
+    // } 
+    let currentNode = this.get_current_graph_node(this.currentState).parentElement as HTMLElement;
+    let spanWithText = currentNode.getElementsByClassName("nodeLabel")![0] as HTMLElement;
     if (toFill) {
-      if (this.endState.includes(this.currentState))
-        next_circle.style.fill = '#009879';
-      else current_circle.style.fill = '#009879';
+      spanWithText.style.textDecoration = "underline";
     } else {
-      if (this.endState.includes(this.currentState))
-        next_circle.removeAttribute('style');
-      else current_circle.removeAttribute('style');
+      spanWithText.removeAttribute('style');
     }
   }
 
   create_triple(states: string, transition: string): string {
     let split = states.split("&");
     let A = split[0], B = split[1];
-    return `${A}((${A})) -->| ${transition} | ${B}((${B}))`;
+    let A_rename = this.get_state_rename(A);
+    let B_rename = this.get_state_rename(B);
+    return `${A}((${A_rename})) -->| ${transition} | ${B}((${B_rename}))`;
   }
 
   create_entering_arrow(): string {
     return `START[ ]--> ${this.startState}`
+  }
+
+  get_state_rename(name: string) {
+    // return name;
+    return this.states_rename[this.states.indexOf(name)]
   }
 }
