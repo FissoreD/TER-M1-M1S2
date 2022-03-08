@@ -14,11 +14,12 @@ export function initiate_global_vars() {
     tableHTML.innerHTML = "";
     message.innerHTML = "";
     clear_automaton_HTML()
-
     current_automaton = radioAlgo[0].checked ?
       new HTML_L_star(teacher) :
       new HTML_NL_star(teacher);
     teacher_description_HTML.innerHTML = current_automaton.teacher.description;
+    // @ts-ignore
+    MathJax.typeset();
   }
 
   automatonHTML = document.getElementById("automaton-mermaid") as HTMLDivElement;
@@ -47,7 +48,7 @@ export function initiate_global_vars() {
     span.innerHTML = pos + "";
 
     radioTeacher.addEventListener("click", () => {
-      listener(teacher)
+      listener(teacher);
     });
 
     label.appendChild(radioTeacher);

@@ -35,7 +35,7 @@ export class Teacher {
 
   member(automaton: Automaton): string | undefined {
     let res = this.word_apperencance.find((word) => {
-      return automaton.accept_word_nfa(word[0]) != word[1];
+      return automaton.accept_word_nfa(word[0])[0] != word[1];
     });
     return res ? res[0] : res;
   }
@@ -50,8 +50,7 @@ export class Teacher {
  * of strings with even number of 0 and even number of 1
  */
 export let teacherPairZeroAndOne = new Teacher(
-  `Automata accepting L = {w in (0, 1)* | #(w_0) % 2 = 0 and #(w_1) % 2 = 0} 
-    → w has even nb of "0" and even nb of "1"`, "01",
+  `Automata accepting \\(L = \\{w \\in (0, 1)^* | \\#(w_0) \\% 2 = 0 \\land \\#(w_1) \\% 2 = 0\\}\\) <br/> → words with even nb of '0' and even nb of '1'`, "01",
   sentence => {
     let parity = count_str_occurrences(sentence, "0");
     return parity % 2 == 0 && sentence.length % 2 == 0;
@@ -63,8 +62,8 @@ export let teacherPairZeroAndOne = new Teacher(
  * (exemple abb, baab, bbabbaab)
  */
 export let teacherA3fromLast = new Teacher(
-  `Automata accepting L = {w in (a, b)* | w[-3] = a} 
-    → w has an 'a' in the 3rd pos from end`, "ab",
+  `Automata accepting \\(L = \\{w \\in (a, b)^* | w[-3] = a\\}\\) <br/>
+    → words with an 'a' in the 3rd pos from end`, "ab",
   sentence => sentence.length >= 3 && sentence[sentence.length - 3] == 'a',
   ["aaa"]
 )
@@ -73,8 +72,8 @@ export let teacherA3fromLast = new Teacher(
  * of strings with any even number of "a" and at least three "b"
  */
 export let teacherEvenAandThreeB = new Teacher(
-  `Automata accepting L = {w in (a, b)* | #(w_b) > 2 and #(w_a) % 2 = 0}
-    → w has at least 3 'b' and an even nb of 'a'`, "ab",
+  `Automata accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\land \\#(w_a) \\% 2 = 0\\}\\)
+  <br/> → words with at least 3 'b' and an even nb of 'a'`, "ab",
   sentence => count_str_occurrences(sentence, "b") >= 3 && count_str_occurrences(sentence, "a") % 2 == 0,
   ["bbb", "ababb", "bbaab", "babba"]
 );
@@ -85,8 +84,8 @@ export let teacherEvenAandThreeB = new Teacher(
  * of 4 
  */
 export let teacherNotAfourthPos = new Teacher(
-  `Automata accepting L = {w in (a,b)* and i in N | w[4 * i] != a and 4 * i <= len(w)}
-    → words without an "a" in a position multiple of 4`, "ab",
+  `Automata accepting \\(L = \\{w \\in (a,b)^* \\land i \\in 4\\mathbb{N} | w[i] \\neq a \\land i \\leq len(w)\\}\\) <br/>
+  → words without an 'a' in a position multiple of 4`, "ab",
   sentence => {
     for (let i = 3; i < sentence.length; i += 4) {
       if (sentence.charAt(i) == "a") return false;
@@ -96,4 +95,16 @@ export let teacherNotAfourthPos = new Teacher(
   ["aaaa", "baaa", "bbaaa", "bbbaaa"]
 )
 
-export let teachers = [teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne]
+/**
+ * a teacher accepting the language over {a, b}
+ * of strings not having an a in a position multiple
+ * of 4 
+ */
+export let teacher_bStar_a_or_aStart_bStar = new Teacher(
+  `Automata accepting \\(L = regex(^\\land((b^+a) | (a^*b^*))$)\\)`, "ab",
+  sentence => {
+    return sentence.match(/^((b+a)|(a*b*))$/g) != undefined
+  },
+  ["aaaa", "baaa", "bbaaa", "bbbaaa"]
+)
+export let teachers = [teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]

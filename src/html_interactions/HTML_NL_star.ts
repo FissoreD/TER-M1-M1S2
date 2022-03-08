@@ -9,10 +9,10 @@ export class HTML_NL_star extends NL_star {
   table_body: HTMLTableSectionElement;
   pile_actions: myFunction<void, void>[];
   automaton: Automaton | undefined;
+  table_counter = 0;
 
   constructor(teacher: Teacher) {
     super(teacher);
-    console.log("Creating NL* algo");
 
     this.table_header = tableHTML.createTHead();
     this.table_body = tableHTML.createTBody();
@@ -20,7 +20,7 @@ export class HTML_NL_star extends NL_star {
   }
 
   draw_table() {
-    this.add_row_html(this.table_header, "Table", undefined, this.E, 2);
+    this.add_row_html(this.table_header, "Table" + this.table_counter++, undefined, this.E, 2);
 
     /**
      The first {@link S}.length rows of the table start with the S symbol
@@ -51,7 +51,7 @@ export class HTML_NL_star extends NL_star {
       var cell = row.insertCell();
       cell.innerHTML = `${convert_to_epsilon(txt)}`
     };
-    // console.log(head ? conver_to_epsilon(head) : "Not head", row_elts);
+
     var row = parent.insertRow();
     if (fst) {
       row.style.borderTop = "2px solid #009879";
@@ -64,6 +64,10 @@ export class HTML_NL_star extends NL_star {
     if (head != undefined) create_cell_with_text(row, head);
     for (var letter of row_elts)
       create_cell_with_text(row, letter)
+
+    if (head != undefined && this.prime_lines.includes(head)) {
+      row.className += "prime-row"
+    }
   }
 
   clear_table() {
@@ -89,21 +93,35 @@ export class HTML_NL_star extends NL_star {
 
   private add_automaton_listener() {
     let input = document.createElement("input");
-    let setB = document.createElement("button");
-    setB.innerHTML = "Reinitialize automaton";
-    setB.addEventListener('click', () => {
-      this.automaton!.restart();
-      this.automaton!.initiate_graph();
+    // let setB = document.createElement("button");
+    // setB.innerHTML = "Reinitialize automaton";
+    // setB.addEventListener('click', () => {
+    //   this.automaton!.restart();
+    //   this.automaton!.initiate_graph();
+    // })
+    // let sendB = document.createElement("button")
+    // sendB.innerHTML = "Next char";
+    // sendB.addEventListener('click', () => {
+    //   this.automaton!.draw_next_step(input.value[0])
+    //   input.value = input.value.slice(1);
+    // });
+    let acceptB = document.createElement("button");
+    let answerP = document.createElement("p");
+    acceptB.innerHTML = "In automaton";
+    acceptB.addEventListener("click", () => {
+      let aut_answer = this.automaton?.accept_word_nfa(input.value);
+      if (aut_answer![0]) {
+        answerP.innerHTML = `The word ${input.value} is accepted, here is a valid path : ${aut_answer![1]}`
+      } else {
+        answerP.innerHTML = `There is no valid path accepting the word ${input.value}`
+      }
+      console.log();
     })
-    let sendB = document.createElement("button")
-    sendB.innerHTML = "Next char";
-    sendB.addEventListener('click', () => {
-      this.automaton!.draw_next_step(input.value[0])
-      input.value = input.value.slice(1);
-    });
     automatonDiv.appendChild(input);
-    automatonDiv.appendChild(sendB);
-    automatonDiv.appendChild(setB);
+    automatonDiv.appendChild(acceptB);
+    automatonDiv.appendChild(answerP);
+    // automatonDiv.appendChild(sendB);
+    // automatonDiv.appendChild(setB);
   }
 
   close_action(): boolean {

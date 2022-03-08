@@ -1,6 +1,5 @@
 import { Automaton } from "../Automaton.js";
 import { automatonDiv, clear_automaton_HTML, message, tableHTML } from "../Main.js";
-import { NL_star } from "../NL_star/NL_star.js";
 import { Teacher } from "../Teacher.js";
 import { myFunction } from "../Utilities.js";
 import { L_star } from "../L_star/L_star.js";
@@ -10,10 +9,10 @@ export class HTML_L_star extends L_star {
   table_body: HTMLTableSectionElement;
   pile_actions: myFunction<void, void>[];
   automaton: Automaton | undefined;
+  table_counter = 0;
 
   constructor(teacher: Teacher) {
     super(teacher);
-    console.log("Creating L* algo");
 
     this.table_header = tableHTML.createTHead();
     this.table_body = tableHTML.createTBody();
@@ -21,7 +20,7 @@ export class HTML_L_star extends L_star {
   }
 
   draw_table() {
-    this.add_row_html(this.table_header, "Table", undefined, this.E, 2);
+    this.add_row_html(this.table_header, "Table" + this.table_counter++, undefined, this.E, 2);
 
     /**
      The first {@link S}.length rows of the table start with the S symbol
@@ -52,7 +51,7 @@ export class HTML_L_star extends L_star {
       var cell = row.insertCell();
       cell.innerHTML = `${convert_to_epsilon(txt)}`
     };
-    // console.log(head ? conver_to_epsilon(head) : "Not head", row_elts);
+
     var row = parent.insertRow();
     if (fst) {
       row.style.borderTop = "2px solid #009879";

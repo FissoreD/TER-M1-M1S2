@@ -14,25 +14,17 @@ export class NL_star extends L_star {
   is_prime(row_key: string): boolean {
     if (this.prime_lines == undefined) this.prime_lines = []
     let row_value = this.observation_table[row_key];
-    // console.log(this.observation_table);
 
-    if (row_key == "aa") console.log(row_key, row_value);
-
-    if (this.prime_lines.includes(row_key) || row_value.length < 2 || parseInt(row_value) == 0) return true;
-    // console.log(2);
-
-    if (row_key == "aa") console.log("Spep1");
+    if (row_value.length < 2 || parseInt(row_value) == 0) return true;
 
     let res = ""
     for (let i = 0; i < row_value.length; i++) res += "0";
 
     Object.values(this.observation_table).forEach(value => {
       if (value != row_value && this.is_covered(value, row_value)) {
-        if (row_key == "aa") console.log("sum of", res, "and", value, "is", this.row_union(res, value));
         res = this.row_union(res, value);
       }
     });
-    if (row_key == "aa") console.log("res and value : ", res, row_value, res != row_value);
     return res != row_value;
   }
 
@@ -54,16 +46,11 @@ export class NL_star extends L_star {
    * 01101 is not covered by 01110 (due to last bit of r1)
    */
   is_covered(row1: string, row2: string): boolean {
-    // console.log(row1, row2, Array.from(row1).every((e, pos) => e <= row2.charAt(pos)));
     return Array.from(row1).every((e, pos) => e <= row2.charAt(pos));
   }
 
-  update_prime_table() {
-    Object.keys(this.observation_table).forEach(key => {
-      if (!this.prime_lines?.includes(key) && this.is_prime(key)) {
-        this.prime_lines!.push(key);
-      }
-    });
+  check_prime_lines() {
+    this.prime_lines = this.prime_lines.filter(l => this.is_prime(l));
   }
 
   add_elt_in_S(new_elt: string): string[] {
@@ -71,6 +58,7 @@ export class NL_star extends L_star {
     added_list.forEach(e => {
       if (!this.prime_lines?.includes(e) && this.is_prime(e)) {
         this.prime_lines.push(e);
+        this.check_prime_lines();
       }
     })
     return added_list;
@@ -83,14 +71,13 @@ export class NL_star extends L_star {
   */
   add_elt_in_E(new_elt: string) {
     let suffix_list = generate_suffix_list(new_elt);
-    console.log(new_elt, "is going to be added in E, it has", suffix_list);
-
     for (const suffix of suffix_list) {
-      if (this.E.includes(suffix)) return;
+      if (this.E.includes(suffix)) break;
       this.SA.forEach(s => this.make_query(s, suffix));
       this.S.forEach(s => this.make_query(s, suffix));
       this.E.push(suffix);
     }
+    this.check_prime_lines()
   }
 
   /**
@@ -116,7 +103,6 @@ export class NL_star extends L_star {
         if (this.is_covered(value_s1, value_s2)) {
           let first_unmacth = this.alphabet.find(a => !this.is_covered(value_s1 + a, value_s2 + a));
           if (first_unmacth != undefined) {
-            console.log(`s1 = ${s1}, s2 = ${s2}, fu = ${first_unmacth}`, this.observation_table);
             return [s1, s2, first_unmacth]
           }
         }

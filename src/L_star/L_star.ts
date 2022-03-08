@@ -45,18 +45,17 @@ export class L_star {
     for (let i = 0; i < word.length + 1; i++) {
       let pref1 = word.substring(0, i);
       let suff1 = word.substring(i);
+      if (pref1 == pref) continue;
       if (this.E.includes(suff1)) {
         if ((this.S.includes(pref1) || this.SA.includes(pref1)) && this.observation_table[pref1]) {
-          console.log(pref1, suff1);
           answer = this.observation_table[pref1].charAt(this.E.indexOf(suff1));
           this.update_observation_table(pref, answer)
+          if (answer == undefined) throw 'Parameter is not a number!';
           return;
         }
       }
     }
     answer = this.teacher.query(word);
-    console.log("pref", pref, "suff", suff);
-
     this.update_observation_table(pref, answer)
     this.query_number++;
   }
@@ -83,8 +82,6 @@ export class L_star {
   add_elt_in_S(new_elt: string): string[] {
     let added_list: string[] = [];
     let prefix_list = generate_prefix_list(new_elt);
-    console.log(new_elt, "is going to be added in S, it has", prefix_list);
-
     for (const prefix of prefix_list) {
       if (this.S.includes(prefix)) return added_list;
       if (this.SA.includes(prefix)) {

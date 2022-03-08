@@ -8,11 +8,14 @@
   <title>L* and NL* Home page</title>
 
   <link rel="shortcut icon" href="#">
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.14.0/mermaid.min.js"></script> -->
 
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.14.0/mermaid.min.js"></script> -->
   <!-- <script src="https://requirejs.org/docs/release/2.3.6/comments/require.js"></script> -->
+  <script src="public/polyfill.min.js"></script>
+  <script src="public/tex-mml-chtml.js"></script>
   <script src="public/mermaid.min.js"></script>
   <script src="public/require.js"></script>
+
   <!-- <script src="public/out.js"></script> -->
   <link rel="stylesheet" href="src/css/htmlStyle.css">
 
@@ -21,35 +24,36 @@
 
 <body>
   <h1> Welcome to the L* and NL* page </h1>
-  <h2> Here you can build a techer and then launch the algorithm to create
+  <h2> Here you can choose a techer and then launch the algorithm to create
     a lerner with either the L* or the NL* algorithms</h2>
 
   <!-- <script>
     require(['Main']);
     // require(["test/L_star_test"])
   </script> -->
-  <div>
+  <div class="preset">
     <p>Choose the algorithm</p>
-    <label>
-      <input type="radio" name="algo" id="radio:l*" class="algo-switch" checked>
-      <span>L*</span>
-    </label>
-
-    <label>
-      <input type="radio" name="algo" id="radio:nl*" class="algo-switch">
-      <span>NL*</span>
-    </label>
+    <div>
+      <label>
+        <input type="radio" name="algo" id="radio:l*" class="algo-switch" checked>
+        <span>L*</span>
+      </label>
+      <label>
+        <input type="radio" name="algo" id="radio:nl*" class="algo-switch">
+        <span>NL*</span>
+      </label>
+    </div>
+    <p>Choose your teacher : </p>
+    <div class="radio_buttons" id="teacher_switch"></div>
   </div>
-  <p>Choose your teacher : </p>
-  <div class="radio_buttons" id="teacher_switch"></div>
   <p class="description" id="teacher_description"></p>
   <button id="next_step">Next step</button>
   <div class="styled-div">
     <table id="table" class="styled-table"> </table>
     <div class="automaton-div" id="automaton-div">
+      <span id="message"></span>
       <div class="mermaid" id='automaton-mermaid'></div>
       <div id="input-automaton"></div>
-      <span id="message"></span>
     </div>
   </div>
   <script type="module" src="dist/Main.js"></script>

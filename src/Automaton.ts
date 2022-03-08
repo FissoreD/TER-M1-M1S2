@@ -39,18 +39,27 @@ export class Automaton implements AutomatonJson {
     return is_accepted;
   }
 
-  accept_word_nfa(word: string): boolean {
-    let recursive_explore = (word: string, index: number, current_state: string): boolean => {
+  accept_word_nfa(word: string): [boolean, string[]] {
+    let path: string[] = [];
+    let recursive_explore = (word: string, index: number, current_state: string, state_path: string): boolean => {
       if (index < word.length) {
         let x = this.states.indexOf(current_state);
         let y = this.alphabet.indexOf(word[index]);
         let next_states = this.transitions[x][y];
-        return next_states.some(next_state => recursive_explore(word, index + 1, next_state))
+        return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + next_state))
       } else {
-        return this.endState.includes(current_state);
+        if (this.endState.includes(current_state)) {
+          path = [state_path]
+          return true;
+        }
+        path.push(state_path)
+        return false;
       }
     }
-    return recursive_explore(word, 0, this.startState);
+
+    let is_accepted = recursive_explore(word, 0, this.startState, this.startState);
+
+    return [is_accepted, path];
   }
 
 

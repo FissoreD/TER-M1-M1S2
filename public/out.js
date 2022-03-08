@@ -177,7 +177,7 @@ define("Teacher", ["require", "exports", "Utilities"], function (require, export
         let parity = (0, Utilities_js_1.count_str_occurrences)(sentence, "0");
         return parity % 2 == 0 && sentence.length % 2 == 0;
     }, ["11", "011"]);
-    exports.teacherA3fromLast = new Teacher(`Automata accepting L = {w in (a, b)* | w[-3] = a} 
+    exports.teacherA3fromLast = new Teacher(`Automata accepting \\(L = {w \in (a, b)* | w[-3] = a}\\)
     → w has an 'a' in the 3rd pos from end`, "ab", sentence => sentence.length >= 3 && sentence[sentence.length - 3] == 'a', ["aaa"]);
     exports.teacherEvenAandThreeB = new Teacher(`Automata accepting L = {w in (a, b)* | #(w_b) > 2 and #(w_a) % 2 = 0}
     → w has at least 3 'b' and an even nb of 'a'`, "ab", sentence => (0, Utilities_js_1.count_str_occurrences)(sentence, "b") >= 3 && (0, Utilities_js_1.count_str_occurrences)(sentence, "a") % 2 == 0, ["bbb", "ababb", "bbaab", "babba"]);
@@ -350,117 +350,11 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
     }
     exports.L_star = L_star;
 });
-define("NL_star/NL_star", ["require", "exports", "Automaton", "L_star/L_star", "Utilities"], function (require, exports, Automaton_js_2, L_star_js_1, Utilities_js_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.NL_star = void 0;
-    class NL_star extends L_star_js_1.L_star {
-        constructor(teacher) {
-            super(teacher);
-            this.prime_lines = Array.from(this.alphabet).concat("");
-        }
-        is_prime(row_key) {
-            if (this.prime_lines == undefined)
-                this.prime_lines = [];
-            let row_value = this.observation_table[row_key];
-            if (row_key == "aa")
-                console.log(row_key, row_value);
-            if (this.prime_lines.includes(row_key) || row_value.length < 2 || parseInt(row_value) == 0)
-                return true;
-            if (row_key == "aa")
-                console.log("Spep1");
-            let res = "";
-            for (let i = 0; i < row_value.length; i++)
-                res += "0";
-            Object.values(this.observation_table).forEach(value => {
-                if (value != row_value && this.is_covered(value, row_value)) {
-                    if (row_key == "aa")
-                        console.log("sum of", res, "and", value, "is", this.row_union(res, value));
-                    res = this.row_union(res, value);
-                }
-            });
-            if (row_key == "aa")
-                console.log("res and value : ", res, row_value, res != row_value);
-            return res != row_value;
-        }
-        row_union(row1, row2) {
-            return Array.from(row1).map((e, pos) => [e, row2.charAt(pos)].includes("1") ? "1" : "0").join("");
-        }
-        is_covered(row1, row2) {
-            return Array.from(row1).every((e, pos) => e <= row2.charAt(pos));
-        }
-        update_prime_table() {
-            Object.keys(this.observation_table).forEach(key => {
-                if (!this.prime_lines?.includes(key) && this.is_prime(key)) {
-                    this.prime_lines.push(key);
-                }
-            });
-        }
-        add_elt_in_S(new_elt) {
-            let added_list = super.add_elt_in_S(new_elt);
-            added_list.forEach(e => {
-                if (!this.prime_lines?.includes(e) && this.is_prime(e)) {
-                    this.prime_lines.push(e);
-                }
-            });
-            return added_list;
-        }
-        add_elt_in_E(new_elt) {
-            let suffix_list = (0, Utilities_js_3.generate_suffix_list)(new_elt);
-            console.log(new_elt, "is going to be added in E, it has", suffix_list);
-            for (const suffix of suffix_list) {
-                if (this.E.includes(suffix))
-                    return;
-                this.SA.forEach(s => this.make_query(s, suffix));
-                this.S.forEach(s => this.make_query(s, suffix));
-                this.E.push(suffix);
-            }
-        }
-        is_close() {
-            return this.SA.find(t => !this.S.some(s => this.same_row(s, t)) && this.prime_lines.includes(t));
-        }
-        is_consistent() {
-            for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
-                for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
-                    let s1 = this.S[s1_ind];
-                    let s2 = this.S[s2_ind];
-                    let value_s1 = this.observation_table[s1];
-                    let value_s2 = this.observation_table[s2];
-                    if (this.is_covered(value_s1, value_s2)) {
-                        let first_unmacth = this.alphabet.find(a => !this.is_covered(value_s1 + a, value_s2 + a));
-                        if (first_unmacth != undefined) {
-                            console.log(`s1 = ${s1}, s2 = ${s2}, fu = ${first_unmacth}`, this.observation_table);
-                            return [s1, s2, first_unmacth];
-                        }
-                    }
-                }
-            }
-        }
-        make_automaton() {
-            let states = {};
-            this.S.forEach(e => states[this.observation_table[e]] = e);
-            let first_state = this.observation_table[""];
-            let keys = Object.keys(states);
-            let end_states = keys.filter(k => k[0] == '1');
-            let transitions = keys.map((k) => this.alphabet.map(a => {
-                return keys.filter(v => this.is_covered(v, this.observation_table[states[k] + a]));
-            }));
-            return new Automaton_js_2.Automaton({
-                "alphabet": this.alphabet,
-                "endState": end_states,
-                "startState": first_state,
-                "states": keys,
-                "transitions": transitions
-            });
-        }
-    }
-    exports.NL_star = NL_star;
-});
-define("html_interactions/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], function (require, exports, Main_js_1, L_star_js_2) {
+define("html_interactions/HTML_L_star", ["require", "exports", "Main", "L_star/L_star"], function (require, exports, Main_js_1, L_star_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HTML_L_star = void 0;
-    class HTML_L_star extends L_star_js_2.L_star {
+    class HTML_L_star extends L_star_js_1.L_star {
         constructor(teacher) {
             super(teacher);
             console.log("Creating L* algo");
@@ -609,6 +503,112 @@ define("html_interactions/HTML_L_star", ["require", "exports", "Main", "L_star/L
         }
     }
     exports.HTML_L_star = HTML_L_star;
+});
+define("NL_star/NL_star", ["require", "exports", "Automaton", "L_star/L_star", "Utilities"], function (require, exports, Automaton_js_2, L_star_js_2, Utilities_js_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.NL_star = void 0;
+    class NL_star extends L_star_js_2.L_star {
+        constructor(teacher) {
+            super(teacher);
+            this.prime_lines = Array.from(this.alphabet).concat("");
+        }
+        is_prime(row_key) {
+            if (this.prime_lines == undefined)
+                this.prime_lines = [];
+            let row_value = this.observation_table[row_key];
+            if (row_key == "aa")
+                console.log(row_key, row_value);
+            if (this.prime_lines.includes(row_key) || row_value.length < 2 || parseInt(row_value) == 0)
+                return true;
+            if (row_key == "aa")
+                console.log("Spep1");
+            let res = "";
+            for (let i = 0; i < row_value.length; i++)
+                res += "0";
+            Object.values(this.observation_table).forEach(value => {
+                if (value != row_value && this.is_covered(value, row_value)) {
+                    if (row_key == "aa")
+                        console.log("sum of", res, "and", value, "is", this.row_union(res, value));
+                    res = this.row_union(res, value);
+                }
+            });
+            if (row_key == "aa")
+                console.log("res and value : ", res, row_value, res != row_value);
+            return res != row_value;
+        }
+        row_union(row1, row2) {
+            return Array.from(row1).map((e, pos) => [e, row2.charAt(pos)].includes("1") ? "1" : "0").join("");
+        }
+        is_covered(row1, row2) {
+            return Array.from(row1).every((e, pos) => e <= row2.charAt(pos));
+        }
+        update_prime_table() {
+            Object.keys(this.observation_table).forEach(key => {
+                if (!this.prime_lines?.includes(key) && this.is_prime(key)) {
+                    this.prime_lines.push(key);
+                }
+            });
+        }
+        add_elt_in_S(new_elt) {
+            let added_list = super.add_elt_in_S(new_elt);
+            added_list.forEach(e => {
+                if (!this.prime_lines?.includes(e) && this.is_prime(e)) {
+                    this.prime_lines.push(e);
+                }
+            });
+            return added_list;
+        }
+        add_elt_in_E(new_elt) {
+            let suffix_list = (0, Utilities_js_3.generate_suffix_list)(new_elt);
+            console.log(new_elt, "is going to be added in E, it has", suffix_list);
+            for (const suffix of suffix_list) {
+                if (this.E.includes(suffix))
+                    return;
+                this.SA.forEach(s => this.make_query(s, suffix));
+                this.S.forEach(s => this.make_query(s, suffix));
+                this.E.push(suffix);
+            }
+        }
+        is_close() {
+            return this.SA.find(t => !this.S.some(s => this.same_row(s, t)) && this.prime_lines.includes(t));
+        }
+        is_consistent() {
+            for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
+                for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
+                    let s1 = this.S[s1_ind];
+                    let s2 = this.S[s2_ind];
+                    let value_s1 = this.observation_table[s1];
+                    let value_s2 = this.observation_table[s2];
+                    if (this.is_covered(value_s1, value_s2)) {
+                        let first_unmacth = this.alphabet.find(a => !this.is_covered(value_s1 + a, value_s2 + a));
+                        if (first_unmacth != undefined) {
+                            console.log(`s1 = ${s1}, s2 = ${s2}, fu = ${first_unmacth}`, this.observation_table);
+                            return [s1, s2, first_unmacth];
+                        }
+                    }
+                }
+            }
+        }
+        make_automaton() {
+            let states = {};
+            this.S.forEach(e => states[this.observation_table[e]] = e);
+            let first_state = this.observation_table[""];
+            let keys = Object.keys(states);
+            let end_states = keys.filter(k => k[0] == '1');
+            let transitions = keys.map((k) => this.alphabet.map(a => {
+                return keys.filter(v => this.is_covered(v, this.observation_table[states[k] + a]));
+            }));
+            return new Automaton_js_2.Automaton({
+                "alphabet": this.alphabet,
+                "endState": end_states,
+                "startState": first_state,
+                "states": keys,
+                "transitions": transitions
+            });
+        }
+    }
+    exports.NL_star = NL_star;
 });
 define("html_interactions/HTML_NL_star", ["require", "exports", "Main", "NL_star/NL_star"], function (require, exports, Main_js_2, NL_star_js_1) {
     "use strict";

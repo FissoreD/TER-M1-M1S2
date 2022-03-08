@@ -17,12 +17,12 @@ if (false) {
   }
 
   console.log(lerner);
-  lerner.update_prime_table();
+  lerner.check_prime_lines();
   console.log(lerner);
 } else {
   for (let i = 0; i < 30; i++) {
     console.log(`/ ************* STEP ${i + 1} ************* /`);
-    lerner.update_prime_table();
+    lerner.check_prime_lines();
     if (lerner.define_next_questions()) {
       console.log("Making automaton :");
       let automaton = lerner.make_automaton();
