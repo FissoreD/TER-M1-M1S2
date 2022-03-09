@@ -12,7 +12,19 @@ define("Automaton", ["require", "exports"], function (require, exports) {
             this.currentState = this.startState[0];
             this.alphabet = Array.from(json.alphabet);
             this.states = json.states;
-            this.states_rename = this.states.map((_e, pos) => "q" + pos);
+            this.states_rename = [];
+            let counter_init = [0, this.startState.length, this.states.length - this.startState.length];
+            for (let i = 0; i < this.states.length; i++) {
+                if (this.startState.includes(this.states[i])) {
+                    this.states_rename.push("s" + counter_init[0]++);
+                }
+                else if (this.endState.includes(this.states[i])) {
+                    this.states_rename.push("q" + counter_init[2]++);
+                }
+                else {
+                    this.states_rename.push("q" + counter_init[1]++);
+                }
+            }
         }
         next_step(next_char) {
             let x = this.states.indexOf(this.currentState);
@@ -33,7 +45,7 @@ define("Automaton", ["require", "exports"], function (require, exports) {
                     let x = this.states.indexOf(current_state);
                     let y = this.alphabet.indexOf(word[index]);
                     let next_states = this.transitions[x][y];
-                    return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + next_state));
+                    return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + this.get_state_rename(next_state)));
                 }
                 else {
                     if (this.endState.includes(current_state)) {
@@ -46,7 +58,7 @@ define("Automaton", ["require", "exports"], function (require, exports) {
             };
             let is_accepted = false;
             for (const start_state of this.startState) {
-                is_accepted = recursive_explore(word, 0, start_state, start_state);
+                is_accepted = recursive_explore(word, 0, start_state, this.get_state_rename(start_state));
                 if (is_accepted)
                     break;
             }
@@ -61,21 +73,23 @@ define("Automaton", ["require", "exports"], function (require, exports) {
             this.color_node(true);
         }
         initiate_graph() {
-            let automatonHTML = document.getElementById("automaton-mermaid");
+            let automatonHTML = $("#automaton-mermaid")[0];
             automatonHTML.removeAttribute('data-processed');
             automatonHTML.innerHTML = this.matrix_to_mermaid();
-            mermaid.init(document.querySelectorAll(".mermaid"));
+            mermaid.init($(".mermaid"));
             this.endState.forEach(n => {
                 let circle = this.get_current_graph_node(n);
+                circle.style.strokeWidth = "1.1";
+                circle.style.stroke = "black";
                 let smaller_circle = circle.cloneNode();
-                (smaller_circle).attributes['r'].value -= 3;
+                smaller_circle.attributes['r'].value -= 4;
                 circle.parentNode.insertBefore(smaller_circle, circle.nextSibling);
             });
             this.color_node(true);
         }
         get_current_graph_node(node) {
             console.log("The node to seek is :", node);
-            return Array.from(document.getElementsByClassName("node")).find(e => e.id.split("-")[1] == node).firstChild;
+            return Array.from($(".node")).find(e => e.id.split("-")[1] == node).firstChild;
         }
         matrix_to_mermaid() {
             let res = "flowchart LR\n";
@@ -94,24 +108,20 @@ define("Automaton", ["require", "exports"], function (require, exports) {
                 }
             }
             res = res.concat(Object.keys(triples).map(x => this.create_triple(x, triples[x].join(","))).join("\n"));
+            this.startState.forEach(e => {
+                res = res.concat(`\nstyle ${e} fill:#FFFF00, stroke:#FF00FF;`);
+            });
             console.log(res);
-            res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;");
             return res;
         }
         color_node(toFill) {
-            let current_circle = this.get_current_graph_node(this.currentState);
-            let next_circle = current_circle.nextSibling;
+            let currentNode = this.get_current_graph_node(this.currentState).parentElement;
+            let spanWithText = currentNode.getElementsByClassName("nodeLabel")[0];
             if (toFill) {
-                if (this.endState.includes(this.currentState))
-                    next_circle.style.fill = '#009879';
-                else
-                    current_circle.style.fill = '#009879';
+                spanWithText.style.textDecoration = "underline";
             }
             else {
-                if (this.endState.includes(this.currentState))
-                    next_circle.removeAttribute('style');
-                else
-                    current_circle.removeAttribute('style');
+                spanWithText.removeAttribute('style');
             }
         }
         create_triple(states, transition) {
@@ -125,7 +135,6 @@ define("Automaton", ["require", "exports"], function (require, exports) {
             return `START[ ]--> ${this.startState}`;
         }
         get_state_rename(name) {
-            return name;
             return this.states_rename[this.states.indexOf(name)];
         }
     }
@@ -781,6 +790,16 @@ define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star"
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.clear_automaton_HTML = exports.initiate_global_vars = exports.automatonHTML = exports.tableHTML = exports.message = exports.automatonDiv = void 0;
     function initiate_global_vars() {
+        exports.automatonHTML = $("#automaton-mermaid")[0];
+        exports.automatonDiv = $("#input-automaton")[0];
+        let button_next = $("#next_step")[0];
+        exports.message = $("#message")[0];
+        exports.tableHTML = $("#table")[0];
+        let current_automaton;
+        let teacher_switch_HTML = $("#teacher_switch")[0];
+        let teacher_description_HTML = $("#teacher_description")[0];
+        let radioAlgo = Array.from($(".algo-switch"));
+        let conterRadioButton = 0;
         let listener = (teacher) => {
             exports.tableHTML.innerHTML = "";
             exports.message.innerHTML = "";
@@ -791,37 +810,46 @@ define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star"
             teacher_description_HTML.innerHTML = current_automaton.teacher.description;
             MathJax.typeset();
         };
-        exports.automatonHTML = document.getElementById("automaton-mermaid");
-        exports.automatonDiv = document.getElementById("input-automaton");
-        let button_next = document.getElementById("next_step");
-        exports.message = document.getElementById("message");
-        exports.tableHTML = document.getElementById("table");
-        let current_automaton;
-        let teacher_switch_HTML = document.getElementById("teacher_switch");
-        let teacher_description_HTML = document.getElementById("teacher_description");
-        let radioAlgo = Array.from(document.getElementsByClassName("algo-switch"));
-        radioAlgo.forEach(e => {
-            e.addEventListener("click", () => listener(current_automaton.teacher));
-        });
-        Teacher_js_1.teachers.forEach((teacher, pos) => {
+        let createRadioTeacher = (teacher) => {
             let radioTeacher = document.createElement("input");
             let label = document.createElement("label");
             let span = document.createElement("span");
             radioTeacher.type = 'radio';
             radioTeacher.name = 'teacher_switcher';
-            span.innerHTML = pos + "";
+            span.innerHTML = conterRadioButton++ + "";
             radioTeacher.addEventListener("click", () => {
                 listener(teacher);
             });
             label.appendChild(radioTeacher);
             label.append(span);
             teacher_switch_HTML.appendChild(label);
-            if (pos == 1) {
+            label.addEventListener("contextmenu", (ev) => {
+                console.log("here");
+                ev.preventDefault();
+                teacher_switch_HTML.removeChild(label);
+                console.log("there");
+            });
+            return radioTeacher;
+        };
+        radioAlgo.forEach(e => {
+            e.addEventListener("click", () => listener(current_automaton.teacher));
+        });
+        Teacher_js_1.teachers.forEach((teacher, pos) => {
+            let radioTeacher = createRadioTeacher(teacher);
+            if (pos == 0)
                 radioTeacher.click();
-            }
         });
         button_next.addEventListener("click", () => {
             current_automaton.graphic_next_step();
+        });
+        let regexAutButton = $("#input-regex")[0];
+        let alphabetAutButton = $("#input-alphabet")[0];
+        let createAutButton = $("#button-regex")[0];
+        createAutButton.addEventListener("click", () => {
+            let teacher = new Teacher_js_1.Teacher(`My automaton with regex = (${regexAutButton.value}) over &Sigma; = {${Array.from(alphabetAutButton.value)}} `, alphabetAutButton.value, sentence => sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined, []);
+            console.log(teacher);
+            let radioTeacher = createRadioTeacher(teacher);
+            radioTeacher.click();
         });
     }
     exports.initiate_global_vars = initiate_global_vars;
@@ -899,21 +927,21 @@ define("html_interactions/listeners", ["require", "exports"], function (require,
     exports.set_text = exports.listener_automaton_click_button = void 0;
     function listener_automaton_click_button(a) {
         let next_char = () => {
-            let dom = document.getElementById('input');
+            let dom = $('#input')[0];
             let name = dom.innerText;
             let currentNode = name[0];
             name = name.substring(1);
             a.draw_next_step(currentNode);
             dom.innerText = name;
         };
-        let x = document.getElementById("next_char");
+        let x = $("#next_char")[0];
         x.addEventListener("click", next_char);
     }
     exports.listener_automaton_click_button = listener_automaton_click_button;
     function set_text() {
-        let form = document.getElementById("form1");
+        let form = $("#form1")[0];
         let str = form.getAttribute("id");
-        document.getElementById("input").innerText = str;
+        $("#input")[0].innerText = str;
     }
     exports.set_text = set_text;
 });

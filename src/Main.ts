@@ -10,6 +10,19 @@ export let
   automatonHTML: HTMLDivElement;
 
 export function initiate_global_vars() {
+  automatonHTML = $("#automaton-mermaid")[0] as HTMLDivElement;
+  automatonDiv = $("#input-automaton")[0] as HTMLDivElement;
+  let button_next = $("#next_step")[0] as HTMLButtonElement;
+  message = $("#message")[0] as HTMLParagraphElement;
+  tableHTML = $("#table")[0] as HTMLTableElement;
+
+  let current_automaton: HTML_NL_star | HTML_L_star;
+
+  let teacher_switch_HTML = $("#teacher_switch")[0] as HTMLDivElement;
+  let teacher_description_HTML = $("#teacher_description")[0] as HTMLParagraphElement;
+  let radioAlgo = Array.from($(".algo-switch")) as HTMLInputElement[];
+  let conterRadioButton = 0;
+
   let listener = (teacher: Teacher) => {
     tableHTML.innerHTML = "";
     message.innerHTML = "";
@@ -22,30 +35,14 @@ export function initiate_global_vars() {
     MathJax.typeset();
   }
 
-  automatonHTML = document.getElementById("automaton-mermaid") as HTMLDivElement;
-  automatonDiv = document.getElementById("input-automaton") as HTMLDivElement;
-  let button_next = document.getElementById("next_step") as HTMLButtonElement;
-  message = document.getElementById("message") as HTMLParagraphElement;
-  tableHTML = document.getElementById("table") as HTMLTableElement;
-
-  let current_automaton: HTML_NL_star | HTML_L_star;
-
-  let teacher_switch_HTML = document.getElementById("teacher_switch") as HTMLDivElement;
-  let teacher_description_HTML = document.getElementById("teacher_description") as HTMLParagraphElement;
-  let radioAlgo = Array.from(document.getElementsByClassName("algo-switch")) as HTMLInputElement[];
-
-  radioAlgo.forEach(e => {
-    e.addEventListener("click", () => listener(current_automaton.teacher))
-  })
-
-  teachers.forEach((teacher, pos) => {
+  let createRadioTeacher = (teacher: Teacher) => {
     let radioTeacher = document.createElement("input");
     let label = document.createElement("label");
     let span = document.createElement("span");
 
     radioTeacher.type = 'radio';
     radioTeacher.name = 'teacher_switcher'
-    span.innerHTML = pos + "";
+    span.innerHTML = conterRadioButton++ + "";
 
     radioTeacher.addEventListener("click", () => {
       listener(teacher);
@@ -54,12 +51,41 @@ export function initiate_global_vars() {
     label.appendChild(radioTeacher);
     label.append(span);
     teacher_switch_HTML.appendChild(label);
+    label.addEventListener("contextmenu", (ev) => {
+      console.log("here");
+      ev.preventDefault();
+      teacher_switch_HTML.removeChild(label);
+      console.log("there");
 
-    if (pos == 1) { radioTeacher.click(); }
+    })
+    return radioTeacher;
+  };
+
+  radioAlgo.forEach(e => {
+    e.addEventListener("click", () => listener(current_automaton.teacher))
+  })
+
+  teachers.forEach((teacher, pos) => {
+    let radioTeacher = createRadioTeacher(teacher);
+    if (pos == 0) radioTeacher.click();
   });
 
   button_next.addEventListener("click", () => {
     current_automaton.graphic_next_step()
+  });
+
+  let regexAutButton = $("#input-regex")![0] as HTMLInputElement;
+  let alphabetAutButton = $("#input-alphabet")![0] as HTMLInputElement;
+  let createAutButton = $("#button-regex")![0];
+  createAutButton.addEventListener("click", () => {
+    let teacher = new Teacher(`My automaton with regex = (${regexAutButton.value}) over &Sigma; = {${Array.from(alphabetAutButton.value)}} `, alphabetAutButton.value,
+      sentence =>
+        sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined,
+      []);
+    console.log(teacher);
+
+    let radioTeacher = createRadioTeacher(teacher)
+    radioTeacher.click()
   });
 }
 

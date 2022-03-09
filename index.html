@@ -14,9 +14,9 @@
   <script src="public/polyfill.min.js"></script>
   <script src="public/tex-mml-chtml.js"></script>
   <script src="public/mermaid.min.js"></script>
+  <script src="public/jquery.min.js"></script>
   <script src="public/require.js"></script>
 
-  <!-- <script src="public/out.js"></script> -->
   <link rel="stylesheet" href="src/css/htmlStyle.css">
 
   <script>mermaid.initialize({ startOnLoad: false });</script>
@@ -27,10 +27,6 @@
   <h2> Here you can choose a techer and then launch the algorithm to create
     a lerner with either the L* or the NL* algorithms</h2>
 
-  <!-- <script>
-    require(['Main']);
-    // require(["test/L_star_test"])
-  </script> -->
   <div class="preset">
     <p>Choose the algorithm</p>
     <div>
@@ -45,6 +41,10 @@
     </div>
     <p>Choose your teacher : </p>
     <div class="radio_buttons" id="teacher_switch"></div>
+    <p>or enter your alphabet and your regular expression</p>
+    <input id="input-alphabet">
+    <input id="input-regex">
+    <button id="button-regex">Send teacher</button>
   </div>
   <p class="description" id="teacher_description"></p>
   <button id="next_step">Next step</button>
@@ -56,7 +56,11 @@
       <div id="input-automaton"></div>
     </div>
   </div>
-  <script type="module" src="dist/Main.js"></script>
+
+  <script src="public/out.js"></script>
+  <script>require(['Main']);</script>
+
+  <!-- <script type="module" src="dist/Main.js"></script> -->
 </body>
 
 </html>

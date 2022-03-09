@@ -91,12 +91,12 @@ export class Automaton implements AutomatonJson {
   }
 
   initiate_graph() {
-    let automatonHTML = document.getElementById("automaton-mermaid") as HTMLDivElement;
+    let automatonHTML = $("#automaton-mermaid")[0];
     automatonHTML.removeAttribute('data-processed')
     automatonHTML.innerHTML = this.matrix_to_mermaid();
 
     // @ts-ignore
-    mermaid.init(document.querySelectorAll(".mermaid"));
+    mermaid.init($(".mermaid"));
 
     // Mark end nodes
     this.endState.forEach(n => {
@@ -116,7 +116,7 @@ export class Automaton implements AutomatonJson {
   get_current_graph_node(node: string) {
     console.log("The node to seek is :", node);
 
-    return Array.from(document.getElementsByClassName("node")).find(e => e.id.split("-")[1] == node)!.firstChild!;
+    return Array.from($(".node")).find(e => e.id.split("-")[1] == node)!.firstChild!;
   }
 
   matrix_to_mermaid(): string {
