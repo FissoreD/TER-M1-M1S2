@@ -85,6 +85,8 @@ export class HTML_L_star extends L_star {
     message.innerHTML =
       `Queries = ${this.query_number} - Membership = ${this.member_number} <br>
       ${message.innerHTML}`
+    // @ts-ignore
+    MathJax.typeset()
   }
 
   private add_automaton_listener() {
@@ -111,7 +113,7 @@ export class HTML_L_star extends L_star {
     if (close_rep != undefined) {
       message.innerText =
         `The table is not closed since
-        row(${close_rep}) = ${this.observation_table[close_rep]} but there is no s in S such that row(s) = ${this.observation_table[close_rep]};
+        \\(\\{row(${close_rep}) = ${this.observation_table[close_rep]} \\land 0 \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) = ${this.observation_table[close_rep]}\\}\\);
         I'm going to move ${close_rep} from SA to S`
       this.pile_actions.push(() => {
         message.innerText = "";
@@ -127,16 +129,15 @@ export class HTML_L_star extends L_star {
   consistence_action(): boolean {
     const consistence_rep = this.is_consistent()
     if (consistence_rep != undefined) {
-      let new_col = this.find_suffix_not_compatible(consistence_rep)
+      let new_col = consistence_rep[2]
       let s1 = consistence_rep[0];
       let s2 = consistence_rep[1];
       let a = consistence_rep[2];
       message.innerText =
         `The table is not consistent : 
-        row(${s1 ? s1 : "ε"}) and row(${s2 ? s2 : "ε"}) have same value in S,
-        but their value is not the same if we add ${a} 
-        row(${s1 + a}) != row(${s2 + a})
-        I'm going to add the column ${new_col} since T(${s1 + new_col}) != T(${s2 + new_col})`;
+        \\(\\{row(${s1 ? s1 : "ε"}) = row(${s2 ? s2 : "ε"}) \\land (${s1 ? s1 : "ε"}, ${s2 ? s2 : "ε"}) \\in S\\}\\),
+        but \\(\\{row(${s1 + a}) \\neq row(${s2 + a}) \\land (${s1 ? s1 : "ε"}, ${s2 ? s2 : "ε"}) \\in S \\land ${a} \\in \\Sigma\\}\\)
+        I'm going to add the column "${new_col}" since \\(T(${s1 + new_col}) \\neq T(${s2 + new_col})\\)`;
       this.pile_actions.push(() => {
         message.innerText = "";
         this.add_column(new_col);

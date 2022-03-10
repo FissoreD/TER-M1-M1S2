@@ -162,22 +162,26 @@ define("Teacher", ["require", "exports", "Utilities"], function (require, export
     class Teacher {
         constructor(description, alphabet, f, counter_exemples) {
             this.max_word_length = 10;
-            this.alphabet = alphabet;
+            this.alphabet = Array.from(alphabet);
             this.check_function = f;
             this.counter_exemples = counter_exemples;
             this.counter = 0;
             this.description = description;
             this.word_apperencance = [["", this.check_function("")]];
-            this.initiate_mapping("");
-            this.word_apperencance = this.word_apperencance.sort((a, b) => a[0].length - b[0].length);
+            this.initiate_mapping();
         }
-        initiate_mapping(word) {
-            if (word.length > this.max_word_length)
-                return;
-            Array.from(this.alphabet).forEach(letter => {
-                this.word_apperencance.push([word + letter, this.check_function(word + letter)]);
-                this.initiate_mapping(word + letter);
-            });
+        initiate_mapping() {
+            let alphabet = Array.from(this.alphabet).sort();
+            let level = Array.from(alphabet);
+            while (this.word_apperencance[this.word_apperencance.length - 1][0].length < this.max_word_length) {
+                let res1 = [];
+                level.forEach(e => alphabet.forEach(a => {
+                    this.word_apperencance.push([e + a, this.check_function(e + a)]);
+                    res1.push(e + a);
+                }));
+                level = res1;
+            }
+            console.log(this.word_apperencance.length);
         }
         query(sentence) {
             return this.boolToString(this.check_function(sentence));
@@ -202,7 +206,7 @@ define("Teacher", ["require", "exports", "Utilities"], function (require, export
     exports.teacherEvenAandThreeB = new Teacher(`Automata accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\land \\#(w_a) \\% 2 = 0\\}\\)
   <br/> → words with at least 3 'b' and an even nb of 'a'`, "ab", sentence => (0, Utilities_js_1.count_str_occurrences)(sentence, "b") >= 3 && (0, Utilities_js_1.count_str_occurrences)(sentence, "a") % 2 == 0, ["bbb", "ababb", "bbaab", "babba"]);
     exports.teacherNotAfourthPos = new Teacher(`Automata accepting \\(L = \\{w \\in (a,b)^* \\land i \\in 4\\mathbb{N} | w[i] \\neq a \\land i \\leq len(w)\\}\\) <br/>
-  → words without an 'a' in a position multiple of 4`, "ab", sentence => {
+  → words without an 'a' in a position multiple of 4`, "ba", sentence => {
         for (let i = 3; i < sentence.length; i += 4) {
             if (sentence.charAt(i) == "a")
                 return false;
@@ -307,14 +311,6 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
                 this.SA.splice(index, 1);
             this.S.push(elt);
         }
-        find_suffix_not_compatible(consistence_error) {
-            let e = this.E.find((_e, pos) => {
-                let cell = (value) => this.observation_table[consistence_error[value] + consistence_error[2]][pos];
-                return cell(0) != cell(1);
-            });
-            let new_col = consistence_error[2] + e;
-            return new_col;
-        }
         add_column(new_col) {
             let L = [this.SA, this.S];
             L.forEach(l => l.forEach(s => this.make_query(s, new_col)));
@@ -327,7 +323,7 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
                 this.add_elt_in_S(close_rep);
             }
             else if (consistence_rep != undefined) {
-                let new_col = this.find_suffix_not_compatible(consistence_rep);
+                let new_col = consistence_rep[2];
                 this.add_column(new_col);
             }
             else {
@@ -361,9 +357,13 @@ define("L_star/L_star", ["require", "exports", "Automaton", "Utilities"], functi
                     let s1 = this.S[s1_ind];
                     let s2 = this.S[s2_ind];
                     if (this.same_row(s1, s2)) {
-                        let first_unmacth = this.alphabet.find(a => !this.same_row(s1 + a, s2 + a));
-                        if (first_unmacth != undefined)
-                            return [s1, s2, first_unmacth];
+                        for (const a of this.alphabet) {
+                            for (let i = 0; i < this.E.length; i++) {
+                                if (this.observation_table[s1 + a][i] !=
+                                    this.observation_table[s2 + a][i])
+                                    return [s1, s2, a + this.E[i]];
+                            }
+                        }
                     }
                 }
             }
@@ -479,7 +479,7 @@ define("html_interactions/HTML_L_star", ["require", "exports", "Main", "L_star/L
         consistence_action() {
             const consistence_rep = this.is_consistent();
             if (consistence_rep != undefined) {
-                let new_col = this.find_suffix_not_compatible(consistence_rep);
+                let new_col = consistence_rep[2];
                 let s1 = consistence_rep[0];
                 let s2 = consistence_rep[1];
                 let a = consistence_rep[2];
@@ -587,16 +587,35 @@ define("NL_star/NL_star", ["require", "exports", "Automaton", "L_star/L_star", "
             return this.SA.find(t => !this.S.some(s => this.same_row(s, t)) && this.prime_lines.includes(t));
         }
         is_consistent() {
+            console.log("A new consistency step");
             for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
                 for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
                     let s1 = this.S[s1_ind];
                     let s2 = this.S[s2_ind];
                     let value_s1 = this.observation_table[s1];
                     let value_s2 = this.observation_table[s2];
+                    console.log(s1, s2, value_s1, value_s2, this.is_covered(value_s1, value_s2));
+                    if (s1 == 'bbb' && s2 == "bb") {
+                        console.log(value_s1, value_s2, this.is_covered(value_s1, value_s2));
+                    }
                     if (this.is_covered(value_s1, value_s2)) {
-                        let first_unmacth = this.alphabet.find(a => !this.is_covered(value_s1 + a, value_s2 + a));
-                        if (first_unmacth != undefined) {
-                            return [s1, s2, first_unmacth];
+                        console.log(s1, s2, value_s1, "is covered by", value_s2);
+                        for (const a of this.alphabet) {
+                            for (let i = 0; i < this.E.length; i++) {
+                                if (this.observation_table[s1 + a][i] <
+                                    this.observation_table[s2 + a][i])
+                                    return [s1, s2, a + this.E[i]];
+                            }
+                        }
+                    }
+                    else if (this.is_covered(value_s2, value_s1)) {
+                        console.log(s2, s1, value_s2, "is covered by", value_s1);
+                        for (const a of this.alphabet) {
+                            for (let i = 0; i < this.E.length; i++) {
+                                if (this.observation_table[s1 + a][i] <
+                                    this.observation_table[s2 + a][i])
+                                    return [s1, s2, a + this.E[i]];
+                            }
                         }
                     }
                 }
@@ -736,7 +755,7 @@ define("html_interactions/HTML_NL_star", ["require", "exports", "Main", "NL_star
         consistence_action() {
             const consistence_rep = this.is_consistent();
             if (consistence_rep != undefined) {
-                let new_col = this.find_suffix_not_compatible(consistence_rep);
+                let new_col = consistence_rep[2];
                 let s1 = consistence_rep[0];
                 let s2 = consistence_rep[1];
                 let a = consistence_rep[2];

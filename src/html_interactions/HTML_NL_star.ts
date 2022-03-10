@@ -89,22 +89,12 @@ export class HTML_NL_star extends NL_star {
     message.innerHTML =
       `Queries = ${this.query_number} - Membership = ${this.member_number} <br>
       ${message.innerHTML}`
+    // @ts-ignore
+    MathJax.typeset()
   }
 
   private add_automaton_listener() {
     let input = document.createElement("input");
-    // let setB = document.createElement("button");
-    // setB.innerHTML = "Reinitialize automaton";
-    // setB.addEventListener('click', () => {
-    //   this.automaton!.restart();
-    //   this.automaton!.initiate_graph();
-    // })
-    // let sendB = document.createElement("button")
-    // sendB.innerHTML = "Next char";
-    // sendB.addEventListener('click', () => {
-    //   this.automaton!.draw_next_step(input.value[0])
-    //   input.value = input.value.slice(1);
-    // });
     let acceptB = document.createElement("button");
     let answerP = document.createElement("p");
     acceptB.innerHTML = "In automaton";
@@ -120,8 +110,6 @@ export class HTML_NL_star extends NL_star {
     automatonDiv.appendChild(input);
     automatonDiv.appendChild(acceptB);
     automatonDiv.appendChild(answerP);
-    // automatonDiv.appendChild(sendB);
-    // automatonDiv.appendChild(setB);
   }
 
   close_action(): boolean {
@@ -129,8 +117,8 @@ export class HTML_NL_star extends NL_star {
     if (close_rep != undefined) {
       message.innerText =
         `The table is not closed since
-        row(${close_rep}) = ${this.observation_table[close_rep]} but there is no s in S such that row(s) = ${this.observation_table[close_rep]};
-        I'm going to move ${close_rep} from SA to S`
+        \\(\\{row(${close_rep}) = ${this.observation_table[close_rep]} \\land ${close_rep} \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) \\sqsupseteq ${this.observation_table[close_rep]}\\}\\);
+        I'm going to move "${close_rep}" from SA to S`
       this.pile_actions.push(() => {
         message.innerText = "";
         this.add_elt_in_S(close_rep);
@@ -145,16 +133,16 @@ export class HTML_NL_star extends NL_star {
   consistence_action(): boolean {
     const consistence_rep = this.is_consistent()
     if (consistence_rep != undefined) {
-      let new_col = this.find_suffix_not_compatible(consistence_rep)
+      let new_col = consistence_rep[2]
       let s1 = consistence_rep[0];
       let s2 = consistence_rep[1];
       let a = consistence_rep[2];
       message.innerText =
-        `The table is not consistent : 
-        row(${s1 ? s1 : "ε"}) and row(${s2 ? s2 : "ε"}) have same value in S,
-        but their value is not the same if we add ${a} 
-        row(${s1 + a}) != row(${s2 + a})
-        I'm going to add the column ${new_col} since T(${s1 + new_col}) != T(${s2 + new_col})`;
+        `The table is not consistent :
+        take \\(${s1 ? s1 : "ε"}\\in S \\land ${s2 ? s2 : "ε"} \\in S \\land ${a[0]} \\in \\Sigma \\)
+        \\(\\{row(${s1 ? s1 : "ε"}) \\sqsubseteq row(${s2 ? s2 : "ε"})\\}\\)
+        but \\(\\{row(${s1 ? s1 : "ε"} \\circ ${new_col[0]}) \\not\\sqsubseteq row(${s2 ? s2 : "ε"} \\circ ${new_col[0]})\\}\\)
+        I'm going to add the column \\(${new_col} \\in \\Sigma \\circ E\\) since \\(T(${s1 ? s1 : "ε"} \\circ ${new_col}) > T(${s2 ? s2 : "ε"} \\circ ${new_col})\\)`;
       this.pile_actions.push(() => {
         message.innerText = "";
         this.add_column(new_col);

@@ -6,27 +6,33 @@ export class Teacher {
   counter_exemples: string[];
   counter: number;
   description: string;
-  alphabet: string;
+  alphabet: string[];
   word_apperencance: [string, boolean][];
   max_word_length = 10;
 
   constructor(description: string, alphabet: string, f: myFunction<string, boolean>, counter_exemples: string[]) {
-    this.alphabet = alphabet;
+    this.alphabet = Array.from(alphabet);
     this.check_function = f;
     this.counter_exemples = counter_exemples;
     this.counter = 0;
     this.description = description;
     this.word_apperencance = [["", this.check_function("")]]
-    this.initiate_mapping("")
-    this.word_apperencance = this.word_apperencance.sort((a, b) => a[0].length - b[0].length);
+    this.initiate_mapping()
+    // this.word_apperencance = this.word_apperencance.sort((a, b) => a[0].length - b[0].length);
   }
 
-  initiate_mapping(word: string) {
-    if (word.length > this.max_word_length) return;
-    Array.from(this.alphabet).forEach(letter => {
-      this.word_apperencance.push([word + letter, this.check_function(word + letter)]);
-      this.initiate_mapping(word + letter)
-    })
+  initiate_mapping() {
+    let alphabet = Array.from(this.alphabet).sort()
+    let level = Array.from(alphabet)
+    while (this.word_apperencance[this.word_apperencance.length - 1][0].length < this.max_word_length) {
+      let res1: string[] = []
+      level.forEach(e => alphabet.forEach(a => {
+        this.word_apperencance.push([e + a, this.check_function(e + a)])
+        res1.push(e + a)
+      }))
+      level = res1
+    }
+    console.log(this.word_apperencance.length);
   }
 
   query(sentence: string): string {
@@ -85,7 +91,7 @@ export let teacherEvenAandThreeB = new Teacher(
  */
 export let teacherNotAfourthPos = new Teacher(
   `Automata accepting \\(L = \\{w \\in (a,b)^* \\land i \\in 4\\mathbb{N} | w[i] \\neq a \\land i \\leq len(w)\\}\\) <br/>
-  → words without an 'a' in a position multiple of 4`, "ab",
+  → words without an 'a' in a position multiple of 4`, "ba",
   sentence => {
     for (let i = 3; i < sentence.length; i += 4) {
       if (sentence.charAt(i) == "a") return false;

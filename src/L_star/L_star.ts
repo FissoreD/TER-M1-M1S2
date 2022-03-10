@@ -121,16 +121,6 @@ export class L_star {
     this.S.push(elt);
   }
 
-  find_suffix_not_compatible(consistence_error: string[]) {
-    let e = this.E.find((_e, pos) => {
-      let cell = (value: number) =>
-        this.observation_table[consistence_error[value] + consistence_error[2]][pos];
-      return cell(0) != cell(1);
-    });
-    let new_col = consistence_error[2] + e;
-    return new_col;
-  }
-
   add_column(new_col: string) {
     let L = [this.SA, this.S];
     L.forEach(l => l.forEach(s => this.make_query(s, new_col)));
@@ -143,7 +133,7 @@ export class L_star {
     if (close_rep != undefined) {
       this.add_elt_in_S(close_rep);
     } else if (consistence_rep != undefined) {
-      let new_col = this.find_suffix_not_compatible(consistence_rep)
+      let new_col = consistence_rep[2]
       this.add_column(new_col);
     } else {
       return true;
@@ -189,9 +179,13 @@ export class L_star {
         let s1 = this.S[s1_ind];
         let s2 = this.S[s2_ind];
         if (this.same_row(s1, s2)) {
-          let first_unmacth = this.alphabet.find(a => !this.same_row(s1 + a, s2 + a));
-          if (first_unmacth != undefined)
-            return [s1, s2, first_unmacth]
+          for (const a of this.alphabet) {
+            for (let i = 0; i < this.E.length; i++) {
+              if (this.observation_table[s1 + a][i] !=
+                this.observation_table[s2 + a][i])
+                return [s1, s2, a + this.E[i]]
+            }
+          }
         }
       }
     }

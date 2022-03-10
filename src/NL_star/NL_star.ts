@@ -94,6 +94,8 @@ export class NL_star extends L_star {
    * and there is an "a" in alphabet st row(s1 + a) is not covered row(s2 + a)
    */
   is_consistent(): string[] | undefined {
+    console.log("A new consistency step");
+
     for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
       for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
         let s1 = this.S[s1_ind];
@@ -101,9 +103,22 @@ export class NL_star extends L_star {
         let value_s1 = this.observation_table[s1];
         let value_s2 = this.observation_table[s2];
         if (this.is_covered(value_s1, value_s2)) {
-          let first_unmacth = this.alphabet.find(a => !this.is_covered(value_s1 + a, value_s2 + a));
-          if (first_unmacth != undefined) {
-            return [s1, s2, first_unmacth]
+          console.log(s1, s2, value_s1, "is covered by", value_s2);
+          for (const a of this.alphabet) {
+            for (let i = 0; i < this.E.length; i++) {
+              if (this.observation_table[s1 + a][i] <
+                this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i]))
+                return [s1, s2, a + this.E[i]]
+            }
+          }
+        } else if (this.is_covered(value_s2, value_s1)) {
+          console.log(s2, s1, value_s2, "is covered by", value_s1);
+          for (const a of this.alphabet) {
+            for (let i = 0; i < this.E.length; i++) {
+              if (this.observation_table[s1 + a][i] <
+                this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i]))
+                return [s2, s1, a + this.E[i]]
+            }
           }
         }
       }

@@ -14,8 +14,9 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    // "rootDir": "./src"
   },
-  // "include": [
-  //   "src/**/*"
-  // ]
+  "include": [
+    "src/**/*"
+  ]
 }
