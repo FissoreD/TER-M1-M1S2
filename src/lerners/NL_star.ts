@@ -1,9 +1,9 @@
 import { Automaton } from "../Automaton.js";
-import { L_star, Map_string_string } from "../L_star/L_star.js";
 import { Teacher } from "../Teacher.js";
 import { generate_suffix_list } from "../Utilities.js";
+import { LernerBase, Map_string_string } from "./LernerBase.js";
 
-export class NL_star extends L_star {
+export class NL_star extends LernerBase {
   prime_lines: string[];
 
   constructor(teacher: Teacher) {
@@ -94,8 +94,6 @@ export class NL_star extends L_star {
    * and there is an "a" in alphabet st row(s1 + a) is not covered row(s2 + a)
    */
   is_consistent(): string[] | undefined {
-    console.log("A new consistency step");
-
     for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
       for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
         let s1 = this.S[s1_ind];
@@ -103,22 +101,29 @@ export class NL_star extends L_star {
         let value_s1 = this.observation_table[s1];
         let value_s2 = this.observation_table[s2];
         if (this.is_covered(value_s1, value_s2)) {
-          console.log(s1, s2, value_s1, "is covered by", value_s2);
           for (const a of this.alphabet) {
-            for (let i = 0; i < this.E.length; i++) {
-              if (this.observation_table[s1 + a][i] <
-                this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i]))
-                return [s1, s2, a + this.E[i]]
+            let value_s1_p = this.observation_table[s1 + a]
+            let value_s2_p = this.observation_table[s2 + a]
+            if (!this.is_covered(value_s1_p, value_s2_p)) {
+              for (let i = 0; i < this.E.length; i++) {
+                if (this.observation_table[s1 + a][i] <
+                  this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i])) {
+                  return [s1, s2, a + this.E[i]]
+                }
+              }
             }
           }
         } else if (this.is_covered(value_s2, value_s1)) {
-          console.log(s2, s1, value_s2, "is covered by", value_s1);
           for (const a of this.alphabet) {
-            for (let i = 0; i < this.E.length; i++) {
-              if (this.observation_table[s1 + a][i] <
-                this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i]))
-                return [s2, s1, a + this.E[i]]
-            }
+            let value_s1_p = this.observation_table[s1 + a]
+            let value_s2_p = this.observation_table[s2 + a]
+            if (!this.is_covered(value_s2_p, value_s1_p))
+              for (let i = 0; i < this.E.length; i++) {
+                if (this.observation_table[s1 + a][i] <
+                  this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i])) {
+                  return [s2, s1, a + this.E[i]]
+                }
+              }
           }
         }
       }
@@ -128,7 +133,6 @@ export class NL_star extends L_star {
   make_automaton() {
     let states: Map_string_string = {}
     this.S.filter(e => this.prime_lines.includes(e)).forEach(e => states[this.observation_table[e]] = e);
-    console.log();
 
     let first_state = this.S.filter(e => {
       let row_e = this.observation_table[e];
@@ -140,7 +144,6 @@ export class NL_star extends L_star {
       (k) => this.alphabet.map(a => {
         return keys.filter(v => this.is_covered(v, this.observation_table[states[k] + a]));
       }));
-    console.log(first_state);
 
     return new Automaton({
       "alphabet": this.alphabet,

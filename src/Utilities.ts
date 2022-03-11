@@ -23,3 +23,7 @@ export const generate_suffix_list = (str: string) =>
 
 export const count_str_occurrences = (str: string, obj: string) =>
   Array.from(str).filter(f => f == obj).length
+
+export function boolToString(bool: boolean): string {
+  return bool ? "1" : "0";
+}

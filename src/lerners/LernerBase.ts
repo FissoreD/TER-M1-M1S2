@@ -1,9 +1,10 @@
 import { Automaton } from "../Automaton.js";
 import { Teacher } from "../Teacher.js";
-import { generate_prefix_list } from "../Utilities.js";
+import { boolToString, generate_prefix_list } from "../Utilities.js";
+
 export type Map_string_string = { [key: string]: string };
 
-export class L_star {
+export abstract class LernerBase {
   alphabet: string[];
   E: string[];
   S: string[];
@@ -36,7 +37,8 @@ export class L_star {
   /**
    * 1. Takes a string in parameter and s in {@link S} and e in {@link E}  
    * 2. Asks to the {@link teacher} if question is accepted  
-   * 3. Updates {@link observation_table} wrt the answer
+   * 3. Updates {@link observation_table} wrt the answer  
+   * No modification is performed in {@link S}, {@link E} or {@link SA} sets
    */
   make_query(pref: string, suff: string) {
     let word = pref + suff;
@@ -79,7 +81,7 @@ export class L_star {
    * @param new_elt the {@link new_elt} to add in {@link S}
    * @returns the list of added elt in SA or S
    */
-  add_elt_in_S(new_elt: string): string[] {
+  add_elt_in_S(new_elt: string, after_member = false): string[] {
     let added_list: string[] = [];
     let prefix_list = generate_prefix_list(new_elt);
     for (const prefix of prefix_list) {
@@ -89,14 +91,14 @@ export class L_star {
         this.alphabet.forEach(a => {
           const new_word = prefix + a;
           if (!this.SA.includes(new_word) && !this.S.includes(new_word)) {
-            this.add_row(new_word);
+            this.add_row(new_word, after_member);
             this.SA.push(new_word);
             added_list.push(new_word);
           }
         })
       } else {
         this.S.push(prefix);
-        this.add_row(prefix);
+        this.add_row(prefix, after_member);
         added_list.push(prefix);
         this.alphabet.forEach(a => {
           let new_word = prefix + a;
@@ -107,12 +109,23 @@ export class L_star {
           }
         });
       }
+      after_member = false;
     }
     return added_list;
   }
 
-  add_row(row_name: string) {
-    this.E.forEach(e => this.make_query(row_name, e));
+  /**
+   * @param row_name 
+   * adds a row to the {@link observation_table} 
+   * querying the teacher for all tuple ({@link row_name}, e) where e is in {@link E}
+   * @see {@link make_query}
+   */
+  add_row(row_name: string, after_member = false) {
+    this.E.forEach(e => {
+      if (after_member && e == "")
+        this.observation_table[row_name] = boolToString(!this.make_automaton().accept_word_nfa(row_name)[0]);
+      else this.make_query(row_name, e)
+    });
   }
 
   move_from_SA_to_S(elt: string) {
@@ -141,55 +154,11 @@ export class L_star {
     return false;
   }
 
-  make_automaton() {
-    let states: Map_string_string = {}
-    this.S.forEach(e => states[this.observation_table[e]] = e);
-    let first_state = this.observation_table[""];
-    let keys = Object.keys(states);
-    let end_states: string[] = keys.filter(k => k[0] == '1');
-    let transitions = keys.map(
-      (k) => this.alphabet.map(a => {
-        return [this.observation_table[states[k] + a]]
-      }));
-    return new Automaton({
-      "alphabet": this.alphabet,
-      "endState": end_states,
-      "startState": [first_state],
-      "states": keys,
-      "transitions": transitions
-    })
-  }
+  abstract make_automaton(): Automaton;
 
+  abstract is_close(): string | undefined;
 
-  /**
-   * @returns the first t in SA st it does not exist s in S st row(s) == row (s.a)
-   */
-  is_close(): string | undefined {
-    return this.SA.find(t => !this.S.some(s => this.same_row(s, t)));
-  }
-
-  /**
-   * @returns a list of 3 elements, 
-   * the first two are s1, s2 in {@link S} st row(s1) == row(s2)
-   * and there is an "a" in alphabet st row(s1 + a) != row(s2 + a)
-   */
-  is_consistent(): string[] | undefined {
-    for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
-      for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
-        let s1 = this.S[s1_ind];
-        let s2 = this.S[s2_ind];
-        if (this.same_row(s1, s2)) {
-          for (const a of this.alphabet) {
-            for (let i = 0; i < this.E.length; i++) {
-              if (this.observation_table[s1 + a][i] !=
-                this.observation_table[s2 + a][i])
-                return [s1, s2, a + this.E[i]]
-            }
-          }
-        }
-      }
-    }
-  }
+  abstract is_consistent(): string[] | undefined;
 
   same_row(a: string, b: string) {
     return this.observation_table[a] == this.observation_table[b];

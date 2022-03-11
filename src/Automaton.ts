@@ -111,16 +111,17 @@ export class Automaton implements AutomatonJson {
 
     // Mark current node = initial state
     this.color_node(true);
+    $(".mermaid")[0].after($(".mermaidTooltip")[0])
+    $('svg')[0].style.height = 'auto'
   }
 
   get_current_graph_node(node: string) {
-    console.log("The node to seek is :", node);
-
     return Array.from($(".node")).find(e => e.id.split("-")[1] == node)!.firstChild!;
   }
 
   matrix_to_mermaid(): string {
     let res = "flowchart LR\n";
+    res = res.concat("subgraph Automaton\ndirection LR\n")
     // res = res.concat("\n" + this.create_entering_arrow() + "\n");
     let triples: { [id: string]: string[] } = {}
     for (let i = 0; i < this.states.length; i++) {
@@ -137,34 +138,40 @@ export class Automaton implements AutomatonJson {
     }
     res = res.concat(Object.keys(triples).map(x => this.create_triple(x, triples[x].join(","))).join("\n"));
     // res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;")
-    this.startState.forEach(e => {
-      res = res.concat(`\nstyle ${e} fill:#FFFF00, stroke:#FF00FF;`)
-    })
+    res += "\n"
+    // res = res.concat(this.startState.map(e => `style ${e} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
+    res += "subgraph InitialStates\n";
+    res += this.startState.map(e => e).join("\n")
+    res += "\nend"
+    res += "\n"
+    res += "end\n"
+    // Callback for tooltip on mouse over
+    res = res.concat(this.states.map(e => `click ${e} undefinedCallback "${e}";`).join("\n"))
     console.log(res);
     return res;
   }
 
 
   color_node(toFill: boolean) {
-    // let current_circle = this.get_current_graph_node(this.currentState) as HTMLElement;
-    // let next_circle = current_circle.nextSibling as HTMLElement;
-    // if (toFill) {
-    //   next_circle.style.textDecoration = "underline";
-    //   // if (this.endState.includes(this.currentState))
-    //   //   next_circle.style.fill = '#009879';
-    //   // else current_circle.style.fill = '#009879';
-    // } else {
-    //   if (this.endState.includes(this.currentState))
-    //     next_circle.removeAttribute('style');
-    //   else current_circle.removeAttribute('style');
-    // } 
-    let currentNode = this.get_current_graph_node(this.currentState).parentElement as HTMLElement;
-    let spanWithText = currentNode.getElementsByClassName("nodeLabel")![0] as HTMLElement;
+    let current_circle = this.get_current_graph_node(this.currentState) as HTMLElement;
+    let next_circle = current_circle.nextSibling as HTMLElement;
     if (toFill) {
-      spanWithText.style.textDecoration = "underline";
+      next_circle.style.textDecoration = "underline";
+      if (this.endState.includes(this.currentState))
+        next_circle.style.fill = '#009879';
+      else current_circle.style.fill = '#009879';
     } else {
-      spanWithText.removeAttribute('style');
+      if (this.endState.includes(this.currentState))
+        next_circle.removeAttribute('style');
+      else current_circle.removeAttribute('style');
     }
+    // let currentNode = this.get_current_graph_node(this.currentState).parentElement as HTMLElement;
+    // let spanWithText = currentNode.getElementsByClassName("nodeLabel")![0] as HTMLElement;
+    // if (toFill) {
+    //   spanWithText.style.textDecoration = "underline";
+    // } else {
+    //   spanWithText.removeAttribute('style');
+    // }
   }
 
   create_triple(states: string, transition: string): string {

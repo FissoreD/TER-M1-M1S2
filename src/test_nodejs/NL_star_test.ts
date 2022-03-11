@@ -1,6 +1,6 @@
 import { Automaton } from "../Automaton.js";
 import { aut } from "../models/automata.js";
-import { NL_star } from "../NL_star/NL_star.js";
+import { NL_star } from "../lerners/NL_star.js";
 import { teacherA3fromLast, teacherEvenAandThreeB, teacherPairZeroAndOne } from "../Teacher.js";
 
 let graphic = false;

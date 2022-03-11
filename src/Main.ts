@@ -1,5 +1,4 @@
-import { Teacher, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teachers } from "./Teacher.js";
-import { L_star } from "./L_star/L_star.js";
+import { Teacher, teachers } from "./Teacher.js";
 import { HTML_L_star } from "./html_interactions/HTML_L_star.js";
 import { HTML_NL_star } from "./html_interactions/HTML_NL_star.js";
 
@@ -30,7 +29,7 @@ export function initiate_global_vars() {
     current_automaton = radioAlgo[0].checked ?
       new HTML_L_star(teacher) :
       new HTML_NL_star(teacher);
-    teacher_description_HTML.innerHTML = current_automaton.teacher.description;
+    teacher_description_HTML.innerHTML = current_automaton.lerner.teacher.description;
     // @ts-ignore
     MathJax.typeset();
   }
@@ -52,17 +51,14 @@ export function initiate_global_vars() {
     label.append(span);
     teacher_switch_HTML.appendChild(label);
     label.addEventListener("contextmenu", (ev) => {
-      console.log("here");
       ev.preventDefault();
       teacher_switch_HTML.removeChild(label);
-      console.log("there");
-
     })
     return radioTeacher;
   };
 
   radioAlgo.forEach(e => {
-    e.addEventListener("click", () => listener(current_automaton.teacher))
+    e.addEventListener("click", () => listener(current_automaton.lerner.teacher))
   })
 
   teachers.forEach((teacher, pos) => {
@@ -82,8 +78,6 @@ export function initiate_global_vars() {
       sentence =>
         sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined,
       []);
-    console.log(teacher);
-
     let radioTeacher = createRadioTeacher(teacher)
     radioTeacher.click()
   });
@@ -94,11 +88,9 @@ export function clear_automaton_HTML() {
   automatonHTML.innerHTML = "";
 }
 
-// console.log(process.argv);
 try {
   // @ts-ignore
   process == undefined;
-  console.log("HERE");
 } catch (e) {
   // @ts-ignore
   window.onload = initiate_global_vars();

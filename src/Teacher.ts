@@ -1,53 +1,54 @@
 import { Automaton } from "./Automaton.js";
-import { count_str_occurrences, myFunction } from "./Utilities.js";
+import { boolToString, count_str_occurrences, myFunction } from "./Utilities.js";
 
 export class Teacher {
   check_function: myFunction<string, boolean>;
   counter_exemples: string[];
+  counter_exemples_pos = 0;
   counter: number;
   description: string;
   alphabet: string[];
   word_apperencance: [string, boolean][];
-  max_word_length = 10;
+  max_word_length = 5;
 
-  constructor(description: string, alphabet: string, f: myFunction<string, boolean>, counter_exemples: string[]) {
+  constructor(description: string, alphabet: string | string[], f: myFunction<string, boolean>, counter_exemples: string[], initiate_mapping?: [string, boolean][]) {
     this.alphabet = Array.from(alphabet);
     this.check_function = f;
     this.counter_exemples = counter_exemples;
     this.counter = 0;
     this.description = description;
-    this.word_apperencance = [["", this.check_function("")]]
-    this.initiate_mapping()
+    this.word_apperencance = initiate_mapping ? initiate_mapping : this.initiate_mapping()
+    // this.initiate_mapping()
     // this.word_apperencance = this.word_apperencance.sort((a, b) => a[0].length - b[0].length);
   }
 
   initiate_mapping() {
+    let res: [string, boolean][] = [["", this.check_function("")]]
     let alphabet = Array.from(this.alphabet).sort()
     let level = Array.from(alphabet)
-    while (this.word_apperencance[this.word_apperencance.length - 1][0].length < this.max_word_length) {
+    while (res[res.length - 1][0].length < this.max_word_length) {
       let res1: string[] = []
       level.forEach(e => alphabet.forEach(a => {
-        this.word_apperencance.push([e + a, this.check_function(e + a)])
+        res.push([e + a, this.check_function(e + a)])
         res1.push(e + a)
       }))
       level = res1
     }
-    console.log(this.word_apperencance.length);
+    return res;
   }
 
   query(sentence: string): string {
-    return this.boolToString(this.check_function(sentence));
+    return boolToString(this.check_function(sentence));
   }
 
   member(automaton: Automaton): string | undefined {
+    if (this.counter_exemples_pos < this.counter_exemples.length) {
+      return this.counter_exemples[this.counter_exemples_pos++]
+    }
     let res = this.word_apperencance.find((word) => {
       return automaton.accept_word_nfa(word[0])[0] != word[1];
     });
     return res ? res[0] : res;
-  }
-
-  boolToString(bool: boolean): string {
-    return bool ? "1" : "0";
   }
 }
 
@@ -75,13 +76,14 @@ export let teacherA3fromLast = new Teacher(
 )
 /**
  * a teacher accepting the language over {a, b}
- * of strings with any even number of "a" and at least three "b"
+ * of strings with any even number of "a" or at least three "b"
  */
 export let teacherEvenAandThreeB = new Teacher(
-  `Automata accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\land \\#(w_a) \\% 2 = 0\\}\\)
-  <br/> → words with at least 3 'b' and an even nb of 'a'`, "ab",
-  sentence => count_str_occurrences(sentence, "b") >= 3 && count_str_occurrences(sentence, "a") % 2 == 0,
-  ["bbb", "ababb", "bbaab", "babba"]
+  `Automata accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\lor \\#(w_a) \\% 2 = 1\\}\\)
+  <br/> → words with at least 3 'b' or an odd nb of 'a'`, "ab",
+  sentence => count_str_occurrences(sentence, "b") >= 3 || count_str_occurrences(sentence, "a") % 2 == 1,
+  []
+  // ["bbb", "ababb", "bbaab", "babba"]
 );
 
 /**
@@ -98,7 +100,7 @@ export let teacherNotAfourthPos = new Teacher(
     }
     return true;
   },
-  ["aaaa", "baaa", "bbaaa", "bbbaaa"]
+  ["aaaa"]
 )
 
 /**
@@ -113,4 +115,37 @@ export let teacher_bStar_a_or_aStart_bStar = new Teacher(
   },
   ["aaaa", "baaa", "bbaaa", "bbbaaa"]
 )
-export let teachers = [teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]
+
+export let binaryAddition = new Teacher(
+  `Automata accepting the sum between binary words, exemple : <br>
+  <pre>
+  0101 + 
+  1001 = 
+  1110 </pre>
+  we encode this sum as the concatenation of vectors of size 3 : <br>
+  <pre>
+  fst column 011 = 3
+  snd column 101 = 5 
+  trd column 001 = 1 
+  fth column 110 = 6 </pre>
+  so 3516 which is a valid word for the sum <br>
+  <input class="sum-calc sum-calc-style" onkeyup="update_input()"> + <br>
+  <input class="sum-calc sum-calc-style" onkeyup="update_input()"> = <br>
+  <input class="sum-calc sum-calc-style" onkeyup="update_input()"><br>
+  <button id="calc" onclick="send_calc_button()">Send</button>
+  <span class="sum-calc-style" id="add-res"></span>
+  `,
+  "01234567", sentence => {
+    let charToBin = (char: string) =>
+      (parseInt(char) >>> 0).toString(2).padStart(3, "0")
+    let sentenceAr = Array.from(sentence).map(e => charToBin(e))
+    // console.log(sentence)
+    let fst_term = parseInt(sentenceAr.map(e => e[0]).join(''), 2);
+    let snd_term = parseInt(sentenceAr.map(e => e[1]).join(''), 2);
+    let trd_term = parseInt(sentenceAr.map(e => e[2]).join(''), 2);
+    // console.log(fst_term, snd_term, trd_term);
+    return fst_term + snd_term == trd_term;
+  }, []
+)
+
+export let teachers = [binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]

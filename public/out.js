@@ -440,6 +440,7 @@ define("html_interactions/HTML_L_star", ["require", "exports", "Main", "L_star/L
             Main_js_1.message.innerHTML =
                 `Queries = ${this.query_number} - Membership = ${this.member_number} <br>
       ${Main_js_1.message.innerHTML}`;
+            MathJax.typeset();
         }
         add_automaton_listener() {
             let input = document.createElement("input");
@@ -464,7 +465,7 @@ define("html_interactions/HTML_L_star", ["require", "exports", "Main", "L_star/L
             if (close_rep != undefined) {
                 Main_js_1.message.innerText =
                     `The table is not closed since
-        row(${close_rep}) = ${this.observation_table[close_rep]} but there is no s in S such that row(s) = ${this.observation_table[close_rep]};
+        \\(\\{row(${close_rep}) = ${this.observation_table[close_rep]} \\land 0 \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) = ${this.observation_table[close_rep]}\\}\\);
         I'm going to move ${close_rep} from SA to S`;
                 this.pile_actions.push(() => {
                     Main_js_1.message.innerText = "";
@@ -485,10 +486,9 @@ define("html_interactions/HTML_L_star", ["require", "exports", "Main", "L_star/L
                 let a = consistence_rep[2];
                 Main_js_1.message.innerText =
                     `The table is not consistent : 
-        row(${s1 ? s1 : "ε"}) and row(${s2 ? s2 : "ε"}) have same value in S,
-        but their value is not the same if we add ${a} 
-        row(${s1 + a}) != row(${s2 + a})
-        I'm going to add the column ${new_col} since T(${s1 + new_col}) != T(${s2 + new_col})`;
+        \\(\\{row(${s1 ? s1 : "ε"}) = row(${s2 ? s2 : "ε"}) \\land (${s1 ? s1 : "ε"}, ${s2 ? s2 : "ε"}) \\in S\\}\\),
+        but \\(\\{row(${s1 + a}) \\neq row(${s2 + a}) \\land (${s1 ? s1 : "ε"}, ${s2 ? s2 : "ε"}) \\in S \\land ${a} \\in \\Sigma\\}\\)
+        I'm going to add the column "${new_col}" since \\(T(${s1 + new_col}) \\neq T(${s2 + new_col})\\)`;
                 this.pile_actions.push(() => {
                     Main_js_1.message.innerText = "";
                     this.add_column(new_col);
@@ -594,16 +594,12 @@ define("NL_star/NL_star", ["require", "exports", "Automaton", "L_star/L_star", "
                     let s2 = this.S[s2_ind];
                     let value_s1 = this.observation_table[s1];
                     let value_s2 = this.observation_table[s2];
-                    console.log(s1, s2, value_s1, value_s2, this.is_covered(value_s1, value_s2));
-                    if (s1 == 'bbb' && s2 == "bb") {
-                        console.log(value_s1, value_s2, this.is_covered(value_s1, value_s2));
-                    }
                     if (this.is_covered(value_s1, value_s2)) {
                         console.log(s1, s2, value_s1, "is covered by", value_s2);
                         for (const a of this.alphabet) {
                             for (let i = 0; i < this.E.length; i++) {
                                 if (this.observation_table[s1 + a][i] <
-                                    this.observation_table[s2 + a][i])
+                                    this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i]))
                                     return [s1, s2, a + this.E[i]];
                             }
                         }
@@ -613,8 +609,8 @@ define("NL_star/NL_star", ["require", "exports", "Automaton", "L_star/L_star", "
                         for (const a of this.alphabet) {
                             for (let i = 0; i < this.E.length; i++) {
                                 if (this.observation_table[s1 + a][i] <
-                                    this.observation_table[s2 + a][i])
-                                    return [s1, s2, a + this.E[i]];
+                                    this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i]))
+                                    return [s2, s1, a + this.E[i]];
                             }
                         }
                     }
@@ -715,6 +711,7 @@ define("html_interactions/HTML_NL_star", ["require", "exports", "Main", "NL_star
             Main_js_2.message.innerHTML =
                 `Queries = ${this.query_number} - Membership = ${this.member_number} <br>
       ${Main_js_2.message.innerHTML}`;
+            MathJax.typeset();
         }
         add_automaton_listener() {
             let input = document.createElement("input");
@@ -740,8 +737,8 @@ define("html_interactions/HTML_NL_star", ["require", "exports", "Main", "NL_star
             if (close_rep != undefined) {
                 Main_js_2.message.innerText =
                     `The table is not closed since
-        row(${close_rep}) = ${this.observation_table[close_rep]} but there is no s in S such that row(s) = ${this.observation_table[close_rep]};
-        I'm going to move ${close_rep} from SA to S`;
+        \\(\\{row(${close_rep}) = ${this.observation_table[close_rep]} \\land ${close_rep} \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) \\sqsupseteq ${this.observation_table[close_rep]}\\}\\);
+        I'm going to move "${close_rep}" from SA to S`;
                 this.pile_actions.push(() => {
                     Main_js_2.message.innerText = "";
                     this.add_elt_in_S(close_rep);
@@ -760,11 +757,11 @@ define("html_interactions/HTML_NL_star", ["require", "exports", "Main", "NL_star
                 let s2 = consistence_rep[1];
                 let a = consistence_rep[2];
                 Main_js_2.message.innerText =
-                    `The table is not consistent : 
-        row(${s1 ? s1 : "ε"}) and row(${s2 ? s2 : "ε"}) have same value in S,
-        but their value is not the same if we add ${a} 
-        row(${s1 + a}) != row(${s2 + a})
-        I'm going to add the column ${new_col} since T(${s1 + new_col}) != T(${s2 + new_col})`;
+                    `The table is not consistent :
+        take \\(${s1 ? s1 : "ε"}\\in S \\land ${s2 ? s2 : "ε"} \\in S \\land ${a[0]} \\in \\Sigma \\)
+        \\(\\{row(${s1 ? s1 : "ε"}) \\sqsubseteq row(${s2 ? s2 : "ε"})\\}\\)
+        but \\(\\{row(${s1 ? s1 : "ε"} \\circ ${new_col[0]}) \\not\\sqsubseteq row(${s2 ? s2 : "ε"} \\circ ${new_col[0]})\\}\\)
+        I'm going to add the column \\(${new_col} \\in \\Sigma \\circ E\\) since \\(T(${s1 ? s1 : "ε"} \\circ ${new_col}) > T(${s2 ? s2 : "ε"} \\circ ${new_col})\\)`;
                 this.pile_actions.push(() => {
                     Main_js_2.message.innerText = "";
                     this.add_column(new_col);
