@@ -1,4 +1,4 @@
-import { Automaton } from "../Automaton";
+import { Automaton } from "../automaton/Automaton.js";
 
 export function listener_automaton_click_button(a: Automaton) {
   let next_char = () => {

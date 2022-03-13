@@ -1,4 +1,4 @@
-import { Automaton } from "../Automaton.js";
+import { Automaton } from "../automaton/Automaton.js";
 import { Teacher } from "../Teacher.js";
 import { boolToString, generate_prefix_list } from "../tools/Utilities.js";
 

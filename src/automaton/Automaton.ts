@@ -7,7 +7,7 @@ export interface Transition {
 export interface AutomatonJson {
   transitions: Transition[],
   startState: string[],
-  endState: string[],
+  acceptingStates: string[],
   alphabet: string[] | string,
   states: string[]
 };
@@ -15,25 +15,25 @@ export interface AutomatonJson {
 export class Automaton implements AutomatonJson {
   transitions: Transition[];
   startState: string[];
-  endState: string[];
+  acceptingStates: string[];
   alphabet: string | string[];
   states: string[];
   states_rename: string[];
-  currentState: string;
+  currentStates: string[];
 
   constructor(json: AutomatonJson) {
     this.transitions = json.transitions;
     this.startState = json.startState;
-    this.endState = json.endState;
-    this.currentState = this.startState[0];
+    this.acceptingStates = json.acceptingStates;
+    this.currentStates = this.startState;
     this.alphabet = Array.from(json.alphabet);
     this.states = json.states;
     this.states_rename = [];
-    let counter_init = [0, this.startState.length, this.states.length - this.endState.length + 1];
+    let counter_init = [0, this.startState.length, this.states.length - this.acceptingStates.length + 1];
     for (let i = 0; i < this.states.length; i++) {
       if (this.startState.includes(this.states[i])) {
         this.states_rename.push("q" + counter_init[0]++)
-      } else if (this.endState.includes(this.states[i])) {
+      } else if (this.acceptingStates.includes(this.states[i])) {
         this.states_rename.push("q" + counter_init[2]++)
       } else {
         this.states_rename.push("q" + counter_init[1]++)
@@ -42,7 +42,16 @@ export class Automaton implements AutomatonJson {
   }
 
   next_step(next_char: string) {
-    this.currentState = this.find_transition(this.currentState, next_char).toStates[0];
+    let newCurrentState: string[] = []
+    this.currentStates.forEach(cs => {
+      let nextStates = this.find_transition(cs, next_char).toStates
+      nextStates.forEach(nextState => {
+        if (!newCurrentState.includes(nextState)) {
+          newCurrentState.push(nextState)
+        }
+      })
+    })
+    this.currentStates = newCurrentState;
   }
 
   accept_word(word: string): boolean {
@@ -50,7 +59,7 @@ export class Automaton implements AutomatonJson {
     Array.from(word).forEach(
       letter => this.next_step(letter)
     )
-    let is_accepted = this.endState.includes(this.currentState);
+    let is_accepted = this.acceptingStates.some(e => this.currentStates.includes(e));
     this.restart()
     return is_accepted;
   }
@@ -68,7 +77,7 @@ export class Automaton implements AutomatonJson {
         let next_states = this.find_transition(current_state, word[index]).toStates;
         return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + this.get_state_rename(next_state)))
       } else {
-        if (this.endState.includes(current_state)) {
+        if (this.acceptingStates.includes(current_state)) {
           path = [state_path]
           return true;
         }
@@ -86,7 +95,7 @@ export class Automaton implements AutomatonJson {
   }
 
   restart() {
-    this.currentState = this.startState[0];
+    this.currentStates = this.startState;
   }
 
   /** GRAPHIC PART */
@@ -106,7 +115,7 @@ export class Automaton implements AutomatonJson {
     mermaid.init($(".mermaid"));
 
     // Mark end nodes
-    this.endState.forEach(n => {
+    this.acceptingStates.forEach(n => {
       let circle = this.get_current_graph_node(n) as HTMLElement;
       circle.style.strokeWidth = "1.1";
       circle.style.stroke = "black"
@@ -160,18 +169,20 @@ export class Automaton implements AutomatonJson {
 
 
   color_node(toFill: boolean) {
-    let current_circle = this.get_current_graph_node(this.currentState) as HTMLElement;
-    let next_circle = current_circle.nextSibling as HTMLElement;
-    if (toFill) {
-      next_circle.style.textDecoration = "underline";
-      if (this.endState.includes(this.currentState))
-        next_circle.style.fill = '#009879';
-      else current_circle.style.fill = '#009879';
-    } else {
-      if (this.endState.includes(this.currentState))
-        next_circle.removeAttribute('style');
-      else current_circle.removeAttribute('style');
-    }
+    this.currentStates.forEach(currentState => {
+      let current_circle = this.get_current_graph_node(currentState) as HTMLElement;
+      let next_circle = current_circle.nextSibling as HTMLElement;
+      if (toFill) {
+        next_circle.style.textDecoration = "underline";
+        if (this.acceptingStates.includes(currentState))
+          next_circle.style.fill = '#009879';
+        else current_circle.style.fill = '#009879';
+      } else {
+        if (this.acceptingStates.includes(currentState))
+          next_circle.removeAttribute('style');
+        else current_circle.removeAttribute('style');
+      }
+    })
     // let currentNode = this.get_current_graph_node(this.currentState).parentElement as HTMLElement;
     // let spanWithText = currentNode.getElementsByClassName("nodeLabel")![0] as HTMLElement;
     // if (toFill) {

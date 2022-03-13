@@ -1,11 +1,6 @@
-import { Automaton, AutomatonJson } from "../Automaton.js";
-// @ts-ignore
-import { noam } from "../../public/automaton/noam.js"
-/*
- * Adapter from 
- * https://cyberzhg.github.io/toolbox/min_dfa?regex=KGF8Yikq 
- *automaton to my representation
- */
+
+// @ts-nocheck
+import { Automaton, AutomatonJson } from "../automaton/Automaton.js";
 
 interface HisTransition {
   fromState: number,
@@ -37,7 +32,7 @@ export function HisAutomaton2Mine(aut: HisAutomaton): Automaton {
   }
   let res: AutomatonJson = {
     alphabet: Array.from(aut.alphabet),
-    endState: aut.acceptingStates.map(e => e + ""),
+    acceptingStates: aut.acceptingStates.map(e => e + ""),
     startState: (typeof aut.initialState === "number") ? [aut.initialState + ""] : Array.from(aut.initialState!).map(e => e + ""),
     states: aut.states.map(e => e + ""),
     transitions: aut.transitions.map(e => ({ fromState: e.fromState + "", symbol: e.symbol, toStates: e.toStates.map(e => e + "") }))
@@ -61,7 +56,7 @@ export function MyAutomatonToHis(aut: Automaton): HisAutomaton {
     states.push(startState)
   } else startState = state2int(aut.startState[0])
   let res: HisAutomaton = {
-    acceptingStates: aut.endState.map(e => state2int(e)),
+    acceptingStates: aut.acceptingStates.map(e => state2int(e)),
     alphabet: Array.from(aut.alphabet),
     states: states,
     initialState: startState,

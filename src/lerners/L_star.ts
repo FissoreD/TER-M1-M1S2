@@ -1,4 +1,4 @@
-import { Automaton, Transition } from "../Automaton.js";
+import { Automaton, Transition } from "../automaton/Automaton.js";
 import { Teacher } from "../Teacher.js";
 import { LernerBase, Map_string_string } from "./LernerBase.js";
 
@@ -77,7 +77,7 @@ export class L_star extends LernerBase {
     }
     this.automaton = new Automaton({
       "alphabet": this.alphabet,
-      "endState": end_states,
+      "acceptingStates": end_states,
       "startState": [first_state],
       "states": keys,
       "transitions": transitions

@@ -1,6 +1,6 @@
-import { Automaton } from "../Automaton.js";
+import { Automaton } from "../automaton/Automaton.js";
 import { LernerBase } from "../lerners/LernerBase.js";
-import { clear_automaton_HTML, message, tableHTML } from "../Main.js";
+import { automatonDiv, clear_automaton_HTML, message, tableHTML } from "../Main.js";
 import { myFunction } from "../tools/Utilities.js";
 
 export abstract class HTML_LernerBase<Lerner extends LernerBase> {
@@ -160,8 +160,40 @@ export abstract class HTML_LernerBase<Lerner extends LernerBase> {
 
   abstract consistent_message(s1: string, s2: string, new_col: string): string;
 
-  abstract add_automaton_listener(): void;
+  // abstract add_automaton_listener(): void;
 
   abstract table_to_update_after_equiv(answer: string): void;
+
+  add_automaton_listener() {
+    let input = document.createElement("input");
+    let setB = document.createElement("button");
+    setB.innerHTML = "Reinitialize automaton";
+    setB.addEventListener('click', () => {
+      this.automaton!.restart();
+      this.automaton!.initiate_graph();
+    })
+    let nextB = document.createElement("button")
+    nextB.innerHTML = "Next char";
+    nextB.addEventListener('click', () => {
+      this.automaton!.draw_next_step(input.value[0])
+      input.value = input.value.slice(1);
+    });
+    automatonDiv.appendChild(input);
+    automatonDiv.appendChild(nextB);
+    automatonDiv.appendChild(setB);
+    let acceptB = document.createElement("button");
+    let answerP = document.createElement("p");
+    acceptB.innerHTML = "In automaton";
+    acceptB.addEventListener("click", () => {
+      let aut_answer = this.automaton?.accept_word_nfa(input.value);
+      if (aut_answer![0]) {
+        answerP.innerHTML = `The word ${input.value} is accepted, here is a valid path : ${aut_answer![1]}`
+      } else {
+        answerP.innerHTML = `There is no valid path accepting the word ${input.value}`
+      }
+    })
+    automatonDiv.appendChild(acceptB);
+    automatonDiv.appendChild(answerP);
+  }
 
 }

@@ -1,5 +1,5 @@
-import { Automaton } from "./Automaton.js";
-import { complementAutomata, differenceAutomata, intersectionAutomata, minimizeAutomaton, MyAutomatonToHis, regexToAutomaton, unionAutomata } from "./tools/automaton_type.js";
+import { Automaton } from "./automaton/Automaton.js";
+import { differenceAutomata, minimizeAutomaton, MyAutomatonToHis, regexToAutomaton } from "./automaton/automaton_type.js";
 import { boolToString, count_str_occurrences, myFunction } from "./tools/Utilities.js";
 
 export class Teacher {
@@ -55,7 +55,7 @@ export class Teacher {
       return difference;
     };
     let counterExemple = (automaton: Automaton): string | undefined => {
-      if (automaton.endState.length == 0) return undefined;
+      if (automaton.acceptingStates.length == 0) return undefined;
       let toExplore = [automaton.startState[0]]
       let explored: string[] = []
       type parentChild = { parent: string, symbol: string }
@@ -72,7 +72,7 @@ export class Teacher {
           }
         }
 
-        if (automaton.endState.includes(current)) {
+        if (automaton.acceptingStates.includes(current)) {
           let id = automaton.states.indexOf(current);
           let res: string[] = [parent[id].symbol]
           while (parent[id].parent != "") {

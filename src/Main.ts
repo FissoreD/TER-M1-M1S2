@@ -1,10 +1,10 @@
 import { Teacher, teachers } from "./Teacher.js";
 import { HTML_L_star } from "./html_interactions/HTML_L_star.js";
 import { HTML_NL_star } from "./html_interactions/HTML_NL_star.js";
-import { Automaton } from "./Automaton.js";
+import { Automaton } from "./automaton/Automaton.js";
 import { L_star } from "./lerners/L_star.js";
 import { NL_star } from "./lerners/NL_star.js";
-import * as autFunction from "./tools/automaton_type.js";
+import * as autFunction from "./automaton/automaton_type.js";
 
 export let
   automatonDiv: HTMLDivElement,

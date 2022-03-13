@@ -1,6 +1,3 @@
-import { Automaton } from "../Automaton";
-
-
 export type myFunction<S, T> = { (data: S): T; };
 
 export function same_vector(v1: any[], v2: any[]): boolean {

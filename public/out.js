@@ -18,7 +18,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-define("Automaton", ["require", "exports"], function (require, exports) {
+define("automaton/Automaton", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Automaton = void 0;
@@ -27,17 +27,17 @@ define("Automaton", ["require", "exports"], function (require, exports) {
         constructor(json) {
             this.transitions = json.transitions;
             this.startState = json.startState;
-            this.endState = json.endState;
-            this.currentState = this.startState[0];
+            this.acceptingStates = json.acceptingStates;
+            this.currentStates = this.startState;
             this.alphabet = Array.from(json.alphabet);
             this.states = json.states;
             this.states_rename = [];
-            let counter_init = [0, this.startState.length, this.states.length - this.startState.length];
+            let counter_init = [0, this.startState.length, this.states.length - this.acceptingStates.length + 1];
             for (let i = 0; i < this.states.length; i++) {
                 if (this.startState.includes(this.states[i])) {
-                    this.states_rename.push("s" + counter_init[0]++);
+                    this.states_rename.push("q" + counter_init[0]++);
                 }
-                else if (this.endState.includes(this.states[i])) {
+                else if (this.acceptingStates.includes(this.states[i])) {
                     this.states_rename.push("q" + counter_init[2]++);
                 }
                 else {
@@ -46,12 +46,21 @@ define("Automaton", ["require", "exports"], function (require, exports) {
             }
         }
         next_step(next_char) {
-            this.currentState = this.find_transition(this.currentState, next_char).toStates[0];
+            let newCurrentState = [];
+            this.currentStates.forEach(cs => {
+                let nextStates = this.find_transition(cs, next_char).toStates;
+                nextStates.forEach(nextState => {
+                    if (!newCurrentState.includes(nextState)) {
+                        newCurrentState.push(nextState);
+                    }
+                });
+            });
+            this.currentStates = newCurrentState;
         }
         accept_word(word) {
             this.restart();
             Array.from(word).forEach(letter => this.next_step(letter));
-            let is_accepted = this.endState.includes(this.currentState);
+            let is_accepted = this.acceptingStates.some(e => this.currentStates.includes(e));
             this.restart();
             return is_accepted;
         }
@@ -68,7 +77,7 @@ define("Automaton", ["require", "exports"], function (require, exports) {
                     return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + this.get_state_rename(next_state)));
                 }
                 else {
-                    if (this.endState.includes(current_state)) {
+                    if (this.acceptingStates.includes(current_state)) {
                         path = [state_path];
                         return true;
                     }
@@ -85,7 +94,7 @@ define("Automaton", ["require", "exports"], function (require, exports) {
             return [is_accepted, path];
         }
         restart() {
-            this.currentState = this.startState[0];
+            this.currentStates = this.startState;
         }
         draw_next_step(next_char) {
             this.color_node(false);
@@ -97,7 +106,7 @@ define("Automaton", ["require", "exports"], function (require, exports) {
             automatonHTML.removeAttribute('data-processed');
             automatonHTML.innerHTML = this.matrix_to_mermaid();
             mermaid.init($(".mermaid"));
-            this.endState.forEach(n => {
+            this.acceptingStates.forEach(n => {
                 let circle = this.get_current_graph_node(n);
                 circle.style.strokeWidth = "1.1";
                 circle.style.stroke = "black";
@@ -141,21 +150,23 @@ define("Automaton", ["require", "exports"], function (require, exports) {
             return res;
         }
         color_node(toFill) {
-            let current_circle = this.get_current_graph_node(this.currentState);
-            let next_circle = current_circle.nextSibling;
-            if (toFill) {
-                next_circle.style.textDecoration = "underline";
-                if (this.endState.includes(this.currentState))
-                    next_circle.style.fill = '#009879';
-                else
-                    current_circle.style.fill = '#009879';
-            }
-            else {
-                if (this.endState.includes(this.currentState))
-                    next_circle.removeAttribute('style');
-                else
-                    current_circle.removeAttribute('style');
-            }
+            this.currentStates.forEach(currentState => {
+                let current_circle = this.get_current_graph_node(currentState);
+                let next_circle = current_circle.nextSibling;
+                if (toFill) {
+                    next_circle.style.textDecoration = "underline";
+                    if (this.acceptingStates.includes(currentState))
+                        next_circle.style.fill = '#009879';
+                    else
+                        current_circle.style.fill = '#009879';
+                }
+                else {
+                    if (this.acceptingStates.includes(currentState))
+                        next_circle.removeAttribute('style');
+                    else
+                        current_circle.removeAttribute('style');
+                }
+            });
         }
         create_triple(states, transition) {
             let split = states.split("&");
@@ -172,6 +183,95 @@ define("Automaton", ["require", "exports"], function (require, exports) {
         }
     }
     exports.Automaton = Automaton;
+});
+define("automaton/automaton_type", ["require", "exports", "automaton/Automaton"], function (require, exports, Automaton_js_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.differenceAutomata = exports.complementAutomata = exports.unionAutomata = exports.intersectionAutomata = exports.minimizeAutomaton = exports.regexToAutomaton = exports.MyAutomatonToHis = exports.HisAutomaton2Mine = void 0;
+    function HisAutomaton2Mine(aut) {
+        let transitionAdapter = () => {
+            let res = [];
+            let trans_copy = Array.from(aut.transitions);
+            for (const state of aut.states) {
+                let line = [];
+                for (const letter of aut.alphabet) {
+                    let next = trans_copy.find(e => e.fromState == state && e.symbol == letter).toStates;
+                    line.push(next.map(e => e + ""));
+                }
+                res.push(line);
+            }
+            return res;
+        };
+        let res = {
+            alphabet: Array.from(aut.alphabet),
+            acceptingStates: aut.acceptingStates.map(e => e + ""),
+            startState: (typeof aut.initialState === "number") ? [aut.initialState + ""] : Array.from(aut.initialState).map(e => e + ""),
+            states: aut.states.map(e => e + ""),
+            transitions: aut.transitions.map(e => ({ fromState: e.fromState + "", symbol: e.symbol, toStates: e.toStates.map(e => e + "") }))
+        };
+        return new Automaton_js_1.Automaton(res);
+    }
+    exports.HisAutomaton2Mine = HisAutomaton2Mine;
+    function MyAutomatonToHis(aut) {
+        let state2int = (state) => aut.states.indexOf(state);
+        let states = aut.states.map(e => state2int(e));
+        let startState = states.length;
+        let transitions = aut.transitions.map(e => ({
+            fromState: state2int(e.fromState), symbol: e.symbol, toStates: e.toStates.map(e => state2int(e))
+        }));
+        if (aut.startState.length > 1) {
+            transitions.push(({
+                fromState: startState,
+                symbol: "$",
+                toStates: aut.startState.map(e => state2int(e))
+            }));
+            states.push(startState);
+        }
+        else
+            startState = state2int(aut.startState[0]);
+        let res = {
+            acceptingStates: aut.acceptingStates.map(e => state2int(e)),
+            alphabet: Array.from(aut.alphabet),
+            states: states,
+            initialState: startState,
+            transitions: transitions
+        };
+        return res;
+    }
+    exports.MyAutomatonToHis = MyAutomatonToHis;
+    function regexToAutomaton(regex) {
+        let aut = (noam.re.string.toAutomaton(regex));
+        return minimizeAutomaton(aut);
+    }
+    exports.regexToAutomaton = regexToAutomaton;
+    function minimizeAutomaton(automaton) {
+        automaton = noam.fsm.convertEnfaToNfa(automaton);
+        automaton = noam.fsm.convertNfaToDfa(automaton);
+        automaton = noam.fsm.minimize(automaton);
+        return HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton));
+    }
+    exports.minimizeAutomaton = minimizeAutomaton;
+    function intersectionAutomata(a1, a2) {
+        return minimizeAutomaton(noam.fsm.intersection(MyAutomatonToHis(a1), MyAutomatonToHis(a2)));
+    }
+    exports.intersectionAutomata = intersectionAutomata;
+    function unionAutomata(a1, a2) {
+        let A1 = MyAutomatonToHis(a1);
+        let A2 = MyAutomatonToHis(a2);
+        let U = noam.fsm.union(A1, A2);
+        let res = minimizeAutomaton(U);
+        return res;
+    }
+    exports.unionAutomata = unionAutomata;
+    function complementAutomata(a1) {
+        return minimizeAutomaton(noam.fsm.complement(MyAutomatonToHis(a1)));
+    }
+    exports.complementAutomata = complementAutomata;
+    function differenceAutomata(a1, a2) {
+        let c = complementAutomata(a2);
+        return intersectionAutomata(a1, c);
+    }
+    exports.differenceAutomata = differenceAutomata;
 });
 define("tools/Utilities", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -192,20 +292,20 @@ define("tools/Utilities", ["require", "exports"], function (require, exports) {
     }
     exports.boolToString = boolToString;
 });
-define("Teacher", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_1) {
+define("Teacher", ["require", "exports", "automaton/automaton_type", "tools/Utilities"], function (require, exports, automaton_type_js_1, Utilities_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.teachers = exports.binaryAddition = exports.teacher_bStar_a_or_aStart_bStar = exports.teacherNotAfourthPos = exports.teacherEvenAandThreeB = exports.teacherA3fromLast = exports.teacherPairZeroAndOne = exports.Teacher = void 0;
     class Teacher {
-        constructor(description, alphabet, f, counter_exemples, initiate_mapping) {
+        constructor(description, alphabet, regex, f, counter_exemples, initiate_mapping) {
             this.counter_exemples_pos = 0;
-            this.max_word_length = 5;
+            this.max_word_length = 8;
             this.alphabet = Array.from(alphabet);
             this.check_function = f;
             this.counter_exemples = counter_exemples;
             this.counter = 0;
             this.description = description;
-            this.word_apperencance = initiate_mapping ? initiate_mapping : this.initiate_mapping();
+            this.automaton = (0, automaton_type_js_1.regexToAutomaton)(regex);
         }
         initiate_mapping() {
             let res = [["", this.check_function("")]];
@@ -222,38 +322,75 @@ define("Teacher", ["require", "exports", "tools/Utilities"], function (require, 
             return res;
         }
         query(sentence) {
-            return (0, Utilities_js_1.boolToString)(this.check_function(sentence));
+            return (0, Utilities_js_1.boolToString)(this.automaton.accept_word_nfa(sentence)[0]);
         }
         member(automaton) {
-            if (this.counter_exemples_pos < this.counter_exemples.length) {
-                return this.counter_exemples[this.counter_exemples_pos++];
-            }
-            let res = this.word_apperencance.find((word) => {
-                return automaton.accept_word_nfa(word[0])[0] != word[1];
-            });
-            return res ? res[0] : res;
+            let differenceAutomaton = (a, b) => {
+                let difference = (0, automaton_type_js_1.differenceAutomata)(a, b);
+                return difference;
+            };
+            let counterExemple = (automaton) => {
+                if (automaton.acceptingStates.length == 0)
+                    return undefined;
+                let toExplore = [automaton.startState[0]];
+                let explored = [];
+                let parent = new Array(automaton.states.length).fill({ parent: "", symbol: "" });
+                while (toExplore.length > 0) {
+                    let current = toExplore.shift();
+                    if (explored.includes(current))
+                        continue;
+                    explored.push(current);
+                    for (const transition of automaton.transitions) {
+                        if (!explored.includes(transition.toStates[0]) && transition.fromState == current) {
+                            parent[automaton.states.indexOf(transition.toStates[0])] =
+                                { parent: transition.fromState, symbol: transition.symbol };
+                            toExplore.push(transition.toStates[0]);
+                        }
+                    }
+                    if (automaton.acceptingStates.includes(current)) {
+                        let id = automaton.states.indexOf(current);
+                        let res = [parent[id].symbol];
+                        while (parent[id].parent != "") {
+                            id = automaton.states.indexOf(parent[id].parent);
+                            res.push(parent[id].symbol);
+                        }
+                        return res.reverse().join("");
+                    }
+                }
+                return "";
+            };
+            let automMinimized = (0, automaton_type_js_1.minimizeAutomaton)((0, automaton_type_js_1.MyAutomatonToHis)(automaton));
+            let diff1 = differenceAutomaton(this.automaton, automMinimized);
+            let diff2 = differenceAutomaton(automMinimized, this.automaton);
+            let counterEx1 = counterExemple(diff1);
+            let counterEx2 = counterExemple(diff2);
+            if (counterEx1 == undefined)
+                return counterEx2;
+            if (counterEx2 == undefined)
+                return counterEx1;
+            return counterEx1 < counterEx2 ? counterEx1 : counterEx2;
         }
     }
     exports.Teacher = Teacher;
-    exports.teacherPairZeroAndOne = new Teacher(`Automata accepting \\(L = \\{w \\in (0, 1)^* | \\#(w_0) \\% 2 = 0 \\land \\#(w_1) \\% 2 = 0\\}\\) <br/> → words with even nb of '0' and even nb of '1'`, "01", sentence => {
+    exports.teacherPairZeroAndOne = new Teacher(`Automata accepting \\(L = \\{w \\in (0, 1)^* | \\#(w_0) \\% 2 = 0 \\land \\#(w_1) \\% 2 = 0\\}\\) <br/> → words with even nb of '0' and even nb of '1'`, "01", "(00+11+(01+10)(00+11)*(01+10))*", sentence => {
         let parity = (0, Utilities_js_1.count_str_occurrences)(sentence, "0");
         return parity % 2 == 0 && sentence.length % 2 == 0;
     }, ["11", "011"]);
     exports.teacherA3fromLast = new Teacher(`Automata accepting \\(L = \\{w \\in (a, b)^* | w[-3] = a\\}\\) <br/>
-    → words with an 'a' in the 3rd pos from end`, "ab", sentence => sentence.length >= 3 && sentence[sentence.length - 3] == 'a', ["aaa"]);
+    → words with an 'a' in the 3rd pos from end`, "ab", "(a+b)*a(a+b)(a+b)", sentence => sentence.length >= 3 && sentence[sentence.length - 3] == 'a', []);
     exports.teacherEvenAandThreeB = new Teacher(`Automata accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\lor \\#(w_a) \\% 2 = 1\\}\\)
-  <br/> → words with at least 3 'b' or an odd nb of 'a'`, "ab", sentence => (0, Utilities_js_1.count_str_occurrences)(sentence, "b") >= 3 || (0, Utilities_js_1.count_str_occurrences)(sentence, "a") % 2 == 1, []);
+  <br/> → words with at least 3 'b' or an odd nb of 'a'`, "ab", "b*a(b+ab*a)*+(a+b)*ba*ba*b(a+b)*", sentence => (0, Utilities_js_1.count_str_occurrences)(sentence, "b") >= 3 || (0, Utilities_js_1.count_str_occurrences)(sentence, "a") % 2 == 1, []);
     exports.teacherNotAfourthPos = new Teacher(`Automata accepting \\(L = \\{w \\in (a,b)^* \\land i \\in 4\\mathbb{N} | w[i] \\neq a \\land i \\leq len(w)\\}\\) <br/>
-  → words without an 'a' in a position multiple of 4`, "ba", sentence => {
+  → words without an 'a' in a position multiple of 4`, "ba", "((a+b)(a+b)(a+b)b)*(a+b+$)(a+b+$)(a+b+$)", sentence => {
         for (let i = 3; i < sentence.length; i += 4) {
             if (sentence.charAt(i) == "a")
                 return false;
         }
         return true;
-    }, ["aaaa"]);
-    exports.teacher_bStar_a_or_aStart_bStar = new Teacher(`Automata accepting \\(L = regex(^\\land((b^+a) | (a^*b^*))$)\\)`, "ab", sentence => {
+    }, []);
+    exports.teacher_bStar_a_or_aStart_bStar = new Teacher(`Automata accepting \\(L = regex(^\\land((b^+a) | (a^*b^*))$)\\)`, "ab", "(bb*a)+(a*b*)", sentence => {
         return sentence.match(/^((b+a)|(a*b*))$/g) != undefined;
-    }, ["aaaa", "baaa", "bbaaa", "bbbaaa"]);
+    }, []);
     exports.binaryAddition = new Teacher(`Automata accepting the sum between binary words, exemple : <br>
   <pre>
   0101 + 
@@ -271,7 +408,7 @@ define("Teacher", ["require", "exports", "tools/Utilities"], function (require, 
   <input class="sum-calc sum-calc-style" onkeyup="update_input()"><br>
   <button id="calc" onclick="send_calc_button()">Send</button>
   <span class="sum-calc-style" id="add-res"></span>
-  `, "01234567", sentence => {
+  `, "01234567", "((0+3+5)+1(7+4+2)*6)*", sentence => {
         let charToBin = (char) => (parseInt(char) >>> 0).toString(2).padStart(3, "0");
         let sentenceAr = Array.from(sentence).map(e => charToBin(e));
         let fst_term = parseInt(sentenceAr.map(e => e[0]).join(''), 2);
@@ -369,7 +506,7 @@ define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function
         add_row(row_name, after_member = false) {
             this.E.forEach(e => {
                 if (after_member && e == "")
-                    this.observation_table[row_name] = (0, Utilities_js_2.boolToString)(!this.make_automaton().accept_word_nfa(row_name)[0]);
+                    this.observation_table[row_name] = (0, Utilities_js_2.boolToString)(!this.automaton.accept_word_nfa(row_name)[0]);
                 else
                     this.make_query(row_name, e);
             });
@@ -406,7 +543,7 @@ define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function
     }
     exports.LernerBase = LernerBase;
 });
-define("lerners/L_star", ["require", "exports", "Automaton", "lerners/LernerBase"], function (require, exports, Automaton_js_1, LernerBase_js_1) {
+define("lerners/L_star", ["require", "exports", "automaton/Automaton", "lerners/LernerBase"], function (require, exports, Automaton_js_2, LernerBase_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.L_star = void 0;
@@ -463,13 +600,14 @@ define("lerners/L_star", ["require", "exports", "Automaton", "lerners/LernerBase
                     });
                 }
             }
-            return new Automaton_js_1.Automaton({
+            this.automaton = new Automaton_js_2.Automaton({
                 "alphabet": this.alphabet,
-                "endState": end_states,
+                "acceptingStates": end_states,
                 "startState": [first_state],
                 "states": keys,
                 "transitions": transitions
             });
+            return this.automaton;
         }
         is_close() {
             return this.SA.find(t => !this.S.some(s => this.same_row(s, t)));
@@ -483,7 +621,7 @@ define("lerners/L_star", ["require", "exports", "Automaton", "lerners/LernerBase
                         for (const a of this.alphabet) {
                             for (let i = 0; i < this.E.length; i++) {
                                 if (this.observation_table[s1 + a][i] !=
-                                    this.observation_table[s2 + a][i])
+                                    this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i]))
                                     return [s1, s2, a + this.E[i]];
                             }
                         }
@@ -624,17 +762,6 @@ define("html_interactions/HTML_LernerBase", ["require", "exports", "Main"], func
                 this.lerner.finish = true;
             });
         }
-    }
-    exports.HTML_LernerBase = HTML_LernerBase;
-});
-define("html_interactions/HTML_L_star", ["require", "exports", "Main", "lerners/L_star", "html_interactions/HTML_LernerBase"], function (require, exports, Main_js_2, L_star_js_1, HTML_LernerBase_js_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.HTML_L_star = void 0;
-    class HTML_L_star extends HTML_LernerBase_js_1.HTML_LernerBase {
-        constructor(teacher) {
-            super(new L_star_js_1.L_star(teacher));
-        }
         add_automaton_listener() {
             let input = document.createElement("input");
             let setB = document.createElement("button");
@@ -643,15 +770,15 @@ define("html_interactions/HTML_L_star", ["require", "exports", "Main", "lerners/
                 this.automaton.restart();
                 this.automaton.initiate_graph();
             });
-            let sendB = document.createElement("button");
-            sendB.innerHTML = "Next char";
-            sendB.addEventListener('click', () => {
+            let nextB = document.createElement("button");
+            nextB.innerHTML = "Next char";
+            nextB.addEventListener('click', () => {
                 this.automaton.draw_next_step(input.value[0]);
                 input.value = input.value.slice(1);
             });
-            Main_js_2.automatonDiv.appendChild(input);
-            Main_js_2.automatonDiv.appendChild(sendB);
-            Main_js_2.automatonDiv.appendChild(setB);
+            Main_js_1.automatonDiv.appendChild(input);
+            Main_js_1.automatonDiv.appendChild(nextB);
+            Main_js_1.automatonDiv.appendChild(setB);
             let acceptB = document.createElement("button");
             let answerP = document.createElement("p");
             acceptB.innerHTML = "In automaton";
@@ -664,8 +791,19 @@ define("html_interactions/HTML_L_star", ["require", "exports", "Main", "lerners/
                     answerP.innerHTML = `There is no valid path accepting the word ${input.value}`;
                 }
             });
-            Main_js_2.automatonDiv.appendChild(acceptB);
-            Main_js_2.automatonDiv.appendChild(answerP);
+            Main_js_1.automatonDiv.appendChild(acceptB);
+            Main_js_1.automatonDiv.appendChild(answerP);
+        }
+    }
+    exports.HTML_LernerBase = HTML_LernerBase;
+});
+define("html_interactions/HTML_L_star", ["require", "exports", "lerners/L_star", "html_interactions/HTML_LernerBase"], function (require, exports, L_star_js_1, HTML_LernerBase_js_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.HTML_L_star = void 0;
+    class HTML_L_star extends HTML_LernerBase_js_1.HTML_LernerBase {
+        constructor(teacher) {
+            super(new L_star_js_1.L_star(teacher));
         }
         close_message(close_rep) {
             return `The table is not closed since
@@ -684,7 +822,7 @@ define("html_interactions/HTML_L_star", ["require", "exports", "Main", "lerners/
     }
     exports.HTML_L_star = HTML_L_star;
 });
-define("lerners/NL_star", ["require", "exports", "Automaton", "tools/Utilities", "lerners/LernerBase"], function (require, exports, Automaton_js_2, Utilities_js_3, LernerBase_js_2) {
+define("lerners/NL_star", ["require", "exports", "automaton/Automaton", "tools/Utilities", "lerners/LernerBase"], function (require, exports, Automaton_js_3, Utilities_js_3, LernerBase_js_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.NL_star = void 0;
@@ -798,18 +936,19 @@ define("lerners/NL_star", ["require", "exports", "Automaton", "tools/Utilities",
                     });
                 }
             }
-            return new Automaton_js_2.Automaton({
+            this.automaton = new Automaton_js_3.Automaton({
                 "alphabet": this.alphabet,
-                "endState": end_states,
+                "acceptingStates": end_states,
                 "startState": first_state,
                 "states": keys,
                 "transitions": transitions
             });
+            return this.automaton;
         }
     }
     exports.NL_star = NL_star;
 });
-define("html_interactions/HTML_NL_star", ["require", "exports", "Main", "lerners/NL_star", "html_interactions/HTML_LernerBase"], function (require, exports, Main_js_3, NL_star_js_1, HTML_LernerBase_js_2) {
+define("html_interactions/HTML_NL_star", ["require", "exports", "lerners/NL_star", "html_interactions/HTML_LernerBase"], function (require, exports, NL_star_js_1, HTML_LernerBase_js_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HTML_NL_star = void 0;
@@ -823,24 +962,6 @@ define("html_interactions/HTML_NL_star", ["require", "exports", "Main", "lerners
                 row.className += "prime-row";
             }
             return row;
-        }
-        add_automaton_listener() {
-            let input = document.createElement("input");
-            let acceptB = document.createElement("button");
-            let answerP = document.createElement("p");
-            acceptB.innerHTML = "In automaton";
-            acceptB.addEventListener("click", () => {
-                let aut_answer = this.automaton?.accept_word_nfa(input.value);
-                if (aut_answer[0]) {
-                    answerP.innerHTML = `The word ${input.value} is accepted, here is a valid path : ${aut_answer[1]}`;
-                }
-                else {
-                    answerP.innerHTML = `There is no valid path accepting the word ${input.value}`;
-                }
-            });
-            Main_js_3.automatonDiv.appendChild(input);
-            Main_js_3.automatonDiv.appendChild(acceptB);
-            Main_js_3.automatonDiv.appendChild(answerP);
         }
         close_message(close_rep) {
             return `The table is not closed since
@@ -860,75 +981,7 @@ define("html_interactions/HTML_NL_star", ["require", "exports", "Main", "lerners
     }
     exports.HTML_NL_star = HTML_NL_star;
 });
-define("tools/automaton_type", ["require", "exports", "Automaton", "../../public/automaton/noam.js"], function (require, exports, Automaton_js_3, noam_js_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.differenceAutomata = exports.complementAutomata = exports.unionAutomata = exports.intersectionAutomata = exports.minimizeAutomaton = exports.regexToAut = exports.MyAutomatonToHis = exports.HisAutomaton2Mine = void 0;
-    function HisAutomaton2Mine(aut) {
-        let transitionAdapter = () => {
-            let res = [];
-            let trans_copy = Array.from(aut.transitions);
-            for (const state of aut.states) {
-                let line = [];
-                for (const letter of aut.alphabet) {
-                    let next = trans_copy.find(e => e.fromState == state && e.symbol == letter).toStates;
-                    line.push(next.map(e => e + ""));
-                }
-                res.push(line);
-            }
-            return res;
-        };
-        let res = {
-            alphabet: Array.from(aut.alphabet),
-            endState: aut.acceptingStates.map(e => e + ""),
-            startState: (typeof aut.initialState === "number") ? [aut.initialState + ""] : Array.from(aut.initialState).map(e => e + ""),
-            states: aut.states.map(e => e + ""),
-            transitions: aut.transitions.map(e => ({ fromState: e.fromState + "", symbol: e.symbol, toStates: e.toStates.map(e => e + "") }))
-        };
-        return new Automaton_js_3.Automaton(res);
-    }
-    exports.HisAutomaton2Mine = HisAutomaton2Mine;
-    function MyAutomatonToHis(aut) {
-        let state2int = (state) => aut.states.indexOf(state);
-        let res = {
-            acceptingStates: aut.endState.map(e => state2int(e)),
-            alphabet: Array.from(aut.alphabet),
-            states: aut.states.map(e => state2int(e)),
-            initialState: aut.startState.map(e => state2int(e)),
-            transitions: aut.transitions.map(e => ({ fromState: state2int(e.fromState), symbol: e.symbol, toStates: e.toStates.map(e => state2int(e)) }))
-        };
-        return res;
-    }
-    exports.MyAutomatonToHis = MyAutomatonToHis;
-    function regexToAut(regex) {
-        return noam_js_1.noam.re.string.toAutomaton(regex);
-    }
-    exports.regexToAut = regexToAut;
-    function minimizeAutomaton(automaton) {
-        automaton = noam_js_1.noam.fsm.convertEnfaToNfa(automaton);
-        automaton = noam_js_1.noam.fsm.convertNfaToDfa(automaton);
-        automaton = noam_js_1.noam.fsm.minimize(automaton);
-        return noam_js_1.noam.fsm.convertStatesToNumbers(automaton);
-    }
-    exports.minimizeAutomaton = minimizeAutomaton;
-    function intersectionAutomata(a1, a2) {
-        return noam_js_1.noam.fsm.intersection(a1, a2);
-    }
-    exports.intersectionAutomata = intersectionAutomata;
-    function unionAutomata(a1, a2) {
-        return noam_js_1.noam.fsm.union(a1, a2);
-    }
-    exports.unionAutomata = unionAutomata;
-    function complementAutomata(a1) {
-        return noam_js_1.noam.fsm.complement(a1);
-    }
-    exports.complementAutomata = complementAutomata;
-    function differenceAutomata(a1, a2) {
-        return intersectionAutomata(a1, complementAutomata(a2));
-    }
-    exports.differenceAutomata = differenceAutomata;
-});
-define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star", "html_interactions/HTML_NL_star", "Automaton", "lerners/L_star", "lerners/NL_star", "tools/automaton_type"], function (require, exports, Teacher_js_1, HTML_L_star_js_1, HTML_NL_star_js_1, Automaton_js_4, L_star_js_2, NL_star_js_2, autFunction) {
+define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star", "html_interactions/HTML_NL_star", "automaton/Automaton", "lerners/L_star", "lerners/NL_star", "automaton/automaton_type"], function (require, exports, Teacher_js_1, HTML_L_star_js_1, HTML_NL_star_js_1, Automaton_js_4, L_star_js_2, NL_star_js_2, autFunction) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.clear_automaton_HTML = exports.initiate_global_vars = exports.automatonHTML = exports.tableHTML = exports.message = exports.automatonDiv = void 0;
@@ -978,7 +1031,7 @@ define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star"
         });
         Teacher_js_1.teachers.forEach((teacher, pos) => {
             let radioTeacher = createRadioTeacher(teacher);
-            if (pos == 0)
+            if (pos == 4)
                 radioTeacher.click();
         });
         button_next.addEventListener("click", () => {
@@ -988,7 +1041,7 @@ define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star"
         let alphabetAutButton = $("#input-alphabet")[0];
         let createAutButton = $("#button-regex")[0];
         createAutButton.addEventListener("click", () => {
-            let teacher = new Teacher_js_1.Teacher(`My automaton with regex = (${regexAutButton.value}) over &Sigma; = {${Array.from(alphabetAutButton.value)}} `, alphabetAutButton.value, sentence => sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined, []);
+            let teacher = new Teacher_js_1.Teacher(`My automaton with regex = (${regexAutButton.value}) over &Sigma; = {${Array.from(alphabetAutButton.value)}} `, regexAutButton.value, alphabetAutButton.value, sentence => sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined, []);
             let radioTeacher = createRadioTeacher(teacher);
             radioTeacher.click();
         });
@@ -1057,7 +1110,7 @@ define("html_interactions/listeners", ["require", "exports"], function (require,
     }
     exports.set_text = set_text;
 });
-define("lerners/Observation_table", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_1) {
+define("lerners/Observation_table", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Observation_table = void 0;
@@ -1086,14 +1139,10 @@ define("lerners/Observation_table", ["require", "exports", "tools/Utilities"], f
             const r1 = this.get_row(row1);
             const r2 = this.get_row(row2);
             return r1 != undefined && r2 != undefined &&
-                (0, Utilities_1.same_vector)(r1, r2);
+                (0, Utilities_js_4.same_vector)(r1, r2);
         }
     }
     exports.Observation_table = Observation_table;
-});
-define("test_nodejs/Automaton_test", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
 });
 define("test_nodejs/L_star_test", ["require", "exports", "html_interactions/listeners", "lerners/L_star", "Teacher"], function (require, exports, listeners_js_1, L_star_js_3, Teacher_js_2) {
     "use strict";

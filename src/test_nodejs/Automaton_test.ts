@@ -1,3 +1,3 @@
-import { intersectionAutomata, minimizeAutomaton, regexToAutomaton } from "../tools/automaton_type.js";
+// import { intersectionAutomata, minimizeAutomaton, regexToAutomaton } from "../automaton/automaton_type.js";
 
 

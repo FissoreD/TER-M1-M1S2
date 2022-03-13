@@ -1,4 +1,4 @@
-import { same_vector } from "../tools/Utilities";
+import { same_vector } from "../tools/Utilities.js";
 
 export class Observation_table {
   private columns: any;

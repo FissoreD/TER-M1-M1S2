@@ -24,8 +24,6 @@
     "@babel/preset-typescript": "^7.16.7",
     "@types/mermaid": "^8.2.7",
     "cross-env": "^7.0.3",
-    "mermaid": "^8.14.0",
-    "noam": "^0.1.0",
     "rimraf": "^3.0.2",
     "typescript": "^4.5.5"
   },
