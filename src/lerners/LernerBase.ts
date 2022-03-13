@@ -1,6 +1,6 @@
 import { Automaton } from "../Automaton.js";
 import { Teacher } from "../Teacher.js";
-import { boolToString, generate_prefix_list } from "../Utilities.js";
+import { boolToString, generate_prefix_list } from "../tools/Utilities.js";
 
 export type Map_string_string = { [key: string]: string };
 
@@ -14,6 +14,7 @@ export abstract class LernerBase {
   query_number: number;
   member_number: number;
   finish = false;
+  automaton: undefined | Automaton;
 
   constructor(teacher: Teacher) {
     this.alphabet = Array.from(teacher.alphabet);
@@ -123,7 +124,7 @@ export abstract class LernerBase {
   add_row(row_name: string, after_member = false) {
     this.E.forEach(e => {
       if (after_member && e == "")
-        this.observation_table[row_name] = boolToString(!this.make_automaton().accept_word_nfa(row_name)[0]);
+        this.observation_table[row_name] = boolToString(!this.automaton!.accept_word_nfa(row_name)[0]);
       else this.make_query(row_name, e)
     });
   }

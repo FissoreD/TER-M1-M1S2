@@ -1,7 +1,7 @@
 import { Automaton } from "../Automaton.js";
 import { LernerBase } from "../lerners/LernerBase.js";
 import { clear_automaton_HTML, message, tableHTML } from "../Main.js";
-import { myFunction } from "../Utilities.js";
+import { myFunction } from "../tools/Utilities.js";
 
 export abstract class HTML_LernerBase<Lerner extends LernerBase> {
   lerner: Lerner;
@@ -137,6 +137,8 @@ export abstract class HTML_LernerBase<Lerner extends LernerBase> {
       automaton.initiate_graph();
       this.add_automaton_listener();
       let answer = this.lerner.make_member(automaton);
+
+
       if (answer != undefined) {
         message.innerText =
           `The sent automaton is not valid, 

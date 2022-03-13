@@ -1,5 +1,11 @@
+export interface Transition {
+  fromState: string,
+  toStates: string[],
+  symbol: string
+}
+
 export interface AutomatonJson {
-  transitions: string[][][],
+  transitions: Transition[],
   startState: string[],
   endState: string[],
   alphabet: string[] | string,
@@ -7,7 +13,7 @@ export interface AutomatonJson {
 };
 
 export class Automaton implements AutomatonJson {
-  transitions: string[][][];
+  transitions: Transition[];
   startState: string[];
   endState: string[];
   alphabet: string | string[];
@@ -23,10 +29,10 @@ export class Automaton implements AutomatonJson {
     this.alphabet = Array.from(json.alphabet);
     this.states = json.states;
     this.states_rename = [];
-    let counter_init = [0, this.startState.length, this.states.length - this.startState.length];
+    let counter_init = [0, this.startState.length, this.states.length - this.endState.length + 1];
     for (let i = 0; i < this.states.length; i++) {
       if (this.startState.includes(this.states[i])) {
-        this.states_rename.push("s" + counter_init[0]++)
+        this.states_rename.push("q" + counter_init[0]++)
       } else if (this.endState.includes(this.states[i])) {
         this.states_rename.push("q" + counter_init[2]++)
       } else {
@@ -36,9 +42,7 @@ export class Automaton implements AutomatonJson {
   }
 
   next_step(next_char: string) {
-    let x = this.states.indexOf(this.currentState);
-    let y = this.alphabet.indexOf(next_char);
-    this.currentState = this.transitions[x][y][0];
+    this.currentState = this.find_transition(this.currentState, next_char).toStates[0];
   }
 
   accept_word(word: string): boolean {
@@ -51,13 +55,17 @@ export class Automaton implements AutomatonJson {
     return is_accepted;
   }
 
+  find_transition(state: string, symbol: string) {
+    return this.transitions
+      .filter(e => e.fromState == state)
+      .find(e => e.symbol == symbol)!
+  }
+
   accept_word_nfa(word: string): [boolean, string[]] {
     let path: string[] = [];
     let recursive_explore = (word: string, index: number, current_state: string, state_path: string): boolean => {
       if (index < word.length) {
-        let x = this.states.indexOf(current_state);
-        let y = this.alphabet.indexOf(word[index]);
-        let next_states = this.transitions[x][y];
+        let next_states = this.find_transition(current_state, word[index]).toStates;
         return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + this.get_state_rename(next_state)))
       } else {
         if (this.endState.includes(current_state)) {
@@ -76,7 +84,6 @@ export class Automaton implements AutomatonJson {
 
     return [is_accepted, path];
   }
-
 
   restart() {
     this.currentState = this.startState[0];
@@ -126,7 +133,7 @@ export class Automaton implements AutomatonJson {
     let triples: { [id: string]: string[] } = {}
     for (let i = 0; i < this.states.length; i++) {
       for (let j = 0; j < this.alphabet.length; j++) {
-        for (const state of this.transitions[i][j]) {
+        for (const state of this.find_transition(this.states[i], this.alphabet[j]).toStates) {
           let stateA_concat_stateB = this.states[i] + '&' + state;
           if (triples[stateA_concat_stateB]) {
             triples[stateA_concat_stateB].push(this.alphabet[j])

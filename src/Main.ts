@@ -1,6 +1,10 @@
 import { Teacher, teachers } from "./Teacher.js";
 import { HTML_L_star } from "./html_interactions/HTML_L_star.js";
 import { HTML_NL_star } from "./html_interactions/HTML_NL_star.js";
+import { Automaton } from "./Automaton.js";
+import { L_star } from "./lerners/L_star.js";
+import { NL_star } from "./lerners/NL_star.js";
+import * as autFunction from "./tools/automaton_type.js";
 
 export let
   automatonDiv: HTMLDivElement,
@@ -63,7 +67,7 @@ export function initiate_global_vars() {
 
   teachers.forEach((teacher, pos) => {
     let radioTeacher = createRadioTeacher(teacher);
-    if (pos == 0) radioTeacher.click();
+    if (pos == 4) radioTeacher.click();
   });
 
   button_next.addEventListener("click", () => {
@@ -74,7 +78,7 @@ export function initiate_global_vars() {
   let alphabetAutButton = $("#input-alphabet")![0] as HTMLInputElement;
   let createAutButton = $("#button-regex")![0];
   createAutButton.addEventListener("click", () => {
-    let teacher = new Teacher(`My automaton with regex = (${regexAutButton.value}) over &Sigma; = {${Array.from(alphabetAutButton.value)}} `, alphabetAutButton.value,
+    let teacher = new Teacher(`My automaton with regex = (${regexAutButton.value}) over &Sigma; = {${Array.from(alphabetAutButton.value)}} `, regexAutButton.value, alphabetAutButton.value,
       sentence =>
         sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined,
       []);
@@ -88,12 +92,28 @@ export function clear_automaton_HTML() {
   automatonHTML.innerHTML = "";
 }
 
+declare global {
+  interface Window {
+    Automaton: any;
+    Teacher: any;
+    teachers: Teacher[];
+    L_star: any;
+    NL_star: any;
+    autFunction: any;
+  }
+}
+
 try {
   // @ts-ignore
   process == undefined;
 } catch (e) {
-  // @ts-ignore
-  window.onload = initiate_global_vars();
+  window.onload = () => initiate_global_vars();
+  window.Automaton = Automaton;
+  window.Teacher = Teacher;
+  window.teachers = teachers;
+  window.L_star = L_star;
+  window.NL_star = NL_star;
+  window.autFunction = autFunction;
 }
 
 // mainMonoid()

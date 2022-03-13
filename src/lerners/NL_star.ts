@@ -1,6 +1,6 @@
-import { Automaton } from "../Automaton.js";
+import { Automaton, Transition } from "../Automaton.js";
 import { Teacher } from "../Teacher.js";
-import { generate_suffix_list } from "../Utilities.js";
+import { generate_suffix_list } from "../tools/Utilities.js";
 import { LernerBase, Map_string_string } from "./LernerBase.js";
 
 export class NL_star extends LernerBase {
@@ -140,17 +140,27 @@ export class NL_star extends LernerBase {
     })!.map(e => this.observation_table[e]);
     let keys = Object.keys(states);
     let end_states: string[] = keys.filter(k => k[0] == '1');
-    let transitions = keys.map(
-      (k) => this.alphabet.map(a => {
-        return keys.filter(v => this.is_covered(v, this.observation_table[states[k] + a]));
-      }));
-
-    return new Automaton({
+    // let transitions = keys.map(
+    //   (k) => this.alphabet.map(a => {
+    //     return keys.filter(v => this.is_covered(v, this.observation_table[states[k] + a]));
+    //   }));
+    let transitions: Transition[] = [];
+    for (const state of this.S) {
+      for (const symbol of this.alphabet) {
+        transitions.push({
+          fromState: this.observation_table[state],
+          symbol: symbol,
+          toStates: keys.filter(v => this.is_covered(v, this.observation_table[state + symbol]))
+        })
+      }
+    }
+    this.automaton = new Automaton({
       "alphabet": this.alphabet,
       "endState": end_states,
       "startState": first_state,
       "states": keys,
       "transitions": transitions
     })
+    return this.automaton;
   }
 }

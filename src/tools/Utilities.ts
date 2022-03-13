@@ -1,4 +1,4 @@
-import { Automaton } from "./Automaton";
+import { Automaton } from "../Automaton";
 
 
 export type myFunction<S, T> = { (data: S): T; };

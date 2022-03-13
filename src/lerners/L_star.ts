@@ -1,6 +1,5 @@
-import { Automaton } from "../Automaton.js";
+import { Automaton, Transition } from "../Automaton.js";
 import { Teacher } from "../Teacher.js";
-import { boolToString, generate_prefix_list } from "../Utilities.js";
 import { LernerBase, Map_string_string } from "./LernerBase.js";
 
 export class L_star extends LernerBase {
@@ -62,17 +61,28 @@ export class L_star extends LernerBase {
     let first_state = this.observation_table[""];
     let keys = Object.keys(states);
     let end_states: string[] = keys.filter(k => k[0] == '1');
-    let transitions = keys.map(
-      (k) => this.alphabet.map(a => {
-        return [this.observation_table[states[k] + a]]
-      }));
-    return new Automaton({
+    // let transitions = keys.map(
+    //   (k) => this.alphabet.map(a => {
+    //     return [this.observation_table[states[k] + a]]
+    //   }));
+    let transitions: Transition[] = []
+    for (const state of this.S) {
+      for (const symbol of this.alphabet) {
+        transitions.push({
+          fromState: this.observation_table[state],
+          symbol: symbol,
+          toStates: [this.observation_table[state + symbol]]
+        })
+      }
+    }
+    this.automaton = new Automaton({
       "alphabet": this.alphabet,
       "endState": end_states,
       "startState": [first_state],
       "states": keys,
       "transitions": transitions
     })
+    return this.automaton;
   }
 
 
@@ -97,7 +107,7 @@ export class L_star extends LernerBase {
           for (const a of this.alphabet) {
             for (let i = 0; i < this.E.length; i++) {
               if (this.observation_table[s1 + a][i] !=
-                this.observation_table[s2 + a][i])
+                this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i]))
                 return [s1, s2, a + this.E[i]]
             }
           }
