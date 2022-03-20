@@ -17,19 +17,6 @@ interface HisAutomaton {
 }
 
 export function HisAutomaton2Mine(aut: HisAutomaton): Automaton {
-  let transitionAdapter = (): string[][][] => {
-    let res: string[][][] = [];
-    let trans_copy = Array.from(aut.transitions);
-    for (const state of aut.states) {
-      let line: string[][] = [];
-      for (const letter of aut.alphabet) {
-        let next = trans_copy.find(e => e.fromState == state && e.symbol == letter)!.toStates;
-        line.push(next.map(e => e + ""))
-      }
-      res.push(line);
-    }
-    return res;
-  }
   let res: AutomatonJson = {
     alphabet: Array.from(aut.alphabet),
     acceptingStates: aut.acceptingStates.map(e => e + ""),
@@ -66,8 +53,8 @@ export function MyAutomatonToHis(aut: Automaton): HisAutomaton {
 }
 
 export function regexToAutomaton(regex: string): Automaton {
-  let aut: HisAutomaton = (noam.re.string.toAutomaton(regex))
-  return minimizeAutomaton(aut);
+  let res = noam.fsm.minimize(noam.fsm.convertEnfaToNfa(noam.re.string.toAutomaton(regex)));
+  return HisAutomaton2Mine(res);
 }
 
 export function minimizeAutomaton(automaton: HisAutomaton): Automaton {
@@ -85,7 +72,6 @@ export function unionAutomata(a1: Automaton, a2: Automaton): Automaton {
   let A1 = MyAutomatonToHis(a1);
   let A2 = MyAutomatonToHis(a2);
   let U: HisAutomaton = noam.fsm.union(A1, A2);
-  // let x = HisAutomaton2Mine(U);
   let res = minimizeAutomaton(U)
   return res
 }

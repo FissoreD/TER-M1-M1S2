@@ -146,6 +146,7 @@ export class NL_star extends LernerBase {
     //   }));
     let transitions: Transition[] = [];
     for (const state of this.S) {
+      if (!this.prime_lines.includes(state)) continue
       for (const symbol of this.alphabet) {
         transitions.push({
           fromState: this.observation_table[state],

@@ -6,7 +6,7 @@
     // "module": "commonjs", // for node
     "removeComments": true,
     "outFile": "./public/out.js",
-    // "baseUrl": "./",
+    "baseUrl": "./src",
     "strict": true,
     "sourceMap": true,
     "alwaysStrict": true,
@@ -14,9 +14,15 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    // "rootDir": "./src"
+    "rootDir": "./src",
     // "allowJs": true
+    "paths": {
+      "*": [
+        "src/*"
+      ]
+    }
   },
   "include": [
-    "src/**/*" ]
+    "src/**/*" 
+  ]
 }

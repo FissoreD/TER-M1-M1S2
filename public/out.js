@@ -189,19 +189,6 @@ define("automaton/automaton_type", ["require", "exports", "automaton/Automaton"]
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.differenceAutomata = exports.complementAutomata = exports.unionAutomata = exports.intersectionAutomata = exports.minimizeAutomaton = exports.regexToAutomaton = exports.MyAutomatonToHis = exports.HisAutomaton2Mine = void 0;
     function HisAutomaton2Mine(aut) {
-        let transitionAdapter = () => {
-            let res = [];
-            let trans_copy = Array.from(aut.transitions);
-            for (const state of aut.states) {
-                let line = [];
-                for (const letter of aut.alphabet) {
-                    let next = trans_copy.find(e => e.fromState == state && e.symbol == letter).toStates;
-                    line.push(next.map(e => e + ""));
-                }
-                res.push(line);
-            }
-            return res;
-        };
         let res = {
             alphabet: Array.from(aut.alphabet),
             acceptingStates: aut.acceptingStates.map(e => e + ""),
@@ -240,8 +227,8 @@ define("automaton/automaton_type", ["require", "exports", "automaton/Automaton"]
     }
     exports.MyAutomatonToHis = MyAutomatonToHis;
     function regexToAutomaton(regex) {
-        let aut = (noam.re.string.toAutomaton(regex));
-        return minimizeAutomaton(aut);
+        let res = noam.fsm.minimize(noam.fsm.convertEnfaToNfa(noam.re.string.toAutomaton(regex)));
+        return HisAutomaton2Mine(res);
     }
     exports.regexToAutomaton = regexToAutomaton;
     function minimizeAutomaton(automaton) {
@@ -295,17 +282,18 @@ define("tools/Utilities", ["require", "exports"], function (require, exports) {
 define("Teacher", ["require", "exports", "automaton/automaton_type", "tools/Utilities"], function (require, exports, automaton_type_js_1, Utilities_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.teachers = exports.binaryAddition = exports.teacher_bStar_a_or_aStart_bStar = exports.teacherNotAfourthPos = exports.teacherEvenAandThreeB = exports.teacherA3fromLast = exports.teacherPairZeroAndOne = exports.Teacher = void 0;
+    exports.teachers = exports.binaryAddition = exports.teacher_b_bStar_a__b_aOrb_star = exports.teacher_bStar_a_or_aStart_bStar = exports.teacherNotAfourthPos = exports.teacherEvenAandThreeB = exports.teacherA3fromLast = exports.teacherPairZeroAndOne = exports.teacher_a_or_baStar = exports.Teacher = void 0;
     class Teacher {
-        constructor(description, alphabet, regex, f, counter_exemples, initiate_mapping) {
+        constructor(description, regex, f, counter_exemples) {
             this.counter_exemples_pos = 0;
             this.max_word_length = 8;
-            this.alphabet = Array.from(alphabet);
             this.check_function = f;
             this.counter_exemples = counter_exemples;
             this.counter = 0;
             this.description = description;
             this.automaton = (0, automaton_type_js_1.regexToAutomaton)(regex);
+            this.alphabet = Array.from(this.automaton.alphabet);
+            this.regex = regex;
         }
         initiate_mapping() {
             let res = [["", this.check_function("")]];
@@ -325,33 +313,37 @@ define("Teacher", ["require", "exports", "automaton/automaton_type", "tools/Util
             return (0, Utilities_js_1.boolToString)(this.automaton.accept_word_nfa(sentence)[0]);
         }
         member(automaton) {
+            console.log("here");
+            if (this.counter_exemples_pos < this.counter_exemples.length) {
+                return this.counter_exemples[this.counter_exemples_pos++];
+            }
             let differenceAutomaton = (a, b) => {
                 let difference = (0, automaton_type_js_1.differenceAutomata)(a, b);
                 return difference;
             };
-            let counterExemple = (automaton) => {
-                if (automaton.acceptingStates.length == 0)
+            let counterExemple = (automatonDiff) => {
+                if (automatonDiff.acceptingStates.length == 0)
                     return undefined;
-                let toExplore = [automaton.startState[0]];
+                let toExplore = [automatonDiff.startState[0]];
                 let explored = [];
-                let parent = new Array(automaton.states.length).fill({ parent: "", symbol: "" });
+                let parent = new Array(automatonDiff.states.length).fill({ parent: "", symbol: "" });
                 while (toExplore.length > 0) {
                     let current = toExplore.shift();
                     if (explored.includes(current))
                         continue;
                     explored.push(current);
-                    for (const transition of automaton.transitions) {
+                    for (const transition of automatonDiff.transitions) {
                         if (!explored.includes(transition.toStates[0]) && transition.fromState == current) {
-                            parent[automaton.states.indexOf(transition.toStates[0])] =
+                            parent[automatonDiff.states.indexOf(transition.toStates[0])] =
                                 { parent: transition.fromState, symbol: transition.symbol };
                             toExplore.push(transition.toStates[0]);
                         }
                     }
-                    if (automaton.acceptingStates.includes(current)) {
-                        let id = automaton.states.indexOf(current);
+                    if (automatonDiff.acceptingStates.includes(current)) {
+                        let id = automatonDiff.states.indexOf(current);
                         let res = [parent[id].symbol];
                         while (parent[id].parent != "") {
-                            id = automaton.states.indexOf(parent[id].parent);
+                            id = automatonDiff.states.indexOf(parent[id].parent);
                             res.push(parent[id].symbol);
                         }
                         return res.reverse().join("");
@@ -372,25 +364,30 @@ define("Teacher", ["require", "exports", "automaton/automaton_type", "tools/Util
         }
     }
     exports.Teacher = Teacher;
-    exports.teacherPairZeroAndOne = new Teacher(`Automata accepting \\(L = \\{w \\in (0, 1)^* | \\#(w_0) \\% 2 = 0 \\land \\#(w_1) \\% 2 = 0\\}\\) <br/> → words with even nb of '0' and even nb of '1'`, "01", "(00+11+(01+10)(00+11)*(01+10))*", sentence => {
+    exports.teacher_a_or_baStar = new Teacher(`Automata accepting \\(regex(a + (ba)*)\\)`, "a+(ba)*", sentence => {
+        let parity = (0, Utilities_js_1.count_str_occurrences)(sentence, "0");
+        return parity % 2 == 0 && sentence.length % 2 == 0;
+    }, []);
+    exports.teacherPairZeroAndOne = new Teacher(`Automata accepting \\(L = \\{w \\in (0, 1)^* | \\#(w_0) \\% 2 = 0 \\land \\#(w_1) \\% 2 = 0\\}\\) <br/> → words with even nb of '0' and even nb of '1'`, "(00+11+(01+10)(00+11)*(01+10))*", sentence => {
         let parity = (0, Utilities_js_1.count_str_occurrences)(sentence, "0");
         return parity % 2 == 0 && sentence.length % 2 == 0;
     }, ["11", "011"]);
     exports.teacherA3fromLast = new Teacher(`Automata accepting \\(L = \\{w \\in (a, b)^* | w[-3] = a\\}\\) <br/>
-    → words with an 'a' in the 3rd pos from end`, "ab", "(a+b)*a(a+b)(a+b)", sentence => sentence.length >= 3 && sentence[sentence.length - 3] == 'a', []);
+    → words with an 'a' in the 3rd pos from end`, "(a+b)*a(a+b)(a+b)", sentence => sentence.length >= 3 && sentence[sentence.length - 3] == 'a', []);
     exports.teacherEvenAandThreeB = new Teacher(`Automata accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\lor \\#(w_a) \\% 2 = 1\\}\\)
-  <br/> → words with at least 3 'b' or an odd nb of 'a'`, "ab", "b*a(b+ab*a)*+(a+b)*ba*ba*b(a+b)*", sentence => (0, Utilities_js_1.count_str_occurrences)(sentence, "b") >= 3 || (0, Utilities_js_1.count_str_occurrences)(sentence, "a") % 2 == 1, []);
+  <br/> → words with at least 3 'b' or an odd nb of 'a'`, "b*a(b+ab*a)*+(a+b)*ba*ba*b(a+b)*", sentence => (0, Utilities_js_1.count_str_occurrences)(sentence, "b") >= 3 || (0, Utilities_js_1.count_str_occurrences)(sentence, "a") % 2 == 1, []);
     exports.teacherNotAfourthPos = new Teacher(`Automata accepting \\(L = \\{w \\in (a,b)^* \\land i \\in 4\\mathbb{N} | w[i] \\neq a \\land i \\leq len(w)\\}\\) <br/>
-  → words without an 'a' in a position multiple of 4`, "ba", "((a+b)(a+b)(a+b)b)*(a+b+$)(a+b+$)(a+b+$)", sentence => {
+  → words without an 'a' in a position multiple of 4`, "((a+b)(a+b)(a+b)b)*(a+b+$)(a+b+$)(a+b+$)", sentence => {
         for (let i = 3; i < sentence.length; i += 4) {
             if (sentence.charAt(i) == "a")
                 return false;
         }
         return true;
     }, []);
-    exports.teacher_bStar_a_or_aStart_bStar = new Teacher(`Automata accepting \\(L = regex(^\\land((b^+a) | (a^*b^*))$)\\)`, "ab", "(bb*a)+(a*b*)", sentence => {
+    exports.teacher_bStar_a_or_aStart_bStar = new Teacher(`Automata accepting \\(L = regex((bb^*a) + (a^*b^*))\\)`, "(bb*a)+(a*b*)", sentence => {
         return sentence.match(/^((b+a)|(a*b*))$/g) != undefined;
     }, []);
+    exports.teacher_b_bStar_a__b_aOrb_star = new Teacher(`Automata accepting \\(L = regex(bb^*($+a(b(a+b))^*)\\)`, "bb*($+a(b(a+b))*)", _sentence => true, []);
     exports.binaryAddition = new Teacher(`Automata accepting the sum between binary words, exemple : <br>
   <pre>
   0101 + 
@@ -408,7 +405,7 @@ define("Teacher", ["require", "exports", "automaton/automaton_type", "tools/Util
   <input class="sum-calc sum-calc-style" onkeyup="update_input()"><br>
   <button id="calc" onclick="send_calc_button()">Send</button>
   <span class="sum-calc-style" id="add-res"></span>
-  `, "01234567", "((0+3+5)+1(7+4+2)*6)*", sentence => {
+  `, "((0+3+5)+1(7+4+2)*6)*", sentence => {
         let charToBin = (char) => (parseInt(char) >>> 0).toString(2).padStart(3, "0");
         let sentenceAr = Array.from(sentence).map(e => charToBin(e));
         let fst_term = parseInt(sentenceAr.map(e => e[0]).join(''), 2);
@@ -416,7 +413,7 @@ define("Teacher", ["require", "exports", "automaton/automaton_type", "tools/Util
         let trd_term = parseInt(sentenceAr.map(e => e[2]).join(''), 2);
         return fst_term + snd_term == trd_term;
     }, []);
-    exports.teachers = [exports.binaryAddition, exports.teacherA3fromLast, exports.teacherEvenAandThreeB, exports.teacherNotAfourthPos, exports.teacherPairZeroAndOne, exports.teacher_bStar_a_or_aStart_bStar];
+    exports.teachers = [exports.teacher_a_or_baStar, exports.teacher_b_bStar_a__b_aOrb_star, exports.binaryAddition, exports.teacherA3fromLast, exports.teacherEvenAandThreeB, exports.teacherNotAfourthPos, exports.teacherPairZeroAndOne, exports.teacher_bStar_a_or_aStart_bStar];
 });
 define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_2) {
     "use strict";
@@ -807,12 +804,12 @@ define("html_interactions/HTML_L_star", ["require", "exports", "lerners/L_star",
         }
         close_message(close_rep) {
             return `The table is not closed since
-        \\(\\{row(${close_rep}) = ${this.lerner.observation_table[close_rep]} \\land 0 \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) = ${this.lerner.observation_table[close_rep]}\\}\\);
+        \\(\\{row(${close_rep}) = ${this.lerner.observation_table[close_rep]} \\land 0 \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) = ${this.lerner.observation_table[close_rep]}\\}\\)
         I'm going to move ${close_rep} from SA to S`;
         }
         consistent_message(s1, s2, new_col) {
             return `The table is not consistent : 
-        \\(\\{row(${s1 ? s1 : "ε"}) = row(${s2 ? s2 : "ε"}) \\land (${s1 ? s1 : "ε"}, ${s2 ? s2 : "ε"}) \\in S\\}\\),
+        \\(\\{row(${s1 ? s1 : "ε"}) = row(${s2 ? s2 : "ε"}) \\land (${s1 ? s1 : "ε"}, ${s2 ? s2 : "ε"}) \\in S\\}\\)
         but \\(\\{row(${s1 + new_col[0]}) \\neq row(${s2 + new_col[0]}) \\land (${s1 ? s1 : "ε"}, ${s2 ? s2 : "ε"}) \\in S \\land ${new_col[0]} \\in \\Sigma\\}\\)
         I'm going to add the column "${new_col}" since \\(T(${s1 + new_col}) \\neq T(${s2 + new_col})\\)`;
         }
@@ -928,6 +925,8 @@ define("lerners/NL_star", ["require", "exports", "automaton/Automaton", "tools/U
             let end_states = keys.filter(k => k[0] == '1');
             let transitions = [];
             for (const state of this.S) {
+                if (!this.prime_lines.includes(state))
+                    continue;
                 for (const symbol of this.alphabet) {
                     transitions.push({
                         fromState: this.observation_table[state],
@@ -964,16 +963,18 @@ define("html_interactions/HTML_NL_star", ["require", "exports", "lerners/NL_star
             return row;
         }
         close_message(close_rep) {
-            return `The table is not closed since
-        \\(\\{row(${close_rep}) = ${this.lerner.observation_table[close_rep]} \\land ${close_rep} \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) \\sqsupseteq ${this.lerner.observation_table[close_rep]}\\}\\);
-        I'm going to move "${close_rep}" from SA to S`;
+            return `
+    The table is not closed since
+    \\(\\{row(${close_rep}) = ${this.lerner.observation_table[close_rep]} \\land ${close_rep} \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) \\sqsupseteq ${this.lerner.observation_table[close_rep]}\\}\\)
+    I'm going to move "${close_rep}" from SA to S`;
         }
         consistent_message(s1, s2, new_col) {
-            return `The table is not consistent :
-        take \\(${s1 ? s1 : "ε"}\\in S \\land ${s2 ? s2 : "ε"} \\in S \\land ${new_col[0]} \\in \\Sigma \\)
-        \\(\\{row(${s1 ? s1 : "ε"}) \\sqsubseteq row(${s2 ? s2 : "ε"})\\}\\)
-        but \\(\\{row(${s1 ? s1 : "ε"} \\circ ${new_col[0]}) \\not\\sqsubseteq row(${s2 ? s2 : "ε"} \\circ ${new_col[0]})\\}\\)
-        I'm going to add the column \\(${new_col} \\in \\Sigma \\circ E\\) since \\(T(${s1 ? s1 : "ε"} \\circ ${new_col}) > T(${s2 ? s2 : "ε"} \\circ ${new_col})\\)`;
+            return `
+    The table is not consistent :
+    take \\(${s1 ? s1 : "ε"}\\in S \\land ${s2 ? s2 : "ε"} \\in S \\land ${new_col[0]} \\in \\Sigma \\)
+    \\(\\{row(${s1 ? s1 : "ε"}) \\sqsubseteq row(${s2 ? s2 : "ε"})\\}\\)
+    but \\(\\{row(${s1 ? s1 : "ε"} \\circ ${new_col[0]}) \\not\\sqsubseteq row(${s2 ? s2 : "ε"} \\circ ${new_col[0]})\\}\\)
+    I'm going to add the column \\(${new_col} \\in \\Sigma \\circ E\\) since \\(T(${s1 ? s1 : "ε"} \\circ ${new_col}) > T(${s2 ? s2 : "ε"} \\circ ${new_col})\\)`;
         }
         table_to_update_after_equiv(answer) {
             this.lerner.add_elt_in_E(answer);
@@ -1038,10 +1039,9 @@ define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star"
             current_automaton.graphic_next_step();
         });
         let regexAutButton = $("#input-regex")[0];
-        let alphabetAutButton = $("#input-alphabet")[0];
         let createAutButton = $("#button-regex")[0];
         createAutButton.addEventListener("click", () => {
-            let teacher = new Teacher_js_1.Teacher(`My automaton with regex = (${regexAutButton.value}) over &Sigma; = {${Array.from(alphabetAutButton.value)}} `, regexAutButton.value, alphabetAutButton.value, sentence => sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined, []);
+            let teacher = new Teacher_js_1.Teacher(`My automaton with regex = (${regexAutButton.value})`, regexAutButton.value, sentence => sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined, []);
             let radioTeacher = createRadioTeacher(teacher);
             radioTeacher.click();
         });

@@ -2,68 +2,80 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>L* and NL* Home page</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L* and NL* Home page</title>
 
-  <link rel="shortcut icon" href="#">
+    <link rel="shortcut icon" href="#">
 
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.14.0/mermaid.min.js"></script> -->
-  <!-- <script src="https://requirejs.org/docs/release/2.3.6/comments/require.js"></script> -->
-  <script src="public/polyfill.min.js"></script>
-  <script src="public/tex-mml-chtml.js"></script>
-  <script src="public/mermaid.min.js"></script>
-  <script src="public/jquery.min.js"></script>
-  <script src="public/require.js"></script>
-  <script src="public/automaton/lexical.js"></script>
-  <script src="public/automaton/nfa2dfa.js"></script>
-  <script src="public/noam.js"></script>
+    <script src="public/polyfill.min.js"></script>
+    <script src="public/tex-mml-chtml.js"></script>
+    <script src="public/mermaid.min.js"></script>
+    <script src="public/jquery.min.js"></script>
+    <script src="public/require.js"></script>
+    <script src="public/myGeneralFunction.js"></script>
+    <script src="public/noam.js"></script>
 
-  <link rel="stylesheet" href="src/css/htmlStyle.css">
+    <link rel="stylesheet" href="src/css/htmlStyle.css">
+    <link rel="stylesheet" href="src/css/tableHtml.css">
+    <link rel="stylesheet" href="src/css/nextStepButton.css">
 
-  <script>mermaid.initialize({ startOnLoad: false });</script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: false
+        });
+    </script>
 </head>
 
 <body>
-  <h1> Welcome to the L* and NL* page </h1>
-  <h2> Here you can choose a techer and then launch the algorithm to create
-    a lerner with either the L* or the NL* algorithms</h2>
+    <h1> Learning languages </h1>
+    <h2> An implementation of L* and NL* algorithms </h2>
 
-  <div class="preset">
-    <p>Choose the algorithm</p>
+    <div class="preset">
+        <div>
+            <p>Choose the algorithm</p>
+            <label>
+                <input type="radio" name="algo" id="radio:l*" class="algo-switch" checked>
+                <span>L*</span>
+            </label>
+            <label>
+                <input type="radio" name="algo" id="radio:nl*" class="algo-switch">
+                <span>NL*</span>
+            </label>
+        </div>
+        <div>
+            <p>Choose your teacher : </p>
+            <select name="teacher-switch" id="teacher_switch"></select>
+        </div>
+        <div>
+            <p>Enter your regular expression</p>
+            <input id="input-regex">
+            <button id="button-regex">Send teacher</button>
+        </div>
+    </div>
     <div>
-      <label>
-        <input type="radio" name="algo" id="radio:l*" class="algo-switch" checked>
-        <span>L*</span>
-      </label>
-      <label>
-        <input type="radio" name="algo" id="radio:nl*" class="algo-switch">
-        <span>NL*</span>
-      </label>
+        <p class="description" id="teacher_description"></p>
+        <button id="next_step">Next step</button>
     </div>
-    <p>Choose your teacher : </p>
-    <div class="radio_buttons" id="teacher_switch"></div>
-    <p>or enter your alphabet and your regular expression</p>
-    <input id="input-alphabet">
-    <input id="input-regex">
-    <button id="button-regex">Send teacher</button>
-  </div>
-  <p class="description" id="teacher_description"></p>
-  <button id="next_step">Next step</button>
-  <div class="styled-div">
-    <table id="table" class="styled-table"> </table>
-    <div class="automaton-div" id="automaton-div">
-      <span id="message"></span>
-      <div class="mermaid" id='automaton-mermaid'></div>
-      <div id="input-automaton"></div>
+    <div class="styled-div">
+        <div class="automaton-div" id="automaton-div">
+            <div class="mermaid" id='automaton-mermaid'></div>
+            <div id="input-automaton"></div>
+        </div>
+        <table id="table" class="styled-table"> </table>
     </div>
-  </div>
 
-  <script src="public/out.js"></script>
-  <script>require(['Main']);</script>
+    <!-- <script sc="public/out.js"></script> -->
+    <!-- <script>
+        require(['Main']);
+    </script> -->
 
-  <!-- <script type="module" src="dist/Main.js"></script> -->
+    <script type="module" src="dist/Main.js"></script>
+    <!-- <script>
+        c = () => $("#next_step")[0].click()
+    </script> -->
+    <span id="message"></span>
 </body>
 
 </html>

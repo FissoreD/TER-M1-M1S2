@@ -75,10 +75,9 @@ export function initiate_global_vars() {
   });
 
   let regexAutButton = $("#input-regex")![0] as HTMLInputElement;
-  let alphabetAutButton = $("#input-alphabet")![0] as HTMLInputElement;
   let createAutButton = $("#button-regex")![0];
   createAutButton.addEventListener("click", () => {
-    let teacher = new Teacher(`My automaton with regex = (${regexAutButton.value}) over &Sigma; = {${Array.from(alphabetAutButton.value)}} `, regexAutButton.value, alphabetAutButton.value,
+    let teacher = new Teacher(`My automaton with regex = (${regexAutButton.value})`, regexAutButton.value,
       sentence =>
         sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined,
       []);

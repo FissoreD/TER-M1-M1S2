@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "test",
+  "name": "lerningalgorithm",
   "version": "1.0.0",
   "main": "./dist/Main.js",
   "scripts": {
@@ -14,8 +14,8 @@
     "compile": "cross-env-shell babel src -d dist --source-maps --extensions '.ts'",
     "compilew": "cross-env-shell babel src -d dist --source-maps --extensions '.ts' -w"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Davide Fissore",
+  "license": "MIT",
   "description": "",
   "dependencies": {
     "@babel/cli": "^7.17.6",
