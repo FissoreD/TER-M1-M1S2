@@ -18,24 +18,6 @@ export class HTML_NL_star extends HTML_LernerBase<NL_star> {
     return row;
   }
 
-  // add_automaton_listener() {
-  //   let input = document.createElement("input");
-  //   let acceptB = document.createElement("button");
-  //   let answerP = document.createElement("p");
-  //   acceptB.innerHTML = "In automaton";
-  //   acceptB.addEventListener("click", () => {
-  //     let aut_answer = this.automaton?.accept_word_nfa(input.value);
-  //     if (aut_answer![0]) {
-  //       answerP.innerHTML = `The word ${input.value} is accepted, here is a valid path : ${aut_answer![1]}`
-  //     } else {
-  //       answerP.innerHTML = `There is no valid path accepting the word ${input.value}`
-  //     }
-  //   })
-  //   automatonDiv.appendChild(input);
-  //   automatonDiv.appendChild(acceptB);
-  //   automatonDiv.appendChild(answerP);
-  // }
-
   close_message(close_rep: string) {
     return `
     The table is not closed since

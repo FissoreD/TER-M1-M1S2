@@ -50,7 +50,7 @@ export class NL_star extends LernerBase {
   }
 
   check_prime_lines() {
-    this.prime_lines = this.prime_lines.filter(l => this.is_prime(l));
+    this.prime_lines = [...this.S, ...this.SA].filter(l => this.is_prime(l));
   }
 
   add_elt_in_S(new_elt: string): string[] {

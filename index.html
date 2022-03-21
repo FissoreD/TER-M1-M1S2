@@ -13,11 +13,9 @@
     <script src="public/tex-mml-chtml.js"></script>
     <script src="public/mermaid.min.js"></script>
     <script src="public/jquery.min.js"></script>
-    <script src="public/require.js"></script>
     <script src="public/myGeneralFunction.js"></script>
     <script src="public/noam.js"></script>
-
-    <!-- <script type="module" src="dist/Main.js"></script> -->
+    <script src="public/require.js"></script>
 
     <link rel="stylesheet" href="src/css/htmlStyle.css">
     <link rel="stylesheet" href="src/css/tableHtml.css">
@@ -48,7 +46,7 @@
         </div>
         <div>
             <p>Choose your teacher : </p>
-            <select name="teacher-switch" id="teacher_switch"></select>
+            <select name="teacher-switch" id="teacher-switch"></select>
         </div>
         <div>
             <p>Enter your regular expression</p>
@@ -60,23 +58,42 @@
         <p class="description" id="teacher_description"></p>
         <button id="next_step">Next step</button>
     </div>
-    <div class="styled-div">
-        <div class="automaton-div" id="automaton-div">
-            <div class="mermaid" id='automaton-mermaid'></div>
-            <div id="input-automaton"></div>
-        </div>
-        <table id="table" class="styled-table"> </table>
+    <table class="mainTable">
+        <thead>
+            <tr>
+                <td>
+                    Observation Table
+                </td>
+                <td>
+                    Automaton
+                </td>
+            </tr>
+        </thead>
+        <tr>
+            <td>
+                <div class="box">
+                    <table id="table" class="styled-table"> </table>
+                </div>
+            </td>
+            <td>
+                <div class="automaton-div" id="automaton-div">
+                    <div class="mermaid" id='automaton-mermaid'></div>
+                    <div id="input-automaton" class="box"></div>
+                </div>
+            </td>
+        </tr>
+    </table>
     </div>
 
     <script src="public/out.js"></script>
-    <script>
-        require(['Main']);
-    </script>
-
-    <!-- <script>
-        c = () => $("#next_step")[0].click()
-    </script> -->
+    <script>require(['Main']);</script>
     <span id="message"></span>
+
+    <!-- <script type="module" src="dist/Main.js"></script> -->
+    <script>
+        c = () => $("#next_step")[0].click()
+        window.onload = resizableGrid($(".mainTable")[0])
+    </script>
 </body>
 
 </html>

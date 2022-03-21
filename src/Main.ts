@@ -10,80 +10,74 @@ export let
   automatonDiv: HTMLDivElement,
   message: HTMLParagraphElement,
   tableHTML: HTMLTableElement,
-  automatonHTML: HTMLDivElement;
+  automatonHTML: HTMLDivElement,
+  automatonDivList: [Automaton, Node][] = [];
 
 export function initiate_global_vars() {
   automatonHTML = $("#automaton-mermaid")[0] as HTMLDivElement;
   automatonDiv = $("#input-automaton")[0] as HTMLDivElement;
-  let button_next = $("#next_step")[0] as HTMLButtonElement;
   message = $("#message")[0] as HTMLParagraphElement;
   tableHTML = $("#table")[0] as HTMLTableElement;
 
-  let current_automaton: HTML_NL_star | HTML_L_star;
+  let button_next = $("#next_step")[0] as HTMLButtonElement,
+    current_automaton: HTML_NL_star | HTML_L_star,
+    teacherSelector = $("#teacher-switch")[0] as HTMLSelectElement,
+    teacherDescription = $("#teacher_description")[0] as HTMLParagraphElement,
+    algoSelector = Array.from($(".algo-switch")) as HTMLInputElement[],
+    mapTeacherValue: { [id: string]: Teacher } = {},
+    counter = 0,
+    currentTeacher: Teacher = teachers[0],
+    newRegex = $("#input-regex")![0] as HTMLInputElement,
+    newRegexSendButton = $("#button-regex")![0];
 
-  let teacher_switch_HTML = $("#teacher_switch")[0] as HTMLDivElement;
-  let teacher_description_HTML = $("#teacher_description")[0] as HTMLParagraphElement;
-  let radioAlgo = Array.from($(".algo-switch")) as HTMLInputElement[];
-  let conterRadioButton = 0;
-
-  let listener = (teacher: Teacher) => {
+  let changeTeacherOrAlgo = () => {
     tableHTML.innerHTML = "";
     message.innerHTML = "";
     clear_automaton_HTML()
-    current_automaton = radioAlgo[0].checked ?
-      new HTML_L_star(teacher) :
-      new HTML_NL_star(teacher);
-    teacher_description_HTML.innerHTML = current_automaton.lerner.teacher.description;
+    current_automaton = algoSelector[0].checked ?
+      new HTML_L_star(currentTeacher) :
+      new HTML_NL_star(currentTeacher);
+    teacherDescription.innerHTML = current_automaton.lerner.teacher.description;
     // @ts-ignore
     MathJax.typeset();
   }
 
   let createRadioTeacher = (teacher: Teacher) => {
-    let radioTeacher = document.createElement("input");
-    let label = document.createElement("label");
-    let span = document.createElement("span");
-
-    radioTeacher.type = 'radio';
-    radioTeacher.name = 'teacher_switcher'
-    span.innerHTML = conterRadioButton++ + "";
-
-    radioTeacher.addEventListener("click", () => {
-      listener(teacher);
-    });
-
-    label.appendChild(radioTeacher);
-    label.append(span);
-    teacher_switch_HTML.appendChild(label);
-    label.addEventListener("contextmenu", (ev) => {
-      ev.preventDefault();
-      teacher_switch_HTML.removeChild(label);
-    })
-    return radioTeacher;
+    let newTeacherHtml = document.createElement("option");
+    newTeacherHtml.value = counter + "";
+    newTeacherHtml.text = teacher.regex;
+    mapTeacherValue["" + counter++] = teacher;
+    teacherSelector.appendChild(newTeacherHtml);
+    return newTeacherHtml;
   };
 
-  radioAlgo.forEach(e => {
-    e.addEventListener("click", () => listener(current_automaton.lerner.teacher))
-  })
+  changeTeacherOrAlgo()
+  teacherSelector.onchange = () => {
+    currentTeacher = mapTeacherValue[teacherSelector.selectedOptions[0].value];
+    changeTeacherOrAlgo();
+  }
 
-  teachers.forEach((teacher, pos) => {
-    let radioTeacher = createRadioTeacher(teacher);
-    if (pos == 4) radioTeacher.click();
+  algoSelector.forEach(as => as.onclick = () => changeTeacherOrAlgo());
+
+  teachers.forEach((teacher) => createRadioTeacher(teacher));
+
+  button_next.addEventListener("click", () => current_automaton.graphic_next_step());
+
+  newRegexSendButton.addEventListener("click", () => {
+    let regexAlreadyExists = Array.from($("#teacher-switch option")).find(e => (e as HTMLOptionElement).text == newRegex.value);
+    let newTeacherOption: HTMLOptionElement;
+    if (regexAlreadyExists) {
+      newTeacherOption = regexAlreadyExists as HTMLOptionElement;
+    } else {
+      currentTeacher = new Teacher(
+        `My automaton with regex = (${newRegex.value})`,
+        newRegex.value, _s => true, []);
+      newTeacherOption = createRadioTeacher(currentTeacher);
+    }
+    newTeacherOption.selected = true;
+    changeTeacherOrAlgo();
   });
 
-  button_next.addEventListener("click", () => {
-    current_automaton.graphic_next_step()
-  });
-
-  let regexAutButton = $("#input-regex")![0] as HTMLInputElement;
-  let createAutButton = $("#button-regex")![0];
-  createAutButton.addEventListener("click", () => {
-    let teacher = new Teacher(`My automaton with regex = (${regexAutButton.value})`, regexAutButton.value,
-      sentence =>
-        sentence.match(new RegExp("^(" + regexAutButton.value + ")$")) != undefined,
-      []);
-    let radioTeacher = createRadioTeacher(teacher)
-    radioTeacher.click()
-  });
 }
 
 export function clear_automaton_HTML() {
@@ -99,8 +93,10 @@ declare global {
     L_star: any;
     NL_star: any;
     autFunction: any;
+    automatonDivList: [Automaton, Node][];
   }
 }
+
 
 try {
   // @ts-ignore
@@ -113,6 +109,5 @@ try {
   window.L_star = L_star;
   window.NL_star = NL_star;
   window.autFunction = autFunction;
+  window.automatonDivList = automatonDivList;
 }
-
-// mainMonoid()
