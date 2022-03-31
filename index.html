@@ -8,14 +8,13 @@
     <title>L* and NL* Home page</title>
 
     <link rel="shortcut icon" href="#">
-
+    <script src="public/require.js"></script>
     <script src="public/polyfill.min.js"></script>
     <script src="public/tex-mml-chtml.js"></script>
     <script src="public/mermaid.min.js"></script>
     <script src="public/jquery.min.js"></script>
     <script src="public/myGeneralFunction.js"></script>
     <script src="public/noam.js"></script>
-    <script src="public/require.js"></script>
 
     <link rel="stylesheet" href="src/css/htmlStyle.css">
     <link rel="stylesheet" href="src/css/tableHtml.css">
@@ -85,11 +84,11 @@
     </table>
     </div>
 
-    <script src="public/out.js"></script>
-    <script>require(['Main']);</script>
+    <!-- <script src="public/out.js"></script> -->
+    <!-- <script>require(['Main']);</script> -->
     <span id="message"></span>
 
-    <!-- <script type="module" src="dist/Main.js"></script> -->
+    <script type="module" src="dist/Main.js"></script>
     <script>
         c = () => $("#next_step")[0].click()
         window.onload = resizableGrid($(".mainTable")[0])
