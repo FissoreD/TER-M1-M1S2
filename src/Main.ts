@@ -102,7 +102,11 @@ try {
   // @ts-ignore
   process == undefined;
 } catch (e) {
-  window.onload = () => initiate_global_vars();
+  window.onload = function () {
+    initiate_global_vars();
+    // @ts-ignore
+    resizableGrid($(".mainTable")[0]);
+  }
   window.Automaton = Automaton;
   window.Teacher = Teacher;
   window.teachers = teachers;

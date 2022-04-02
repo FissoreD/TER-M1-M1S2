@@ -1044,7 +1044,10 @@ define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star"
         process == undefined;
     }
     catch (e) {
-        window.onload = () => initiate_global_vars();
+        window.onload = function () {
+            initiate_global_vars();
+            resizableGrid($(".mainTable")[0]);
+        };
         window.Automaton = Automaton_js_4.Automaton;
         window.Teacher = Teacher_js_1.Teacher;
         window.teachers = Teacher_js_1.teachers;

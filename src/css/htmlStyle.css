@@ -123,8 +123,8 @@ h2 {
     width: 40pt;
 }
 
-/* #message {
-    z-index: 1;
+#message {
+    /* z-index: 1;
     width: 100%;
     background: #ffecec;
     display: inline-block;
@@ -134,8 +134,12 @@ h2 {
     align-items: center;
     justify-content: center;
     align-items: center;
-    text-align: center;
-} */
+    text-align: center; */
+    position: absolute;
+    top: 2pt;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
 
 
 /* Scrollbar */
@@ -168,6 +172,12 @@ div.box {
 
 .automaton-div {
     text-align: center;
+}
+
+#input-automaton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .mainTable {
