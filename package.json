@@ -10,6 +10,7 @@
     "build-typecheck": "npm run typecheck && npm run build",
     "lstar": "node ./dist/test_nodejs/L_star_test.js",
     "nlstar": "node ./dist/test_nodejs/NL_star_test.js",
+    "compare": "node ./dist/test_nodejs/LernerCompare.js",
     "clean": "rimraf dist",
     "compile": "cross-env-shell babel src -d dist --source-maps --extensions '.ts'",
     "compilew": "cross-env-shell babel src -d dist --source-maps --extensions '.ts' -w"

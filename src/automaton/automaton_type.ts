@@ -1,6 +1,7 @@
 
 // @ts-nocheck
 import { Automaton, AutomatonJson } from "../automaton/Automaton.js";
+import { noam } from '../../public/noam.js';
 
 interface HisTransition {
   fromState: number,

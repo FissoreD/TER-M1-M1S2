@@ -51,8 +51,6 @@ export class Teacher {
   }
 
   member(automaton: Automaton): string | undefined {
-    console.log("here");
-
     if (this.counter_exemples_pos < this.counter_exemples.length) {
       return this.counter_exemples[this.counter_exemples_pos++]
     }

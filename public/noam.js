@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-var noam = {};
+export const noam = {};
 
 noam.util = {};
 

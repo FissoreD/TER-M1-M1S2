@@ -5,6 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "command": "npm run lstar",
+      "name": "Test L-Star",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "npm run nlstar",
+      "name": "Test NL-Star",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
       "type": "pwa-chrome",
       "request": "launch",
       "name": "Launch Chrome index hidden",
