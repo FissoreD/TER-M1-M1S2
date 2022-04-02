@@ -73,6 +73,7 @@
                 </div>
             </td>
             <td>
+                <span id="message"></span>
                 <div class="automaton-div" id="automaton-div">
                     <div class="mermaid" id='automaton-mermaid'></div>
                     <div id="input-automaton" class="box"></div>
@@ -84,13 +85,12 @@
 
     <script src="public/out.js"></script>
     <script>require(['Main']);</script>
-    <span id="message"></span>
 
-    <!-- <script type="module" src="dist/Main.js"></script>
+    <!-- <script type="module" src="dist/Main.js"></script> -->
     <script>
         c = () => $("#next_step")[0].click()
         window.onload = resizableGrid($(".mainTable")[0])
-    </script> -->
+    </script>
 </body>
 
 </html>

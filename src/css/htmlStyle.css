@@ -123,7 +123,7 @@ h2 {
     width: 40pt;
 }
 
-#message {
+/* #message {
     z-index: 1;
     width: 100%;
     background: #ffecec;
@@ -135,7 +135,7 @@ h2 {
     justify-content: center;
     align-items: center;
     text-align: center;
-}
+} */
 
 
 /* Scrollbar */
