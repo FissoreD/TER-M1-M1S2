@@ -86,7 +86,7 @@ export abstract class HTML_LernerBase<Lerner extends LernerBase> {
     else if (!this.consistence_action()) { }
     else this.send_automaton_action()
     message.innerHTML =
-      `Queries = ${this.lerner.query_number} - Membership = ${this.lerner.member_number} <br>
+      `Queries = ${this.lerner.query_number} - Membership = ${this.lerner.equiv_number} <br>
       ${message.innerHTML}`
     // @ts-ignore
     MathJax.typeset()
@@ -136,7 +136,7 @@ export abstract class HTML_LernerBase<Lerner extends LernerBase> {
       message.innerHTML = "";
       automaton.initiate_graph();
       this.add_automaton_listener();
-      let answer = this.lerner.make_member(automaton);
+      let answer = this.lerner.make_equiv(automaton);
 
 
       if (answer != undefined) {

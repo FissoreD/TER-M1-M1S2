@@ -39,7 +39,7 @@ export class LernerTester {
   send_automaton_action() {
     let automaton = this.lerner.make_automaton();
     this.lerner.automaton = automaton;
-    let answer = this.lerner.make_member(automaton);
+    let answer = this.lerner.make_equiv(automaton);
     if (answer != undefined) {
       this.table_to_update_after_equiv(answer!)
       return;

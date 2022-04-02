@@ -14,7 +14,7 @@ while (!lernerNL.finish())
 
 let compare = (a: L_star, b: NL_star) => {
   let qNb1 = a.query_number, qNb2 = b.query_number,
-    mNb1 = a.member_number, mNb2 = b.member_number;
+    mNb1 = a.equiv_number, mNb2 = b.equiv_number;
   console.log(`L Star : queries = ${qNb1}, equiv = ${mNb1}`);
   console.log(`NL Star : queries = ${qNb2}, equiv = ${mNb2}`);
 }

@@ -49,9 +49,9 @@ export class L_star extends LernerBase {
    * Else : it appends the counter-exemple to {@link S}
    * @param a an Automaton
    */
-  make_member(a: Automaton) {
+  make_equiv(a: Automaton) {
     let answer = this.teacher.member(a);
-    this.member_number++;
+    this.equiv_number++;
     return answer;
   }
 
