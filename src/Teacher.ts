@@ -45,12 +45,12 @@ export class Teacher {
    * @param sentence the sentence to test the appartenance
    * @returns the string "0" if the sentence is accepted else "1"
    */
-  query(sentence: string): string {
+  member(sentence: string): string {
     // return boolToString(this.check_function(sentence));
     return boolToString(this.automaton.accept_word_nfa(sentence)[0]);
   }
 
-  member(automaton: Automaton): string | undefined {
+  equiv(automaton: Automaton): string | undefined {
     if (this.counter_exemples_pos < this.counter_exemples.length) {
       return this.counter_exemples[this.counter_exemples_pos++]
     }

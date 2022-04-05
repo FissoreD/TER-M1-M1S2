@@ -18,6 +18,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 define("automaton/Automaton", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -184,7 +187,7 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
     }
     exports.Automaton = Automaton;
 });
-define("automaton/automaton_type", ["require", "exports", "automaton/Automaton"], function (require, exports, Automaton_js_1) {
+define("automaton/automaton_type", ["require", "exports", "automaton/Automaton", "../../public/noam.js"], function (require, exports, Automaton_js_1, noam_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.differenceAutomata = exports.complementAutomata = exports.unionAutomata = exports.intersectionAutomata = exports.minimizeAutomaton = exports.regexToAutomaton = exports.MyAutomatonToHis = exports.HisAutomaton2Mine = void 0;
@@ -227,31 +230,31 @@ define("automaton/automaton_type", ["require", "exports", "automaton/Automaton"]
     }
     exports.MyAutomatonToHis = MyAutomatonToHis;
     function regexToAutomaton(regex) {
-        let res = noam.fsm.minimize(noam.fsm.convertEnfaToNfa(noam.re.string.toAutomaton(regex)));
+        let res = noam_js_1.noam.fsm.minimize(noam_js_1.noam.fsm.convertEnfaToNfa(noam_js_1.noam.re.string.toAutomaton(regex)));
         return HisAutomaton2Mine(res);
     }
     exports.regexToAutomaton = regexToAutomaton;
     function minimizeAutomaton(automaton) {
-        automaton = noam.fsm.convertEnfaToNfa(automaton);
-        automaton = noam.fsm.convertNfaToDfa(automaton);
-        automaton = noam.fsm.minimize(automaton);
-        return HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton));
+        automaton = noam_js_1.noam.fsm.convertEnfaToNfa(automaton);
+        automaton = noam_js_1.noam.fsm.convertNfaToDfa(automaton);
+        automaton = noam_js_1.noam.fsm.minimize(automaton);
+        return HisAutomaton2Mine(noam_js_1.noam.fsm.convertStatesToNumbers(automaton));
     }
     exports.minimizeAutomaton = minimizeAutomaton;
     function intersectionAutomata(a1, a2) {
-        return minimizeAutomaton(noam.fsm.intersection(MyAutomatonToHis(a1), MyAutomatonToHis(a2)));
+        return minimizeAutomaton(noam_js_1.noam.fsm.intersection(MyAutomatonToHis(a1), MyAutomatonToHis(a2)));
     }
     exports.intersectionAutomata = intersectionAutomata;
     function unionAutomata(a1, a2) {
         let A1 = MyAutomatonToHis(a1);
         let A2 = MyAutomatonToHis(a2);
-        let U = noam.fsm.union(A1, A2);
+        let U = noam_js_1.noam.fsm.union(A1, A2);
         let res = minimizeAutomaton(U);
         return res;
     }
     exports.unionAutomata = unionAutomata;
     function complementAutomata(a1) {
-        return minimizeAutomaton(noam.fsm.complement(MyAutomatonToHis(a1)));
+        return minimizeAutomaton(noam_js_1.noam.fsm.complement(MyAutomatonToHis(a1)));
     }
     exports.complementAutomata = complementAutomata;
     function differenceAutomata(a1, a2) {
@@ -309,11 +312,10 @@ define("Teacher", ["require", "exports", "automaton/automaton_type", "tools/Util
             }
             return res;
         }
-        query(sentence) {
+        member(sentence) {
             return (0, Utilities_js_1.boolToString)(this.automaton.accept_word_nfa(sentence)[0]);
         }
-        member(automaton) {
-            console.log("here");
+        equiv(automaton) {
             if (this.counter_exemples_pos < this.counter_exemples.length) {
                 return this.counter_exemples[this.counter_exemples_pos++];
             }
@@ -424,8 +426,8 @@ define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function
             this.finish = false;
             this.alphabet = Array.from(teacher.alphabet);
             this.teacher = teacher;
-            this.query_number = 0;
             this.member_number = 0;
+            this.equiv_number = 0;
             this.E = [""];
             this.S = [""];
             this.SA = Array.from(this.alphabet);
@@ -439,7 +441,7 @@ define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function
                 value = old_value + value;
             this.observation_table[key] = value;
         }
-        make_query(pref, suff) {
+        make_member(pref, suff) {
             let word = pref + suff;
             let answer;
             for (let i = 0; i < word.length + 1; i++) {
@@ -457,13 +459,13 @@ define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function
                     }
                 }
             }
-            answer = this.teacher.query(word);
+            answer = this.teacher.member(word);
             this.update_observation_table(pref, answer);
-            this.query_number++;
-        }
-        make_member(a) {
-            let answer = this.teacher.member(a);
             this.member_number++;
+        }
+        make_equiv(a) {
+            let answer = this.teacher.equiv(a);
+            this.equiv_number++;
             return answer;
         }
         add_elt_in_S(new_elt, after_member = false) {
@@ -505,7 +507,7 @@ define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function
                 if (after_member && e == "")
                     this.observation_table[row_name] = (0, Utilities_js_2.boolToString)(!this.automaton.accept_word_nfa(row_name)[0]);
                 else
-                    this.make_query(row_name, e);
+                    this.make_member(row_name, e);
             });
         }
         move_from_SA_to_S(elt) {
@@ -516,23 +518,37 @@ define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function
         }
         add_column(new_col) {
             let L = [this.SA, this.S];
-            L.forEach(l => l.forEach(s => this.make_query(s, new_col)));
+            L.forEach(l => l.forEach(s => this.make_member(s, new_col)));
             this.E.push(new_col);
         }
-        define_next_questions() {
-            const close_rep = this.is_close();
-            const consistence_rep = this.is_consistent();
-            if (close_rep != undefined) {
+        make_next_query() {
+            if (this.finish)
+                return;
+            var close_rep;
+            var consistence_rep;
+            if (close_rep = this.is_close()) {
                 this.add_elt_in_S(close_rep);
             }
-            else if (consistence_rep != undefined) {
+            else if (consistence_rep = this.is_consistent()) {
                 let new_col = consistence_rep[2];
                 this.add_column(new_col);
             }
             else {
-                return true;
+                let automaton = this.make_automaton();
+                this.automaton = automaton;
+                let answer = this.make_equiv(automaton);
+                if (answer != undefined) {
+                    this.table_to_update_after_equiv(answer);
+                }
+                else {
+                    this.finish = true;
+                }
             }
-            return false;
+        }
+        make_all_queries() {
+            while (!this.finish) {
+                this.make_next_query();
+            }
         }
         same_row(a, b) {
             return this.observation_table[a] == this.observation_table[b];
@@ -554,7 +570,7 @@ define("lerners/L_star", ["require", "exports", "automaton/Automaton", "lerners/
                 value = old_value + value;
             this.observation_table[key] = value;
         }
-        make_query(pref, suff) {
+        make_member(pref, suff) {
             let word = pref + suff;
             let answer;
             for (let i = 0; i < word.length + 1; i++) {
@@ -572,13 +588,13 @@ define("lerners/L_star", ["require", "exports", "automaton/Automaton", "lerners/
                     }
                 }
             }
-            answer = this.teacher.query(word);
+            answer = this.teacher.member(word);
             this.update_observation_table(pref, answer);
-            this.query_number++;
-        }
-        make_member(a) {
-            let answer = this.teacher.member(a);
             this.member_number++;
+        }
+        make_equiv(a) {
+            let answer = this.teacher.equiv(a);
+            this.equiv_number++;
             return answer;
         }
         make_automaton() {
@@ -628,6 +644,9 @@ define("lerners/L_star", ["require", "exports", "automaton/Automaton", "lerners/
         }
         same_row(a, b) {
             return this.observation_table[a] == this.observation_table[b];
+        }
+        table_to_update_after_equiv(answer) {
+            this.add_elt_in_S(answer);
         }
     }
     exports.L_star = L_star;
@@ -697,7 +716,7 @@ define("html_interactions/HTML_LernerBase", ["require", "exports", "Main"], func
             else
                 this.send_automaton_action();
             Main_js_1.message.innerHTML =
-                `Queries = ${this.lerner.query_number} - Membership = ${this.lerner.member_number} <br>
+                `Queries = ${this.lerner.member_number} - Membership = ${this.lerner.equiv_number} <br>
       ${Main_js_1.message.innerHTML}`;
             MathJax.typeset();
         }
@@ -742,7 +761,7 @@ define("html_interactions/HTML_LernerBase", ["require", "exports", "Main"], func
                 Main_js_1.message.innerHTML = "";
                 automaton.initiate_graph();
                 this.add_automaton_listener();
-                let answer = this.lerner.make_member(automaton);
+                let answer = this.lerner.make_equiv(automaton);
                 if (answer != undefined) {
                     Main_js_1.message.innerText =
                         `The sent automaton is not valid, 
@@ -790,6 +809,13 @@ define("html_interactions/HTML_LernerBase", ["require", "exports", "Main"], func
             });
             Main_js_1.automatonDiv.appendChild(acceptB);
             Main_js_1.automatonDiv.appendChild(answerP);
+        }
+        go_to_end() {
+            this.lerner.make_all_queries();
+            this.clear_table();
+            this.draw_table();
+            (0, Main_js_1.clear_automaton_HTML)();
+            this.lerner.automaton?.initiate_graph();
         }
     }
     exports.HTML_LernerBase = HTML_LernerBase;
@@ -868,8 +894,8 @@ define("lerners/NL_star", ["require", "exports", "automaton/Automaton", "tools/U
             for (const suffix of suffix_list) {
                 if (this.E.includes(suffix))
                     break;
-                this.SA.forEach(s => this.make_query(s, suffix));
-                this.S.forEach(s => this.make_query(s, suffix));
+                this.SA.forEach(s => this.make_member(s, suffix));
+                this.S.forEach(s => this.make_member(s, suffix));
                 this.E.push(suffix);
             }
             this.check_prime_lines();
@@ -944,6 +970,9 @@ define("lerners/NL_star", ["require", "exports", "automaton/Automaton", "tools/U
             });
             return this.automaton;
         }
+        table_to_update_after_equiv(answer) {
+            this.add_elt_in_E(answer);
+        }
     }
     exports.NL_star = NL_star;
 });
@@ -993,7 +1022,7 @@ define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star"
         exports.automatonDiv = $("#input-automaton")[0];
         exports.message = $("#message")[0];
         exports.tableHTML = $("#table")[0];
-        let button_next = $("#next_step")[0], current_automaton, teacherSelector = $("#teacher-switch")[0], teacherDescription = $("#teacher_description")[0], algoSelector = Array.from($(".algo-switch")), mapTeacherValue = {}, counter = 0, currentTeacher = Teacher_js_1.teachers[0], newRegex = $("#input-regex")[0], newRegexSendButton = $("#button-regex")[0];
+        let current_automaton, teacherSelector = $("#teacher-switch")[0], teacherDescription = $("#teacher_description")[0], algoSelector = Array.from($(".algo-switch")), mapTeacherValue = {}, counter = 0, currentTeacher = Teacher_js_1.teachers[0], newRegex = $("#input-regex")[0], newRegexSendButton = $("#button-regex")[0];
         let changeTeacherOrAlgo = () => {
             exports.tableHTML.innerHTML = "";
             exports.message.innerHTML = "";
@@ -1019,7 +1048,8 @@ define("Main", ["require", "exports", "Teacher", "html_interactions/HTML_L_star"
         };
         algoSelector.forEach(as => as.onclick = () => changeTeacherOrAlgo());
         Teacher_js_1.teachers.forEach((teacher) => createRadioTeacher(teacher));
-        button_next.addEventListener("click", () => current_automaton.graphic_next_step());
+        $("#next_step")[0].addEventListener("click", () => current_automaton.graphic_next_step());
+        $("#go_to_end")[0].addEventListener("click", () => current_automaton.go_to_end());
         newRegexSendButton.addEventListener("click", () => {
             let regexAlreadyExists = Array.from($("#teacher-switch option")).find(e => e.text == newRegex.value);
             let newTeacherOption;
@@ -1136,31 +1166,26 @@ define("lerners/Observation_table", ["require", "exports", "tools/Utilities"], f
     }
     exports.Observation_table = Observation_table;
 });
-define("test_nodejs/L_star_test", ["require", "exports", "html_interactions/listeners", "lerners/L_star", "Teacher"], function (require, exports, listeners_js_1, L_star_js_3, Teacher_js_2) {
+define("test_nodejs/LernerCompare", ["require", "exports", "lerners/NL_star", "lerners/L_star", "Teacher", "assert/strict"], function (require, exports, NL_star_js_3, L_star_js_3, Teacher_js_2, strict_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let graphic = false;
-    let lerner = new L_star_js_3.L_star(Teacher_js_2.teacherPairZeroAndOne);
-    console.log(lerner);
-    for (let i = 0; i < 6; i++) {
-        console.log(`/ ************* STEP ${i + 1} ************* /`);
-        if (lerner.define_next_questions()) {
-            console.log("Making automaton :");
-            let automaton = lerner.make_automaton();
-            if (graphic) {
-                console.log(automaton.initiate_graph());
-                (0, listeners_js_1.listener_automaton_click_button)(automaton);
-            }
-            console.log(automaton);
-            let answer = lerner.make_member(automaton);
-            if (answer != undefined) {
-                lerner.add_elt_in_S(answer);
-            }
-            console.log("After member function : \n", lerner);
-        }
-        else {
-            console.log(lerner);
-        }
+    strict_1 = __importDefault(strict_1);
+    let compare = (a, b) => {
+        let printInfo = (algoName, algo) => {
+            return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.states.length}`;
+        };
+        (0, strict_1.default)(a.teacher == b.teacher);
+        console.log(printInfo("L Star", a));
+        console.log(printInfo("NL Star", b));
+    };
+    for (const teacher of Teacher_js_2.teachers) {
+        let lernerL = new L_star_js_3.L_star(teacher);
+        let lernerNL = new NL_star_js_3.NL_star(teacher);
+        console.log("==============================");
+        console.log("Current regexp : ", teacher.regex);
+        lernerL.make_all_queries();
+        lernerNL.make_all_queries();
+        compare(lernerL, lernerNL);
     }
 });
 //# sourceMappingURL=out.js.map

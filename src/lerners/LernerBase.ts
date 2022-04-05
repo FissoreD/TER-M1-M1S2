@@ -11,7 +11,7 @@ export abstract class LernerBase {
   SA: string[];
   observation_table: Map_string_string;
   teacher: Teacher;
-  query_number: number;
+  member_number: number;
   equiv_number: number;
   finish = false;
   automaton: undefined | Automaton;
@@ -19,7 +19,7 @@ export abstract class LernerBase {
   constructor(teacher: Teacher) {
     this.alphabet = Array.from(teacher.alphabet);
     this.teacher = teacher;
-    this.query_number = 0;
+    this.member_number = 0;
     this.equiv_number = 0;
     this.E = [""];
     this.S = [""];
@@ -41,7 +41,7 @@ export abstract class LernerBase {
    * 3. Updates {@link observation_table} wrt the answer  
    * No modification is performed in {@link S}, {@link E} or {@link SA} sets
    */
-  make_query(pref: string, suff: string) {
+  make_member(pref: string, suff: string) {
     let word = pref + suff;
     let answer: string;
     // If we know already the answer, we do not query the teacher
@@ -58,9 +58,9 @@ export abstract class LernerBase {
         }
       }
     }
-    answer = this.teacher.query(word);
+    answer = this.teacher.member(word);
     this.update_observation_table(pref, answer)
-    this.query_number++;
+    this.member_number++;
   }
 
   /**
@@ -69,9 +69,10 @@ export abstract class LernerBase {
    * If so : the Lerner has learnt the language
    * Else : it appends the counter-exemple to {@link S}
    * @param a an Automaton
+   * @returns undefined if {@link a} recognize the teacher's language, a counter-exemple (as a string) otherwise.
    */
   make_equiv(a: Automaton) {
-    let answer = this.teacher.member(a);
+    let answer = this.teacher.equiv(a);
     this.equiv_number++;
     return answer;
   }
@@ -119,13 +120,13 @@ export abstract class LernerBase {
    * @param row_name 
    * adds a row to the {@link observation_table} 
    * querying the teacher for all tuple ({@link row_name}, e) where e is in {@link E}
-   * @see {@link make_query}
+   * @see {@link make_member}
    */
   add_row(row_name: string, after_member = false) {
     this.E.forEach(e => {
       if (after_member && e == "")
         this.observation_table[row_name] = boolToString(!this.automaton!.accept_word_nfa(row_name)[0]);
-      else this.make_query(row_name, e)
+      else this.make_member(row_name, e)
     });
   }
 
@@ -137,23 +138,46 @@ export abstract class LernerBase {
 
   add_column(new_col: string) {
     let L = [this.SA, this.S];
-    L.forEach(l => l.forEach(s => this.make_query(s, new_col)));
+    L.forEach(l => l.forEach(s => this.make_member(s, new_col)));
     this.E.push(new_col);
   }
 
-  define_next_questions() {
-    const close_rep = this.is_close();
-    const consistence_rep = this.is_consistent()
-    if (close_rep != undefined) {
+  /**
+   * The lerner finds the next question according to 
+   * current context
+   */
+  make_next_query() {
+    if (this.finish) return;
+    var close_rep;
+    var consistence_rep;
+    if (close_rep = this.is_close()) {
       this.add_elt_in_S(close_rep);
-    } else if (consistence_rep != undefined) {
+    } else if (consistence_rep = this.is_consistent()) {
       let new_col = consistence_rep[2]
       this.add_column(new_col);
     } else {
-      return true;
+      let automaton = this.make_automaton();
+      this.automaton = automaton;
+      let answer = this.make_equiv(automaton);
+      if (answer != undefined) {
+        this.table_to_update_after_equiv(answer!)
+      } else {
+        this.finish = true;
+      }
     }
-    return false;
   }
+
+  make_all_queries() {
+    while (!this.finish) {
+      this.make_next_query()
+    }
+  }
+
+  /**
+   * Every lerner can update differently the observation table according to its implementation
+   * @param answer the answer of teacher after equiv question
+   */
+  abstract table_to_update_after_equiv(answer: string): void;
 
   abstract make_automaton(): Automaton;
 

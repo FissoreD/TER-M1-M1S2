@@ -1,7 +1,6 @@
 import { NL_star } from "../lerners/NL_star.js";
 import { L_star } from "../lerners/L_star.js";
 import { teachers } from "../Teacher.js";
-import { LernerTester } from "./AlgoTester.js";
 import assert from 'assert/strict';
 import { LernerBase } from "../lerners/LernerBase.js";
 /**
@@ -17,7 +16,7 @@ import { LernerBase } from "../lerners/LernerBase.js";
 
 let compare = (a: L_star, b: NL_star) => {
   let printInfo = (algoName: string, algo: LernerBase) => {
-    return `${algoName} : queries = ${algo.query_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.states.length}`;
+    return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.states.length}`;
   }
   assert(a.teacher == b.teacher)
 
@@ -26,17 +25,15 @@ let compare = (a: L_star, b: NL_star) => {
 }
 
 for (const teacher of teachers) {
-  let lernerL = new LernerTester(new L_star(teacher))
-  let lernerNL = new LernerTester(new NL_star(teacher))
+  let lernerL = new L_star(teacher)
+  let lernerNL = new NL_star(teacher)
 
   console.log("==============================");
   console.log("Current regexp : ", teacher.regex);
 
-  while (!lernerL.finish())
-    lernerL.next_step()
+  lernerL.make_all_queries()
 
-  while (!lernerNL.finish())
-    lernerNL.next_step()
+  lernerNL.make_all_queries()
 
-  compare(lernerL.lerner as L_star, lernerNL.lerner as NL_star)
+  compare(lernerL, lernerNL)
 }

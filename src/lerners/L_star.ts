@@ -20,7 +20,7 @@ export class L_star extends LernerBase {
    * 3. Updates {@link observation_table} wrt the answer  
    * No modification is performed in {@link S}, {@link E} or {@link SA} sets
    */
-  make_query(pref: string, suff: string) {
+  make_member(pref: string, suff: string) {
     let word = pref + suff;
     let answer: string;
     // If we know already the answer, we do not query the teacher
@@ -37,9 +37,9 @@ export class L_star extends LernerBase {
         }
       }
     }
-    answer = this.teacher.query(word);
+    answer = this.teacher.member(word);
     this.update_observation_table(pref, answer)
-    this.query_number++;
+    this.member_number++;
   }
 
   /**
@@ -50,7 +50,7 @@ export class L_star extends LernerBase {
    * @param a an Automaton
    */
   make_equiv(a: Automaton) {
-    let answer = this.teacher.member(a);
+    let answer = this.teacher.equiv(a);
     this.equiv_number++;
     return answer;
   }
@@ -118,5 +118,10 @@ export class L_star extends LernerBase {
 
   same_row(a: string, b: string) {
     return this.observation_table[a] == this.observation_table[b];
+  }
+
+
+  table_to_update_after_equiv(answer: string): void {
+    this.add_elt_in_S(answer);
   }
 }

@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>L* and NL* Home page</title>
 
-    <link rel="stylesheet" href="src/css/htmlStyle.css">
-    <link rel="stylesheet" href="src/css/tableHtml.css">
-    <link rel="stylesheet" href="src/css/nextStepButton.css">
+    <link rel="stylesheet" href="css/htmlStyle.css">
+    <link rel="stylesheet" href="css/tableHtml.css">
+    <link rel="stylesheet" href="css/nextStepButton.css">
     <link rel="shortcut icon" href="#">
 
     <script src="public/polyfill.min.js"></script>
@@ -18,7 +18,6 @@
     <script src="public/require.js"></script>
     <script src="public/jquery.min.js"></script>
     <script src="public/myGeneralFunction.js"></script>
-    <script src="public/noam.js"></script>
 
     <script>
         mermaid.initialize({ startOnLoad: false });
@@ -51,9 +50,10 @@
             <button id="button-regex">Send teacher</button>
         </div>
     </div>
-    <div>
-        <p class="description" id="teacher_description"></p>
-        <button id="next_step">Next step</button>
+    <p class="description" id="teacher_description"></p>
+    <div class="bottom_page">
+        <button class="bottom_button" id="next_step">Next step</button>
+        <button class="bottom_button" id="go_to_end">Run algo</button>
     </div>
     <table class="mainTable">
         <thead>

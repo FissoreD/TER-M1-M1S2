@@ -19,8 +19,7 @@ export function initiate_global_vars() {
   message = $("#message")[0] as HTMLParagraphElement;
   tableHTML = $("#table")[0] as HTMLTableElement;
 
-  let button_next = $("#next_step")[0] as HTMLButtonElement,
-    current_automaton: HTML_NL_star | HTML_L_star,
+  let current_automaton: HTML_NL_star | HTML_L_star,
     teacherSelector = $("#teacher-switch")[0] as HTMLSelectElement,
     teacherDescription = $("#teacher_description")[0] as HTMLParagraphElement,
     algoSelector = Array.from($(".algo-switch")) as HTMLInputElement[],
@@ -61,7 +60,8 @@ export function initiate_global_vars() {
 
   teachers.forEach((teacher) => createRadioTeacher(teacher));
 
-  button_next.addEventListener("click", () => current_automaton.graphic_next_step());
+  ($("#next_step")[0] as HTMLButtonElement).addEventListener("click", () => current_automaton.graphic_next_step());
+  ($("#go_to_end")[0] as HTMLButtonElement).addEventListener("click", () => current_automaton.go_to_end());
 
   newRegexSendButton.addEventListener("click", () => {
     let regexAlreadyExists = Array.from($("#teacher-switch option")).find(e => (e as HTMLOptionElement).text == newRegex.value);

@@ -1,4 +1,11 @@
-#next_step {
+.bottom_page {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 5;
+}
+
+.bottom_button {
     display: inline-block;
     padding: 0.75rem 1.25rem;
     border-radius: 10rem;
@@ -7,14 +14,14 @@
     font-size: 1rem;
     letter-spacing: 0.15rem;
     transition: all 0.3s;
-    position: fixed;
+    position: relative;
     bottom: 0;
     right: 0;
     overflow: hidden;
     z-index: 3;
 }
 
-#next_step:after {
+.bottom_button:after {
     content: "";
     position: absolute;
     bottom: 0;
@@ -26,7 +33,7 @@
     z-index: -2;
 }
 
-#next_step:before {
+.bottom_button:before {
     content: "";
     position: absolute;
     bottom: 0;
@@ -39,10 +46,10 @@
     z-index: -1;
 }
 
-#next_step:hover {
+.bottom_button:hover {
     color: #fff;
 }
 
-#next_step:hover:before {
+.bottom_button:hover:before {
     width: 100%;
 }

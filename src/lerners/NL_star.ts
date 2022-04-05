@@ -73,8 +73,8 @@ export class NL_star extends LernerBase {
     let suffix_list = generate_suffix_list(new_elt);
     for (const suffix of suffix_list) {
       if (this.E.includes(suffix)) break;
-      this.SA.forEach(s => this.make_query(s, suffix));
-      this.S.forEach(s => this.make_query(s, suffix));
+      this.SA.forEach(s => this.make_member(s, suffix));
+      this.S.forEach(s => this.make_member(s, suffix));
       this.E.push(suffix);
     }
     this.check_prime_lines()
@@ -163,5 +163,10 @@ export class NL_star extends LernerBase {
       "transitions": transitions
     })
     return this.automaton;
+  }
+
+
+  table_to_update_after_equiv(answer: string): void {
+    this.add_elt_in_E(answer);
   }
 }
