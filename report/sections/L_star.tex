@@ -1,3 +1,26 @@
 \section{L* algorithm}
 
-The L* algorithm aims to build a minimum DFA to define an unknown language \langU{} asking to the \teacher{} if a word belongs to \langU{} or sending an automaton \automaton{} to check if the \lerner{} has understood \langU{}.
+The L* algorithm, described by Dana Angluin in \cite{angluinL}, is a lerning algorithm that wants to build a minimum DFA to define an unknown language \langU{}. In this algorithm we see the interaction between a \lerner{} and a \teacher{} as said in the introduction section, where communications are made thanks membership and equivalence queries.
+
+\subsection{\textit{member} and \textit{equiv} functions}
+
+A membership query is represented as a function which maps a word $w$ to \{True, False\} and an equivalence query maps an automaton \automaton{} to \{True, $w \in \Sigma^*$\}, where $w$ is a counter-exemple if \automaton{} does not recognize \langU{}.
+
+A counter-example is a word belonging to the symmetric difference of \langU{} and the language recognized by \automaton{}. The symmetric difference between to sets $A$ and $B$ is a set $S$ containing all the elements that are in $A$ and not in $B$ or that are in $B$ and not in $A$, we can note it as : $A \Delta B \equiv (A \cap \bar{B}) \cup (\bar{A} \cap B) \equiv (A \cup B) - (A \cap B) $
+
+Mathematically :\\
+let w be a word over an alphabet \alphabet{}, \automaton{} an automaton and \langU{} the language to be learnt, then
+\[ member(w) =
+  \begin{cases}
+    \text{True}  & \quad \text{if } w \in U \\
+    \text{False} & \quad \text{otherwise}
+  \end{cases}
+\]
+\[ equiv(\automatonN{}) =
+  \begin{cases}
+    \text{True} & \quad \text{if } \automatonN{} \text{ recognizes } U           \\
+    \text{w}    & \quad \text{otherwise, where } w \in U \Delta L(\automatonN{})
+  \end{cases}
+\]
+
+\subsection{Tools of L* algorithm}

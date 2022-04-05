@@ -8,6 +8,11 @@ export class LernerTester {
     this.lerner = lerner;
   }
 
+  /**
+   * Calculate the next step of the algorithm which may be :   
+   * A member query if the table is not closed or not consistent   
+   * An equivalence query on the other case
+   */
   next_step() {
     if (this.lerner.finish) { }
     else if (!this.close_action()) { }
@@ -15,6 +20,11 @@ export class LernerTester {
     else this.send_automaton_action()
   }
 
+  /**
+   * Check and return if the observation table is closed.
+   * If it is not closed, it also updates the obs. table
+   * @returns if the observation table is closed
+   */
   close_action(): boolean {
     const close_rep = this.lerner.is_close();
     if (close_rep != undefined) {
@@ -24,6 +34,11 @@ export class LernerTester {
     return true;
   }
 
+  /**
+   * Check and return if the observation table is consistent.
+   * If it is not consistent, it also updates the obs. table
+   * @returns if the observation table is consistence
+   */
   consistence_action(): boolean {
     const consistence_rep = this.lerner.is_consistent()
     if (consistence_rep != undefined) {
@@ -48,7 +63,7 @@ export class LernerTester {
   }
 
   table_to_update_after_equiv(answer: string) {
-    if (this instanceof NL_star) (this as NL_star).add_elt_in_E(answer);
+    if (this.lerner instanceof NL_star) (this.lerner as NL_star).add_elt_in_E(answer);
     else this.lerner.add_elt_in_S(answer)
   }
 

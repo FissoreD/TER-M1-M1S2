@@ -5,6 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "command": "npm run compare",
+      "name": "Compare Algo",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
       "command": "npm run lstar",
       "name": "Test L-Star",
       "request": "launch",
