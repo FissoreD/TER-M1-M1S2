@@ -35,6 +35,18 @@ If you make changes in *ts* files, you must recompile them to see modification i
 To run the *index.html* in browser, you should launch a local server from the project.  
 Suggestion : if you use VSCode, you can install the extension [*Live Server*](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer).
 
+## Compare L* and NL*
+To compare these two algorithms, you can launch the command 
+- `npm run wrostDFA` to compare them on regex of style (a+b)*a(a+b)^n
+- `npm run compare` to compare them on random regex
+
+Once you have done this, you can see the corresponding csv file in the statistic
+folder, you can plot this csv thanks to a mini-python program that can be run with the 
+command : `py statistics\pythonPlotter\csvToPlot.py`
+
+The resulting plots will be drawn in the *statistics/plots* folder.  
+(Depending on your machine, the *npm* commands that generates the *csv* may be slow, this is because of operation of determinisation and comparaison of automata, in this case you can interrupt the process with *CTRL-C* -> csv files will contain rows up to where the program arrived to write)
+
 ## Author 
 Fissore Davide
 

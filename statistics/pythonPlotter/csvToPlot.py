@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from os import listdir
 
-folderPrefix = ["statistics/", "../"][1]
+folderPrefix = ["statistics/", "../"][0]
 plotFolder = "plots/"
 
 
