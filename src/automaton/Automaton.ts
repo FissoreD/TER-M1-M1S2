@@ -162,11 +162,9 @@ export class Automaton implements AutomatonJson {
     // res = res.concat(this.startState.map(e => `style ${e} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
     res += "subgraph InitialStates\n";
     res += this.startState.map(e => e).join("\n")
-    res += "\nend\n"
-
-    this.acceptingStates.forEach(s => res += `style ${s} fill:#00758f\n`)
-
-    res += "\nend\n"
+    res += "\nend"
+    res += "\n"
+    res += "end\n"
     // Callback for tooltip on mouse over
     res = res.concat(this.states.map(e => `click ${e} undefinedCallback "${e}";`).join("\n"))
     console.log(res);
@@ -223,151 +221,66 @@ export class Automaton implements AutomatonJson {
     return this.transitions.map(e => e.toStates.length).reduce((prev, current) => prev + current);
   }
 
-  // minimize() {
-  //   let couples: string[][] = []
-  //   let separable = new Set();
+  minimize() {
+    let couples: string[][] = []
+    let separable = new Set();
+    for (let i1 = 0; i1 < this.states.length; i1++) {
+      for (let i2 = i1 + 1; i2 < this.states.length; i2++) {
+        if (this.acceptingStates.includes(this.states[i1]) != this.acceptingStates.includes(this.states[i2])) separable.add(`${this.states[i1]}-${this.states[i2]}`)
+        else couples.push([this.states[i1], this.states[i2]]);
+      }
+    }
+    while (true) {
+      let oldLength = couples.length;
+      couples = couples.filter(e => {
+        let fst = e[0], snd = e[1];
+        let tr0 = this.transitions.filter(t => t.fromState == fst);
+        let tr1 = this.transitions.filter(t => t.fromState == snd);
+        for (const letter of this.alphabet) {
+          let t1 = tr0.find(e => e.symbol == letter)?.toStates
+          let t2 = tr1.find(e => e.symbol == letter)?.toStates
+          if (t1 && t2) {
+            for (const x of t1) {
+              for (const y of t2) {
+                if (separable.has(`${x}-${y}`) || separable.has(`${y}-${x}`)) {
+                  separable.add(`${fst}-${snd}`)
+                  return false;
+                }
+              }
+            }
+          }
+        }
+        return true;
+      })
+      if (couples.length == oldLength) break
+    }
 
+    for (const couple of couples) {
+      this.transitions.filter(e => e.fromState == couple[1]).forEach(
+        s => {
+          let tr;
+          if (tr = this.transitions.find(t => t.fromState == couple[0] && t.symbol == s.symbol)) {
+            for (const next of s.toStates) {
+              if (!tr.toStates.includes(next)) tr.toStates.push(next)
+            }
+          } else {
+            this.transitions.push({ fromState: couple[0], symbol: s.symbol, toStates: s.toStates })
+          }
+        }
+      )
+      if (this.startState.includes(couple[1])) {
+        this.startState = this.startState.filter(e => e != couple[1])
+        if (!this.startState.includes(couple[0])) this.startState.push(couple[0])
+      }
+      this.acceptingStates = this.acceptingStates.filter(e => e != couple[1])
+      this.states = this.states.filter(e => e != couple[1])
+      this.transitions = this.transitions.filter(e => e.fromState != couple[1])
+      this.transitions.forEach(e => e.toStates = e.toStates.filter(x => x != couple[1]))
+      this.transitions = this.transitions.filter(t => t.toStates.length != 0)
+    }
 
-  //   let reachableStates = () => {
-  //     let reachable: string[] = [];
-  //     let toExplore: string[] | undefined = Array.from(this.startState);
-  //     while (toExplore.length > 0) {
-  //       console.log("HERE");
-  //       let current = toExplore.shift()!
-  //       reachable.push(current)
-  //       let neighbors = this.transitions.filter(t => t.fromState == current).map(t => t.toStates).flat()
-  //       for (const neighbor of neighbors) {
-  //         if (!reachable.includes(neighbor) && !toExplore.includes(neighbor)) {
-  //           toExplore.push(neighbor)
-  //         }
-  //       }
-  //     }
-  //     return reachable
-  //   }
-
-  //   let reachables = reachableStates();
-
-  //   for (let i1 = 0; i1 < reachables.length; i1++) {
-  //     for (let i2 = i1 + 1; i2 < reachables.length; i2++) {
-  //       if (this.acceptingStates.includes(reachables[i1]) != this.acceptingStates.includes(reachables[i2])) separable.add(`${reachables[i1]}-${reachables[i2]}`)
-  //       else couples.push([reachables[i1], reachables[i2]]);
-  //     }
-  //   }
-
-  //   while (true) {
-  //     let oldLength = couples.length;
-  //     couples = couples.filter(e => {
-  //       let fst = e[0], snd = e[1];
-  //       let tr0 = this.transitions.filter(t => t.fromState == fst);
-  //       let tr1 = this.transitions.filter(t => t.fromState == snd);
-  //       for (const letter of this.alphabet) {
-  //         let t1 = tr0.find(e => e.symbol == letter)?.toStates
-  //         let t2 = tr1.find(e => e.symbol == letter)?.toStates
-  //         if (t1 && t2) {
-  //           for (const x of t1) {
-  //             for (const y of t2) {
-  //               if (separable.has(`${x}-${y}`) || separable.has(`${y}-${x}`)) {
-  //                 separable.add(`${fst}-${snd}`)
-  //                 return false;
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //       return true;
-  //     })
-  //     if (couples.length == oldLength) break
-  //   }
-
-  //   let statesMerged = Array.from(reachables)
-  //   let transitions: { [key: string]: Transition[] } = {};
-  //   for (const iterator of couples) {
-  //     let a = iterator[0], b = iterator[1];
-  //     statesMerged = statesMerged.filter(e => e != (this.startState.includes(b) ? a : b))
-  //   }
-
-  //   let mergeListWithoutRepetition = (L1: string[], L2: string[]) => {
-  //     let s = new Set()
-  //     L1.forEach(e => s.add(e))
-  //     L2.forEach(e => s.add(e))
-  //   }
-
-  //   let createValidTransition = (transition: Transition): Transition => ({
-  //     fromState: transition.fromState,
-  //     toStates: transition.toStates.filter(e => statesMerged.includes(e)),
-  //     symbol: transition.symbol
-  //   })
-
-  //   let extendWithoutRepetition = (t1: Transition[], t2: Transition) => {
-  //     let t;
-  //     if (t = t1.find(x => x.symbol == t2.symbol))
-  //       for (const state of t2.toStates) {
-  //         if (!t.toStates.includes(state) && statesMerged.includes(state)) t.toStates.push(state)
-  //       }
-  //     else t1.push(createValidTransition(t2))
-  //   }
-
-  //   for (const couple of couples) {
-  //     let a = couple[0], b = couple[1];
-  //     let tA = this.transitions.filter(t => t.fromState == a)
-  //     let tB = this.transitions.filter(t => t.fromState == b)
-  //     if (statesMerged.includes(a)) {
-  //       if (!transitions[a])
-  //         transitions[a] = tA.map(e => createValidTransition(e));
-  //       else tA.forEach(e => {
-  //         extendWithoutRepetition(transitions[a], e)
-  //       });
-  //       tB.forEach(e => extendWithoutRepetition(transitions[a], e))
-  //     } else if (statesMerged.includes(b)) {
-  //       if (!transitions[b])
-  //         transitions[b] = tB.map(e => createValidTransition(e));
-  //       else tB.forEach(e => extendWithoutRepetition(transitions[b], e));
-  //       tA.forEach(e => extendWithoutRepetition(transitions[b], e))
-  //     }
-  //   }
-
-  //   let startStates = statesMerged.filter(e => this.startState.includes(e))
-  //   let acceptingStates = statesMerged.filter(e => this.acceptingStates.includes(e))
-  //   let o = Object.entries(transitions).map(e => e[1][0]).filter(t => t.toStates.length != 0)
-
-  //   let newAutomaton: AutomatonJson = {
-  //     transitions: [],
-  //     startState: [],
-  //     acceptingStates: [],
-  //     alphabet: this.alphabet,
-  //     states: reachables
-  //   }
-
-  //   console.log(Array.from(separable), couples);
-
-  //   return this;
-
-  //   // for (const couple of couples) {
-  //   //   this.transitions.filter(e => e.fromState == couple[1]).forEach(
-  //   //     s => {
-  //   //       let tr;
-  //   //       if (tr = this.transitions.find(t => t.fromState == couple[0] && t.symbol == s.symbol)) {
-  //   //         for (const next of s.toStates) {
-  //   //           if (!tr.toStates.includes(next)) tr.toStates.push(next)
-  //   //         }
-  //   //       } else {
-  //   //         newAutomaton.transitions.push({ fromState: couple[0], symbol: s.symbol, toStates: s.toStates })
-  //   //       }
-  //   //     }
-  //   //   )
-  //   //   if (this.startState.includes(couple[1])) {
-  //   //     this.startState = this.startState.filter(e => e != couple[1])
-  //   //     if (!this.startState.includes(couple[0])) this.startState.push(couple[0])
-  //   //   }
-  //   //   this.acceptingStates = this.acceptingStates.filter(e => e != couple[1])
-  //   //   this.states = this.states.filter(e => e != couple[1])
-  //   //   this.transitions = this.transitions.filter(e => e.fromState != couple[1])
-  //   //   this.transitions.forEach(e => e.toStates = e.toStates.filter(x => x != couple[1]))
-  //   //   this.transitions = this.transitions.filter(t => t.toStates.length != 0)
-  //   // }
-
-  //   // this.set_state_rename()
-  //   // console.log(Array.from(separable), couples);
-  //   // return this;
-  // }
+    this.set_state_rename()
+    console.log(Array.from(separable), couples);
+    return this;
+  }
 }

@@ -84,9 +84,9 @@ export class Teacher {
       }
       return "";
     }
-    // let automMinimized = minimizeAutomaton(MyAutomatonToHis(automaton));
-    let diff1 = differenceAutomata(this.automaton, automaton);
-    let diff2 = differenceAutomata(automaton, this.automaton);
+    let automMinimized = minimizeAutomaton(MyAutomatonToHis(automaton));
+    let diff1 = differenceAutomata(this.automaton, automMinimized);
+    let diff2 = differenceAutomata(automMinimized, this.automaton);
     // BREAKPOINT AFTER DIFF 
     let counterEx1 = counterExemple(diff1);
     let counterEx2 = counterExemple(diff2);

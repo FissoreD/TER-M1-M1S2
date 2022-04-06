@@ -21,4 +21,4 @@ let a: Automaton = new Automaton({
 
 console.log(JSON.stringify(a, null, 4));
 console.log("-".repeat(50));
-// console.log(JSON.stringify(a.minimize(), null, 4));
+console.log(JSON.stringify(a.minimize(), null, 4));
