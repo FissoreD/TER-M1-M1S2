@@ -1,8 +1,7 @@
 import { NL_star } from "../lerners/NL_star.js";
 import { L_star } from "../lerners/L_star.js";
 import { teachers } from "../Teacher.js";
-import assert from 'assert/strict';
-import { LernerBase } from "../lerners/LernerBase.js";
+import { clearFile, csvHead, printCsvCompare, printInfo, writeToFile } from "./PrintFunction.js";
 /**
  * About this file : 
  * The goal here is to compare L and NL algo in term
@@ -14,26 +13,22 @@ import { LernerBase } from "../lerners/LernerBase.js";
  * interactions with the teacher.
  */
 
-let compare = (a: L_star, b: NL_star) => {
-  let printInfo = (algoName: string, algo: LernerBase) => {
-    return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.states.length}`;
-  }
-  assert(a.teacher == b.teacher)
-
-  console.log(printInfo("L Star", a));
-  console.log(printInfo("NL Star", b));
-}
+let fileName = "randomRegex";
+clearFile(fileName)
+writeToFile(fileName, csvHead)
 
 for (const teacher of teachers) {
-  let lernerL = new L_star(teacher)
-  let lernerNL = new NL_star(teacher)
+  let L = new L_star(teacher)
+  let NL = new NL_star(teacher)
 
   console.log("==============================");
   console.log("Current regexp : ", teacher.regex);
 
-  lernerL.make_all_queries()
+  L.make_all_queries()
+  printInfo(L, "L*")
 
-  lernerNL.make_all_queries()
+  NL.make_all_queries()
+  printInfo(L, "NL*")
 
-  compare(lernerL, lernerNL)
+  writeToFile(fileName, printCsvCompare(L, NL))
 }

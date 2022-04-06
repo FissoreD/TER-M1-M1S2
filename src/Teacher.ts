@@ -13,9 +13,9 @@ export class Teacher {
   regex: string;
   automaton: Automaton;
 
-  constructor(description: string, regex: string, f: myFunction<string, boolean>, counter_exemples: string[]) {
-    this.check_function = f;
-    this.counter_exemples = counter_exemples;
+  constructor(description: string, regex: string, f?: myFunction<string, boolean>, counter_exemples?: string[]) {
+    this.check_function = f || (() => true);
+    this.counter_exemples = counter_exemples || [];
     this.counter = 0;
     this.description = description;
     this.automaton = regexToAutomaton(regex)
@@ -54,10 +54,6 @@ export class Teacher {
     if (this.counter_exemples_pos < this.counter_exemples.length) {
       return this.counter_exemples[this.counter_exemples_pos++]
     }
-    let differenceAutomaton = (a: Automaton, b: Automaton) => {
-      let difference = differenceAutomata(a, b);
-      return difference;
-    };
     let counterExemple = (automatonDiff: Automaton): string | undefined => {
       if (automatonDiff.acceptingStates.length == 0) return undefined;
       let toExplore = [automatonDiff.startState[0]]
@@ -89,22 +85,17 @@ export class Teacher {
       return "";
     }
     let automMinimized = minimizeAutomaton(MyAutomatonToHis(automaton));
-    let diff1 = differenceAutomaton(this.automaton, automMinimized);
-    let diff2 = differenceAutomaton(automMinimized, this.automaton);
+    let diff1 = differenceAutomata(this.automaton, automMinimized);
+    let diff2 = differenceAutomata(automMinimized, this.automaton);
     // BREAKPOINT AFTER DIFF 
     let counterEx1 = counterExemple(diff1);
     let counterEx2 = counterExemple(diff2);
     // AFTER COUNTEREXEMPLE
+    console.log(`C1 = { ${counterEx1} }, C2 = { ${counterEx2} }`);
+
     if (counterEx1 == undefined) return counterEx2;
     if (counterEx2 == undefined) return counterEx1;
     return counterEx1! < counterEx2! ? counterEx1 : counterEx2;
-    // if (this.counter_exemples_pos < this.counter_exemples.length) {
-    //   return this.counter_exemples[this.counter_exemples_pos++]
-    // }
-    // let res = this.word_apperencance.find((word) => {
-    //   return automaton.accept_word_nfa(word[0])[0] != word[1];
-    // });
-    // return res ? res[0] : res;
   }
 }
 

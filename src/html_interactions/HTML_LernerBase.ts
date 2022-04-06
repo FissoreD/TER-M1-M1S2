@@ -86,8 +86,7 @@ export abstract class HTML_LernerBase<Lerner extends LernerBase> {
     else if (!this.consistence_action()) { }
     else this.send_automaton_action()
     message.innerHTML =
-      `Queries = ${this.lerner.member_number} - Membership = ${this.lerner.equiv_number} <br>
-      ${message.innerHTML}`
+      `Queries = ${this.lerner.member_number} - Membership = ${this.lerner.equiv_number}` + (this.lerner.automaton ? ` - States = ${this.lerner.automaton?.state_number()} - Transitions = ${this.lerner.automaton?.transition_number()}` : ``) + `<br> ${message.innerHTML}`
     // @ts-ignore
     MathJax.typeset()
   }
@@ -197,11 +196,13 @@ export abstract class HTML_LernerBase<Lerner extends LernerBase> {
   }
 
   go_to_end() {
+    if (this.lerner.finish) return
     this.lerner.make_all_queries()
     this.clear_table()
     this.draw_table()
     clear_automaton_HTML();
     this.lerner.automaton?.initiate_graph()
+    this.graphic_next_step()
   }
 
 }

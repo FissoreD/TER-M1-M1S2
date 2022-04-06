@@ -1,0 +1,5 @@
+regex,Alp Length,L Member,L Equiv,L Aut State,L Aut Tran,NL Member,NL Equiv,NL Aut State,NL Aut Tran
+(a+b)*a,2,5,1,2,4,5,1,2,6
+(a+b)*a(a+b),2,14,2,4,8,15,2,3,11
+(a+b)*a(a+b)(a+b),2,35,2,8,16,24,2,4,16
+(a+b)*a(a+b)(a+b)(a+b),2,84,2,16,32,35,2,5,21

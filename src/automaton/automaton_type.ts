@@ -61,7 +61,17 @@ export function regexToAutomaton(regex: string): Automaton {
 export function minimizeAutomaton(automaton: HisAutomaton): Automaton {
   automaton = noam.fsm.convertEnfaToNfa(automaton);
   automaton = noam.fsm.convertNfaToDfa(automaton);
+  // HELP PROFESSORI
   automaton = noam.fsm.minimize(automaton);
+  // let myAutomaton = HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton));
+  // console.log(myAutomaton.matrix_to_mermaid());
+  // let minimized = myAutomaton.minimize()
+  // console.log("-".repeat(50));
+  // console.log(JSON.stringify(automaton, null, 4));
+
+  // console.log(minimized.matrix_to_mermaid());
+  // console.log("=".repeat(50));
+
   return HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton))
 }
 

@@ -18,7 +18,7 @@ export class Automaton implements AutomatonJson {
   acceptingStates: string[];
   alphabet: string | string[];
   states: string[];
-  states_rename: string[];
+  states_rename: string[] = [];
   currentStates: string[];
 
   constructor(json: AutomatonJson) {
@@ -28,6 +28,10 @@ export class Automaton implements AutomatonJson {
     this.currentStates = this.startState;
     this.alphabet = Array.from(json.alphabet);
     this.states = json.states;
+    this.set_state_rename()
+  }
+
+  set_state_rename() {
     this.states_rename = [];
     let counter_init = [0, this.startState.length, this.states.length - this.acceptingStates.length + 1];
     for (let i = 0; i < this.states.length; i++) {
@@ -207,5 +211,76 @@ export class Automaton implements AutomatonJson {
   get_state_rename(name: string) {
     // return name;
     return this.states_rename[this.states.indexOf(name)]
+  }
+
+  state_number() {
+    return this.states.length;
+  }
+
+  transition_number() {
+    return this.transitions.map(e => e.toStates.length).reduce((prev, current) => prev + current);
+  }
+
+  minimize() {
+    let couples: string[][] = []
+    let separable = new Set();
+    for (let i1 = 0; i1 < this.states.length; i1++) {
+      for (let i2 = i1 + 1; i2 < this.states.length; i2++) {
+        if (this.acceptingStates.includes(this.states[i1]) != this.acceptingStates.includes(this.states[i2])) separable.add(`${this.states[i1]}-${this.states[i2]}`)
+        else couples.push([this.states[i1], this.states[i2]]);
+      }
+    }
+    while (true) {
+      let oldLength = couples.length;
+      couples = couples.filter(e => {
+        let fst = e[0], snd = e[1];
+        let tr0 = this.transitions.filter(t => t.fromState == fst);
+        let tr1 = this.transitions.filter(t => t.fromState == snd);
+        for (const letter of this.alphabet) {
+          let t1 = tr0.find(e => e.symbol == letter)?.toStates
+          let t2 = tr1.find(e => e.symbol == letter)?.toStates
+          if (t1 && t2) {
+            for (const x of t1) {
+              for (const y of t2) {
+                if (separable.has(`${x}-${y}`) || separable.has(`${y}-${x}`)) {
+                  separable.add(`${fst}-${snd}`)
+                  return false;
+                }
+              }
+            }
+          }
+        }
+        return true;
+      })
+      if (couples.length == oldLength) break
+    }
+
+    for (const couple of couples) {
+      this.transitions.filter(e => e.fromState == couple[1]).forEach(
+        s => {
+          let tr;
+          if (tr = this.transitions.find(t => t.fromState == couple[0] && t.symbol == s.symbol)) {
+            for (const next of s.toStates) {
+              if (!tr.toStates.includes(next)) tr.toStates.push(next)
+            }
+          } else {
+            this.transitions.push({ fromState: couple[0], symbol: s.symbol, toStates: s.toStates })
+          }
+        }
+      )
+      if (this.startState.includes(couple[1])) {
+        this.startState = this.startState.filter(e => e != couple[1])
+        if (!this.startState.includes(couple[0])) this.startState.push(couple[0])
+      }
+      this.acceptingStates = this.acceptingStates.filter(e => e != couple[1])
+      this.states = this.states.filter(e => e != couple[1])
+      this.transitions = this.transitions.filter(e => e.fromState != couple[1])
+      this.transitions.forEach(e => e.toStates = e.toStates.filter(x => x != couple[1]))
+      this.transitions = this.transitions.filter(t => t.toStates.length != 0)
+    }
+
+    this.set_state_rename()
+    console.log(Array.from(separable), couples);
+    return this;
   }
 }
