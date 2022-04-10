@@ -5,12 +5,12 @@
     "module": "amd", // for browser
     // "module": "commonjs", // for node
     "removeComments": true,
-    // "outFile": "./public/out.js",
+    "outFile": "./public/out.js",
     "baseUrl": "./src",
     "strict": true,
     "sourceMap": true,
     "alwaysStrict": true,
-    // "declaration": true,
+    "declaration": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleResolution": "node",

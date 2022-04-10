@@ -1,5 +1,5 @@
 import { Automaton, Transition } from "../automaton/Automaton.js";
-import { Teacher } from "../Teacher.js";
+import { Teacher } from "../teacher/Teacher.js";
 import { generate_suffix_list } from "../tools/Utilities.js";
 import { LernerBase, Map_string_string } from "./LernerBase.js";
 
@@ -17,8 +17,10 @@ export class NL_star extends LernerBase {
 
     if (row_value.length < 2 || parseInt(row_value) == 0) return true;
 
-    let res = ""
-    for (let i = 0; i < row_value.length; i++) res += "0";
+    let res = "0".repeat(row_value.length)
+
+    // let res = ""
+    // for (let i = 0; i < row_value.length; i++) res += "0";
 
     Object.values(this.observation_table).forEach(value => {
       if (value != row_value && this.is_covered(value, row_value)) {
@@ -81,8 +83,8 @@ export class NL_star extends LernerBase {
   }
 
   /**
-   * @returns the first `s` in {@link SA} st `s` is a prime lines and 
-   * and `s` is not in {@link S}
+   * @returns the first `s` in {@link SA} st `s` is a prime line and 
+   * `s` is not in {@link S}
    */
   is_close(): string | undefined {
     return this.SA.find(t => !this.S.some(s => this.same_row(s, t)) && this.prime_lines.includes(t));

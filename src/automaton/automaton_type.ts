@@ -54,15 +54,15 @@ export function MyAutomatonToHis(aut: Automaton): HisAutomaton {
 }
 
 export function regexToAutomaton(regex: string): Automaton {
-  let res = noam.fsm.minimize(noam.fsm.convertEnfaToNfa(noam.re.string.toAutomaton(regex)));
+  let res = noam.fsm.minimize(noam.re.string.toAutomaton(regex));
   return HisAutomaton2Mine(res);
 }
 
 export function minimizeAutomaton(automaton: HisAutomaton): Automaton {
-  automaton = noam.fsm.convertEnfaToNfa(automaton);
-  automaton = noam.fsm.convertNfaToDfa(automaton);
-  // HELP PROFESSORI
-  automaton = noam.fsm.minimize(automaton);
+  // automaton = noam.fsm.convertEnfaToNfa(automaton);
+  // automaton = noam.fsm.convertNfaToDfa(automaton);
+  // // HELP PROFESSORI
+  // automaton = noam.fsm.minimize(automaton);
   // let myAutomaton = HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton));
   // console.log(myAutomaton.matrix_to_mermaid());
   // let minimized = myAutomaton.minimize()
@@ -71,8 +71,14 @@ export function minimizeAutomaton(automaton: HisAutomaton): Automaton {
 
   // console.log(minimized.matrix_to_mermaid());
   // console.log("=".repeat(50));
-
-  return HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton))
+  console.log("1");
+  let hisMinimized = noam.fsm.minimize(automaton)
+  console.log("2");
+  let statesToNumbers = noam.fsm.convertStatesToNumbers(hisMinimized)
+  console.log("3");
+  let minimized = HisAutomaton2Mine(statesToNumbers)
+  console.log("4");
+  return minimized
 }
 
 export function intersectionAutomata(a1: Automaton, a2: Automaton): Automaton {

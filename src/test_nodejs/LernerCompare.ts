@@ -1,6 +1,6 @@
 import { NL_star } from "../lerners/NL_star.js";
 import { L_star } from "../lerners/L_star.js";
-import { teachers } from "../Teacher.js";
+import { teachers } from "../teacher/Teacher.js";
 import { clearFile, csvHead, printCsvCompare, printInfo, writeToFile } from "./PrintFunction.js";
 /**
  * About this file : 

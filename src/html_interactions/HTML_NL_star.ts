@@ -1,4 +1,4 @@
-import { Teacher } from "../Teacher.js";
+import { Teacher } from "../teacher/Teacher.js";
 import { NL_star } from "../lerners/NL_star.js";
 import { HTML_LernerBase } from "./HTML_LernerBase.js";
 

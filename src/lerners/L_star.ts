@@ -1,5 +1,5 @@
 import { Automaton, Transition } from "../automaton/Automaton.js";
-import { Teacher } from "../Teacher.js";
+import { Teacher } from "../teacher/Teacher.js";
 import { LernerBase, Map_string_string } from "./LernerBase.js";
 
 export class L_star extends LernerBase {
@@ -87,7 +87,7 @@ export class L_star extends LernerBase {
 
 
   /**
-   * @returns the first t in SA st it does not exist s in S st row(s) == row (s.a)
+   * @returns the first t in SA st it does not exist s in S st row(s) == row (t)
    */
   is_close(): string | undefined {
     return this.SA.find(t => !this.S.some(s => this.same_row(s, t)));

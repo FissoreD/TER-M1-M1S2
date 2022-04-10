@@ -1,10 +1,11 @@
-import { Teacher, teachers } from "./Teacher.js";
+import { Teacher, teachers } from "./teacher/Teacher.js";
 import { HTML_L_star } from "./html_interactions/HTML_L_star.js";
 import { HTML_NL_star } from "./html_interactions/HTML_NL_star.js";
 import { Automaton } from "./automaton/Automaton.js";
 import { L_star } from "./lerners/L_star.js";
 import { NL_star } from "./lerners/NL_star.js";
 import * as autFunction from "./automaton/automaton_type.js";
+import { TeacherAutomaton } from "./teacher/TeacherAutomaton.js";
 
 export let
   automatonDiv: HTMLDivElement,
@@ -69,9 +70,9 @@ export function initiate_global_vars() {
     if (regexAlreadyExists) {
       newTeacherOption = regexAlreadyExists as HTMLOptionElement;
     } else {
-      currentTeacher = new Teacher(
-        `My automaton with regex = (${newRegex.value})`,
-        newRegex.value, _s => true, []);
+      currentTeacher = new TeacherAutomaton(
+        newRegex.value,
+        `My automaton with regex = (${newRegex.value})`);
       newTeacherOption = createRadioTeacher(currentTeacher);
     }
     newTeacherOption.selected = true;
@@ -88,7 +89,6 @@ export function clear_automaton_HTML() {
 declare global {
   interface Window {
     Automaton: any;
-    Teacher: any;
     teachers: Teacher[];
     L_star: any;
     NL_star: any;
@@ -108,7 +108,6 @@ try {
     resizableGrid($(".mainTable")[0]);
   }
   window.Automaton = Automaton;
-  window.Teacher = Teacher;
   window.teachers = teachers;
   window.L_star = L_star;
   window.NL_star = NL_star;

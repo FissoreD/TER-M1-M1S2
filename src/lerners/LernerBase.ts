@@ -1,5 +1,5 @@
 import { Automaton } from "../automaton/Automaton.js";
-import { Teacher } from "../Teacher.js";
+import { Teacher } from "../teacher/Teacher.js";
 import { boolToString, generate_prefix_list } from "../tools/Utilities.js";
 
 export type Map_string_string = { [key: string]: string };
