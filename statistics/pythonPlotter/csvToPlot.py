@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from os import listdir
+import os
 
 folderPrefix = ["statistics/", "../"][0]
 plotFolder = "plots/"
 
 
 def savePlot(plot: plt, path: str):
-    plot.savefig(folderPrefix + plotFolder + path,
-                 bbox_inches='tight', facecolor="white")
+    plot.savefig(path, bbox_inches='tight', facecolor="white")
 
 
 def show(plt: plt):
@@ -23,7 +23,7 @@ def allCsvNameInDirectory():
     return [i for i in listdir(folderPrefix) if i.endswith(".csv")]
 
 
-def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName):
+def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName: str):
     fig, ax = plt.subplots()
     ax.set_title(f'Comparing {comparator}')
     for i in algos:
@@ -41,6 +41,9 @@ def plotAllCsv():
     allCsv = allCsvNameInDirectory()
     print("This are allCSV", allCsv)
     for fileName in allCsv:
+        folderPath = folderPrefix + plotFolder + fileName[:-4] + "/"
+        if not os.path.exists(folderPath):
+            os.mkdir(folderPath)
         df = csvToDf(folderPrefix + fileName)
         partitions = {}
         for (pos, col) in enumerate(df.columns):
@@ -54,7 +57,7 @@ def plotAllCsv():
         print(partitions)
         for comparator, algos in partitions.items():
             fig = plotCsv(df, comparator, algos,
-                          f"{fileName[:-4]}-{comparator}.png")
+                          f"{folderPath}/{comparator}.png")
             # return fig
 
 
