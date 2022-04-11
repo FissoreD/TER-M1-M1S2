@@ -1,54 +1,68 @@
-export interface Transition {
-  fromState: string,
-  toStates: string[],
-  symbol: string
+export class State {
+  isAccepting: boolean;
+  isInitial: boolean;
+  alphabet: string[];
+  transitions: Map<string, State[]>
+  name: string;
+
+  constructor(name: string, isAccepting: boolean, isInitial: boolean, alphabet: string[]) {
+    this.name = name;
+    this.isAccepting = isAccepting;
+    this.isInitial = isInitial;
+    this.alphabet = alphabet;
+    this.transitions = new Map()
+    for (const symbol of alphabet) {
+      this.transitions.set(symbol, [])
+    }
+  }
+
+  addTransition(symbol: string, state: State) {
+    this.transitions.get(symbol)!.push(state);
+  }
 }
 
 export interface AutomatonJson {
-  transitions: Transition[],
-  startState: string[],
-  acceptingStates: string[],
-  alphabet: string[] | string,
-  states: string[]
+  states: Map<string, State>;
+  initialStates: State[];
+  acceptingStates: State[];
+  alphabet: string[];
 };
 
 export class Automaton implements AutomatonJson {
-  transitions: Transition[];
-  startState: string[];
-  acceptingStates: string[];
-  alphabet: string | string[];
-  states: string[];
-  states_rename: string[] = [];
-  currentStates: string[];
+  states: Map<string, State>;
+  initialStates: State[];
+  acceptingStates: State[];
+  alphabet: string[];
+  currentStates: State[];
+  states_rename: Map<string, string>;
 
   constructor(json: AutomatonJson) {
-    this.transitions = json.transitions;
-    this.startState = json.startState;
+    this.initialStates = json.initialStates;
     this.acceptingStates = json.acceptingStates;
-    this.currentStates = this.startState;
+    this.currentStates = this.initialStates;
     this.alphabet = Array.from(json.alphabet);
     this.states = json.states;
+    this.states_rename = new Map();
     this.set_state_rename()
   }
 
   set_state_rename() {
-    this.states_rename = [];
-    let counter_init = [0, this.startState.length, this.states.length - this.acceptingStates.length + 1];
-    for (let i = 0; i < this.states.length; i++) {
-      if (this.startState.includes(this.states[i])) {
-        this.states_rename.push("q" + counter_init[0]++)
-      } else if (this.acceptingStates.includes(this.states[i])) {
-        this.states_rename.push("q" + counter_init[2]++)
+    let counter_init = [0, this.initialStates.length, this.states.size - this.acceptingStates.length + 1];
+    for (const [_name, state] of this.states) {
+      if (this.initialStates.includes(state)) {
+        this.states_rename.set(state.name, "q" + counter_init[0]++)
+      } else if (this.acceptingStates.includes(state)) {
+        this.states_rename.set(state.name, "q" + counter_init[2]++)
       } else {
-        this.states_rename.push("q" + counter_init[1]++)
+        this.states_rename.set(state.name, "q" + counter_init[1]++)
       }
     }
   }
 
   next_step(next_char: string) {
-    let newCurrentState: string[] = []
+    let newCurrentState: State[] = []
     this.currentStates.forEach(cs => {
-      let nextStates = this.find_transition(cs, next_char).toStates
+      let nextStates = cs.transitions.get(next_char)!;
       nextStates.forEach(nextState => {
         if (!newCurrentState.includes(nextState)) {
           newCurrentState.push(nextState)
@@ -68,38 +82,50 @@ export class Automaton implements AutomatonJson {
     return is_accepted;
   }
 
-  find_transition(state: string, symbol: string) {
-    return this.transitions
-      .filter(e => e.fromState == state)
-      .find(e => e.symbol == symbol)!
+  // find_transition(state: string, symbol: string) {
+  //   return this.transitions
+  //     .filter(e => e.fromState == state)
+  //     .find(e => e.symbol == symbol)!
+  // }
+
+
+  /* {TODO} */
+  accept_word_nfa(word: string): boolean {
+    // let path: string[] = [];
+    // let recursive_explore = (word: string, index: number, current_state: State, state_path: string): boolean => {
+    //   if (index < word.length) {
+    //     let next_states = this.find_transition(current_state, word[index]).toStates;
+    //     return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + this.get_state_rename(next_state)))
+    //   } else {
+    //     if (this.acceptingStates.includes(current_state)) {
+    //       path = [state_path]
+    //       return true;
+    //     }
+    //     path.push(state_path)
+    //     return false;
+    //   }
+    // }
+    // console.log(1);
+
+    let nextStates: Set<State> = new Set(this.initialStates);
+    for (let index = 0; index < word.length && nextStates.size > 0; index++) {
+      let nextStates2: Set<State> = new Set();
+      const symbol = word[index];
+      for (const state of nextStates) {
+        Array.from(this.findTransition(state, symbol)).forEach(e => nextStates2.add(e))
+      }
+      nextStates = nextStates2;
+    }
+    // console.log(2);
+    return Array.from(nextStates).some(e => e.isAccepting);
   }
 
-  accept_word_nfa(word: string): [boolean, string[]] {
-    let path: string[] = [];
-    let recursive_explore = (word: string, index: number, current_state: string, state_path: string): boolean => {
-      if (index < word.length) {
-        let next_states = this.find_transition(current_state, word[index]).toStates;
-        return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + this.get_state_rename(next_state)))
-      } else {
-        if (this.acceptingStates.includes(current_state)) {
-          path = [state_path]
-          return true;
-        }
-        path.push(state_path)
-        return false;
-      }
-    }
-    let is_accepted: boolean = false;
-    for (const start_state of this.startState) {
-      is_accepted = recursive_explore(word, 0, start_state, this.get_state_rename(start_state));
-      if (is_accepted) break;
-    }
-
-    return [is_accepted, path];
+  findTransition(state: State, symbol: string) {
+    return this.states.get(state.name)!.transitions.get(symbol)!
   }
 
   restart() {
-    this.currentStates = this.startState;
+    this.currentStates = this.initialStates;
   }
 
   /** GRAPHIC PART */
@@ -135,8 +161,8 @@ export class Automaton implements AutomatonJson {
     $('svg')[0].style.height = 'auto'
   }
 
-  get_current_graph_node(node: string) {
-    return Array.from($(".node")).find(e => e.id.split("-")[1] == node)!.firstChild!;
+  get_current_graph_node(node: State) {
+    return Array.from($(".node")).find(e => e.id.split("-")[1] == node.name)!.firstChild!;
   }
 
   matrix_to_mermaid(): string {
@@ -144,10 +170,10 @@ export class Automaton implements AutomatonJson {
     res = res.concat("subgraph Automaton\ndirection LR\n")
     // res = res.concat("\n" + this.create_entering_arrow() + "\n");
     let triples: { [id: string]: string[] } = {}
-    for (let i = 0; i < this.states.length; i++) {
+    for (const [name, state] of this.states) {
       for (let j = 0; j < this.alphabet.length; j++) {
-        for (const state of this.find_transition(this.states[i], this.alphabet[j]).toStates) {
-          let stateA_concat_stateB = this.states[i] + '&' + state;
+        for (const nextState of this.findTransition(state, this.alphabet[j])) {
+          let stateA_concat_stateB = name + '&' + nextState.name;
           if (triples[stateA_concat_stateB]) {
             triples[stateA_concat_stateB].push(this.alphabet[j])
           } else {
@@ -159,14 +185,14 @@ export class Automaton implements AutomatonJson {
     res = res.concat(Object.keys(triples).map(x => this.create_triple(x, triples[x].join(","))).join("\n"));
     // res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;")
     res += "\n"
-    // res = res.concat(this.startState.map(e => `style ${e} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
+    // res = res.concat(this.initialStates.map(e => `style ${e} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
     res += "subgraph InitialStates\n";
-    res += this.startState.map(e => e).join("\n")
+    res += this.initialStates.map(e => e.name).join("\n")
     res += "\nend"
     res += "\n"
     res += "end\n"
     // Callback for tooltip on mouse over
-    res = res.concat(this.states.map(e => `click ${e} undefinedCallback "${e}";`).join("\n"))
+    res = res.concat(Array.from(this.states).map(([name, _]) => `click ${name} undnamefinedCallback "${name}";`).join("\n"))
     console.log(res);
     return res;
   }
@@ -205,82 +231,81 @@ export class Automaton implements AutomatonJson {
   }
 
   create_entering_arrow(): string {
-    return `START[ ]--> ${this.startState}`
+    return `START[ ]--> ${this.initialStates}`
   }
 
   get_state_rename(name: string) {
-    // return name;
-    return this.states_rename[this.states.indexOf(name)]
+    return this.states_rename.get(name)!
   }
 
   state_number() {
-    return this.states.length;
+    return this.states.size;
   }
 
   transition_number() {
-    return this.transitions.map(e => e.toStates.length).reduce((prev, current) => prev + current);
+    return Array.from(this.states).map(e => Array.from(e[1].transitions)).flat().reduce((a, b) => a + b[1].length, 0)
   }
 
-  minimize() {
-    let couples: string[][] = []
-    let separable = new Set();
-    for (let i1 = 0; i1 < this.states.length; i1++) {
-      for (let i2 = i1 + 1; i2 < this.states.length; i2++) {
-        if (this.acceptingStates.includes(this.states[i1]) != this.acceptingStates.includes(this.states[i2])) separable.add(`${this.states[i1]}-${this.states[i2]}`)
-        else couples.push([this.states[i1], this.states[i2]]);
-      }
-    }
-    while (true) {
-      let oldLength = couples.length;
-      couples = couples.filter(e => {
-        let fst = e[0], snd = e[1];
-        let tr0 = this.transitions.filter(t => t.fromState == fst);
-        let tr1 = this.transitions.filter(t => t.fromState == snd);
-        for (const letter of this.alphabet) {
-          let t1 = tr0.find(e => e.symbol == letter)?.toStates
-          let t2 = tr1.find(e => e.symbol == letter)?.toStates
-          if (t1 && t2) {
-            for (const x of t1) {
-              for (const y of t2) {
-                if (separable.has(`${x}-${y}`) || separable.has(`${y}-${x}`)) {
-                  separable.add(`${fst}-${snd}`)
-                  return false;
-                }
-              }
-            }
-          }
-        }
-        return true;
-      })
-      if (couples.length == oldLength) break
-    }
+  // minimize() {
+  //   let couples: string[][] = []
+  //   let separable = new Set();
+  //   for (let i1 = 0; i1 < this.states.size; i1++) {
+  //     for (let i2 = i1 + 1; i2 < this.states.size; i2++) {
+  //       if (this.acceptingStates.includes(this.states[i1]) != this.acceptingStates.includes(this.states[i2])) separable.add(`${this.states[i1]}-${this.states[i2]}`)
+  //       else couples.push([this.states[i1], this.states[i2]]);
+  //     }
+  //   }
+  //   while (true) {
+  //     let oldLength = couples.length;
+  //     couples = couples.filter(e => {
+  //       let fst = e[0], snd = e[1];
+  //       let tr0 = this.transitions.filter(t => t.fromState == fst);
+  //       let tr1 = this.transitions.filter(t => t.fromState == snd);
+  //       for (const letter of this.alphabet) {
+  //         let t1 = tr0.find(e => e.symbol == letter)?.toStates
+  //         let t2 = tr1.find(e => e.symbol == letter)?.toStates
+  //         if (t1 && t2) {
+  //           for (const x of t1) {
+  //             for (const y of t2) {
+  //               if (separable.has(`${x}-${y}`) || separable.has(`${y}-${x}`)) {
+  //                 separable.add(`${fst}-${snd}`)
+  //                 return false;
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+  //       return true;
+  //     })
+  //     if (couples.length == oldLength) break
+  //   }
 
-    for (const couple of couples) {
-      this.transitions.filter(e => e.fromState == couple[1]).forEach(
-        s => {
-          let tr;
-          if (tr = this.transitions.find(t => t.fromState == couple[0] && t.symbol == s.symbol)) {
-            for (const next of s.toStates) {
-              if (!tr.toStates.includes(next)) tr.toStates.push(next)
-            }
-          } else {
-            this.transitions.push({ fromState: couple[0], symbol: s.symbol, toStates: s.toStates })
-          }
-        }
-      )
-      if (this.startState.includes(couple[1])) {
-        this.startState = this.startState.filter(e => e != couple[1])
-        if (!this.startState.includes(couple[0])) this.startState.push(couple[0])
-      }
-      this.acceptingStates = this.acceptingStates.filter(e => e != couple[1])
-      this.states = this.states.filter(e => e != couple[1])
-      this.transitions = this.transitions.filter(e => e.fromState != couple[1])
-      this.transitions.forEach(e => e.toStates = e.toStates.filter(x => x != couple[1]))
-      this.transitions = this.transitions.filter(t => t.toStates.length != 0)
-    }
+  //   for (const couple of couples) {
+  //     this.transitions.filter(e => e.fromState == couple[1]).forEach(
+  //       s => {
+  //         let tr;
+  //         if (tr = this.transitions.find(t => t.fromState == couple[0] && t.symbol == s.symbol)) {
+  //           for (const next of s.toStates) {
+  //             if (!tr.toStates.includes(next)) tr.toStates.push(next)
+  //           }
+  //         } else {
+  //           this.transitions.push({ fromState: couple[0], symbol: s.symbol, toStates: s.toStates })
+  //         }
+  //       }
+  //     )
+  //     if (this.initialStates.includes(couple[1])) {
+  //       this.initialStates = this.initialStates.filter(e => e != couple[1])
+  //       if (!this.initialStates.includes(couple[0])) this.initialStates.push(couple[0])
+  //     }
+  //     this.acceptingStates = this.acceptingStates.filter(e => e != couple[1])
+  //     this.states = this.states.filter(e => e != couple[1])
+  //     this.transitions = this.transitions.filter(e => e.fromState != couple[1])
+  //     this.transitions.forEach(e => e.toStates = e.toStates.filter(x => x != couple[1]))
+  //     this.transitions = this.transitions.filter(t => t.toStates.length != 0)
+  //   }
 
-    this.set_state_rename()
-    console.log(Array.from(separable), couples);
-    return this;
-  }
+  //   this.set_state_rename()
+  //   console.log(Array.from(separable), couples);
+  //   return this;
+  // }
 }

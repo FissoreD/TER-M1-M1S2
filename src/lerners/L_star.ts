@@ -1,4 +1,4 @@
-import { Automaton, Transition } from "../automaton/Automaton.js";
+import { Automaton, State } from "../automaton/Automaton.js";
 import { Teacher } from "../teacher/Teacher.js";
 import { LernerBase, Map_string_string } from "./LernerBase.js";
 
@@ -14,74 +14,35 @@ export class L_star extends LernerBase {
     this.observation_table[key] = value;
   }
 
-  /**
-   * 1. Takes a string in parameter and s in {@link S} and e in {@link E}  
-   * 2. Asks to the {@link teacher} if question is accepted  
-   * 3. Updates {@link observation_table} wrt the answer  
-   * No modification is performed in {@link S}, {@link E} or {@link SA} sets
-   */
-  make_member(pref: string, suff: string) {
-    let word = pref + suff;
-    let answer: string;
-    // If we know already the answer, we do not query the teacher
-    for (let i = 0; i < word.length + 1; i++) {
-      let pref1 = word.substring(0, i);
-      let suff1 = word.substring(i);
-      if (pref1 == pref) continue;
-      if (this.E.includes(suff1)) {
-        if ((this.S.includes(pref1) || this.SA.includes(pref1)) && this.observation_table[pref1]) {
-          answer = this.observation_table[pref1].charAt(this.E.indexOf(suff1));
-          this.update_observation_table(pref, answer)
-          if (answer == undefined) throw 'Parameter is not a number!';
-          return;
-        }
+  make_automaton(): Automaton {
+    let wordForState: string[] = [], states: Map<string, State> = new Map(),
+      acceptingStates: State[] = [], initialStates: State[] = [];
+    this.S.forEach(s => {
+      let name = this.observation_table[s];
+      if (!states.get(name)) {
+        let state = new State(name, name[0] == "1", s == "", this.alphabet);
+        wordForState.push(s);
+        if (state.isAccepting) acceptingStates.push(state)
+        if (state.isInitial) initialStates.push(state)
+        states.set(name, state);
       }
-    }
-    answer = this.teacher.member(word);
-    this.update_observation_table(pref, answer)
-    this.member_number++;
-  }
-
-  /**
-   * Takes in parameter an {@link Automaton} and ask 
-   * to the teacher if the automaton knows the language.
-   * If so : the Lerner has learnt the language
-   * Else : it appends the counter-exemple to {@link S}
-   * @param a an Automaton
-   */
-  make_equiv(a: Automaton) {
-    let answer = this.teacher.equiv(a);
-    this.equiv_number++;
-    return answer;
-  }
-
-  make_automaton() {
-    let states: Map_string_string = {}
-    this.S.forEach(e => states[this.observation_table[e]] = e);
-    let first_state = this.observation_table[""];
-    let keys = Object.keys(states);
-    let end_states: string[] = keys.filter(k => k[0] == '1');
-    // let transitions = keys.map(
-    //   (k) => this.alphabet.map(a => {
-    //     return [this.observation_table[states[k] + a]]
-    //   }));
-    let transitions: Transition[] = []
-    for (const state of this.S) {
-      for (const symbol of this.alphabet) {
-        transitions.push({
-          fromState: this.observation_table[state],
-          symbol: symbol,
-          toStates: [this.observation_table[state + symbol]]
-        })
-      }
-    }
-    this.automaton = new Automaton({
-      "alphabet": this.alphabet,
-      "acceptingStates": end_states,
-      "startState": [first_state],
-      "states": keys,
-      "transitions": transitions
     })
+
+    for (const word of wordForState) {
+      let name = this.observation_table[word]
+      for (const symbol of this.alphabet) {
+        states.get(name)!.transitions.get(symbol)!.push(states.get(this.observation_table[word + symbol])!)
+      }
+    }
+
+    this.automaton = new Automaton(
+      {
+        states: states,
+        acceptingStates: acceptingStates,
+        alphabet: this.alphabet,
+        initialStates: initialStates
+      }
+    )
     return this.automaton;
   }
 

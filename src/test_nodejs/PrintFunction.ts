@@ -14,7 +14,7 @@ export let printCsvCompare = (L: L_star, NL: NL_star) => {
   return `${L.teacher.regex},${L.teacher.alphabet.length},${L.member_number},${L.equiv_number},${L.automaton?.state_number()},${L.automaton?.transition_number()},${NL.member_number},${NL.equiv_number},${NL.automaton?.state_number()},${NL.automaton?.transition_number()}`;
 }
 
-export let csvHead = "regex,Alp Length,L Member,L Equiv,L Aut State,L Aut Tran,NL Member,NL Equiv,NL Aut State,NL Aut Tran"
+export let csvHead = "Regex,Length alphabet,L Membership queries,L Equivalence queries,L State nb in A,L Transition nb in A,NL Membership queries,NL Equivalence queries,NL State nb in A,NL Transition nb in A"
 
 let fileNameToCsv = (fileName: string) => "./statistics/" + fileName + ".csv"
 

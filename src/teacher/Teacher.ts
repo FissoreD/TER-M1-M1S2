@@ -20,7 +20,7 @@ export let teacher_a_or_baStar = new TeacherAutomaton("a+(ba)*");
  */
 export let teacherPairZeroAndOne = new TeacherAutomaton(
   "(00+11+(01+10)(00+11)*(01+10))*",
-  `Automata accepting \\(L = \\{w \\in (0, 1)^* | \\#(w_0) \\% 2 = 0 \\land \\#(w_1) \\% 2 = 0\\}\\) <br/> → words with even nb of '0' and even nb of '1'`);
+  `Automaton accepting \\(L = \\{w \\in (0, 1)^* | \\#(w_0) \\% 2 = 0 \\land \\#(w_1) \\% 2 = 0\\}\\) <br/> → words with even nb of '0' and even nb of '1'`);
 
 /**
  * a teacher accepting the language over {a, b}
@@ -29,7 +29,7 @@ export let teacherPairZeroAndOne = new TeacherAutomaton(
  */
 export let teacherA3fromLast = new TeacherAutomaton(
   "(a+b)*a(a+b)(a+b)",
-  `Automata accepting \\(L = \\{w \\in (a, b)^* | w[-3] = a\\}\\) <br/>
+  `Automaton accepting \\(L = \\{w \\in (a, b)^* | w[-3] = a\\}\\) <br/>
     → words with an 'a' in the 3rd pos from end`,
 )
 /**
@@ -38,7 +38,7 @@ export let teacherA3fromLast = new TeacherAutomaton(
  */
 export let teacherEvenAandThreeB = new TeacherAutomaton(
   "b*a(b+ab*a)*+(a+b)*ba*ba*b(a+b)*",
-  `Automata accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\lor \\#(w_a) \\% 2 = 1\\}\\)
+  `Automaton accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\lor \\#(w_a) \\% 2 = 1\\}\\)
   <br/> → words with at least 3 'b' or an odd nb of 'a'`
 );
 
@@ -49,7 +49,7 @@ export let teacherEvenAandThreeB = new TeacherAutomaton(
  */
 export let teacherNotAfourthPos = new TeacherAutomaton(
   "((a+b)(a+b)(a+b)b)*(a+b+$)(a+b+$)(a+b+$)",
-  `Automata accepting \\(L = \\{w \\in (a,b)^* \\land i \\in 4\\mathbb{N} | w[i] \\neq a \\land i \\leq len(w)\\}\\) <br/>
+  `Automaton accepting \\(L = \\{w \\in (a,b)^* \\land i \\in 4\\mathbb{N} | w[i] \\neq a \\land i \\leq len(w)\\}\\) <br/>
   → words without an 'a' in a position multiple of 4`)
 
 /**
@@ -57,7 +57,7 @@ export let teacherNotAfourthPos = new TeacherAutomaton(
  */
 export let teacher_bStar_a_or_aStart_bStar = new TeacherNoAutomaton(
   { alphabet: "ab", regex: "((bb*a)|(a*b*))", counter_exemples: ["bba", "b", "aabb", "aba", "aa", "bbaa"] },
-  `Automata accepting \\(L = regex((bb^*a) + (a^*b^*))\\)`)
+  `Automaton accepting \\(L = regex((bb^*a) + (a^*b^*))\\)`)
 
 /**
  * a teacher accepting the regex bb*($ + a(b(a+b))*)
@@ -80,7 +80,7 @@ export let binaryAddition = new TeacherNoAutomaton(
     },
     counter_exemples: []
   },
-  `Automata accepting the sum between binary words, exemple : <br>
+  `Automaton accepting the sum between binary words, exemple : <br>
   <pre>
   0101 + 
   1001 = 

@@ -1,6 +1,5 @@
-
-// @ts-nocheck
-import { Automaton, AutomatonJson } from "../automaton/Automaton.js";
+import { Automaton, AutomatonJson, State } from "../automaton/Automaton.js";
+// @ts-ignore
 import { noam } from '../../public/noam.js';
 
 interface HisTransition {
@@ -18,31 +17,58 @@ interface HisAutomaton {
 }
 
 export function HisAutomaton2Mine(aut: HisAutomaton): Automaton {
+
+  let states: State[] = aut.states.map(
+    e => new State(
+      e + "",
+      aut.acceptingStates.map(e => e + "").includes(e + ""),
+      (typeof aut.initialState == "number" ? aut.initialState + "" == e + "" : aut.initialState?.map(e => e + "").includes(e + "")) || false,
+      aut.alphabet))
+
+  let statesMap: Map<string, State> = new Map()
+  for (const state of states) {
+    statesMap.set(state.name, state)
+  }
+
+  for (const transition of aut.transitions) {
+    let from = transition.fromState
+    let symbol = transition.symbol
+    let to = transition.toStates
+    to.forEach(state =>
+      statesMap.get(from + "")?.addTransition(symbol, statesMap.get(state + "")!))
+  }
+
   let res: AutomatonJson = {
     alphabet: Array.from(aut.alphabet),
-    acceptingStates: aut.acceptingStates.map(e => e + ""),
-    startState: (typeof aut.initialState === "number") ? [aut.initialState + ""] : Array.from(aut.initialState!).map(e => e + ""),
-    states: aut.states.map(e => e + ""),
-    transitions: aut.transitions.map(e => ({ fromState: e.fromState + "", symbol: e.symbol, toStates: e.toStates.map(e => e + "") }))
+    initialStates: states.filter(s => s.isInitial),
+    acceptingStates: states.filter(s => s.isAccepting),
+    states: statesMap,
   }
   return new Automaton(res);
 }
 
 export function MyAutomatonToHis(aut: Automaton): HisAutomaton {
-  let state2int = (state: string) => aut.states.indexOf(state);
-  let states = aut.states.map(e => state2int(e))
+  let stateList = Array.from(aut.states).map(e => e[1]);
+  let state2int = (state: State) => stateList.indexOf(state);
+  let states = stateList.map(e => state2int(e))
   let startState = states.length;
-  let transitions = aut.transitions.map(e => ({
-    fromState: state2int(e.fromState), symbol: e.symbol, toStates: e.toStates.map(e => state2int(e))
-  }))
-  if (aut.startState.length > 1) {
+  let transitions: HisTransition[] = stateList.map(state => Array.from(state.transitions).map(transition =>
+  ({
+    fromState: state2int(state),
+    symbol: transition[0],
+    toStates: transition[1].map(e => state2int(e))
+  })).flat()).flat();
+  //   )) aut.transitions.map(e => ({
+  //   fromState: state2int(e.fromState), symbol: e.symbol, toStates: e.toStates.map(e => state2int(e))
+  // }))
+  if (aut.initialStates.length > 1) {
     transitions.push(({
       fromState: startState,
       symbol: "$",
-      toStates: aut.startState.map(e => state2int(e))
+      toStates: aut.initialStates.map(e => state2int(e))
     }));
     states.push(startState)
-  } else startState = state2int(aut.startState[0])
+  } else startState = state2int(aut.initialStates[0])
   let res: HisAutomaton = {
     acceptingStates: aut.acceptingStates.map(e => state2int(e)),
     alphabet: Array.from(aut.alphabet),
@@ -71,13 +97,13 @@ export function minimizeAutomaton(automaton: HisAutomaton): Automaton {
 
   // console.log(minimized.matrix_to_mermaid());
   // console.log("=".repeat(50));
-  console.log("1");
+  // console.log("1");
   let hisMinimized = noam.fsm.minimize(automaton)
-  console.log("2");
+  // console.log("2");
   let statesToNumbers = noam.fsm.convertStatesToNumbers(hisMinimized)
-  console.log("3");
+  // console.log("3");
   let minimized = HisAutomaton2Mine(statesToNumbers)
-  console.log("4");
+  // console.log("4");
   return minimized
 }
 

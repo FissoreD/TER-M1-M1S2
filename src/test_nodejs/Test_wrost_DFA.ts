@@ -20,7 +20,7 @@ clearFile(fileName)
 writeToFile(fileName, csvHead)
 
 let regexList: [string, string[]][] = []
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 10; i++) {
   let counter_exemples: string[] = []
   for (let j = Math.max(0, i - 3); j <= i + 3; j++) {
     counter_exemples.push("a".repeat(j))
@@ -39,7 +39,6 @@ let printInfo = (algo: LernerBase, algoName: string) => {
 }
 
 for (const [regex, counter_exemples] of regexList) {
-
   let teacher = new TeacherNoAutomaton({
     alphabet: "ab",
     regex: regex,
@@ -51,8 +50,11 @@ for (const [regex, counter_exemples] of regexList) {
   console.log("==============================");
   console.log("Current regexp : ", regex);
 
+  console.log("In L*");
+
   L.make_all_queries();
   console.log(printInfo(L, "L*"));
+  console.log("In NL*");
   NL.make_all_queries();
   console.log(printInfo(NL, "NL*"));
 

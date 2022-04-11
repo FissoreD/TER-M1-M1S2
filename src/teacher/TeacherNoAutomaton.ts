@@ -49,10 +49,15 @@ export class TeacherNoAutomaton implements Teacher {
   }
 
   equiv(automaton: Automaton): string | undefined {
+    console.log("This 1");
     let acceptedByTeacher = this.counter_exemples.filter(e => this.check_function(e))
-    let acceptedByLerner = this.counter_exemples.filter(e => automaton.accept_word_nfa(e)[0])
+    // HERE OTHER PROBLEM
+    console.log("This 2", automaton.state_number(), automaton.transition_number());
+    let acceptedByLerner = this.counter_exemples.filter(e => automaton.accept_word_nfa(e))
+    console.log("This 3");
     let symetricDifference = acceptedByLerner.filter(e => !acceptedByTeacher.includes(e)).
       concat(acceptedByTeacher.filter(e => !acceptedByLerner.includes(e)))
+    console.log("This 4");
     return symetricDifference ? symetricDifference[0] : undefined;
   }
 

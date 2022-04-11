@@ -1,42 +1,43 @@
 declare module "automaton/Automaton" {
-    export interface Transition {
-        fromState: string;
-        toStates: string[];
-        symbol: string;
+    export class State {
+        isAccepting: boolean;
+        isInitial: boolean;
+        alphabet: string[];
+        transitions: Map<string, State[]>;
+        name: string;
+        constructor(name: string, isAccepting: boolean, isInitial: boolean, alphabet: string[]);
+        addTransition(symbol: string, state: State): void;
     }
     export interface AutomatonJson {
-        transitions: Transition[];
-        startState: string[];
-        acceptingStates: string[];
-        alphabet: string[] | string;
-        states: string[];
+        states: Map<string, State>;
+        initialStates: State[];
+        acceptingStates: State[];
+        alphabet: string[];
     }
     export class Automaton implements AutomatonJson {
-        transitions: Transition[];
-        startState: string[];
-        acceptingStates: string[];
-        alphabet: string | string[];
-        states: string[];
-        states_rename: string[];
-        currentStates: string[];
+        states: Map<string, State>;
+        initialStates: State[];
+        acceptingStates: State[];
+        alphabet: string[];
+        currentStates: State[];
+        states_rename: Map<string, State>;
         constructor(json: AutomatonJson);
         set_state_rename(): void;
         next_step(next_char: string): void;
         accept_word(word: string): boolean;
-        find_transition(state: string, symbol: string): Transition;
-        accept_word_nfa(word: string): [boolean, string[]];
+        accept_word_nfa(word: string): boolean;
+        findTransition(state: State, symbol: string): State[];
         restart(): void;
         draw_next_step(next_char: string): void;
         initiate_graph(): void;
-        get_current_graph_node(node: string): ChildNode;
+        get_current_graph_node(node: State): ChildNode;
         matrix_to_mermaid(): string;
         color_node(toFill: boolean): void;
         create_triple(states: string, transition: string): string;
         create_entering_arrow(): string;
-        get_state_rename(name: string): string;
+        get_state_rename(name: string): State;
         state_number(): number;
-        transition_number(): number;
-        minimize(): this;
+        transition_number(): any;
     }
 }
 declare module "automaton/automaton_type" {
@@ -72,43 +73,66 @@ declare module "tools/Utilities" {
     export const count_str_occurrences: (str: string, obj: string) => number;
     export function boolToString(bool: boolean): string;
 }
-declare module "Teacher" {
+declare module "teacher/TeacherAutomaton" {
+    import { Automaton } from "automaton/Automaton";
+    import { Teacher } from "teacher/Teacher";
+    export class TeacherAutomaton implements Teacher {
+        alphabet: string[] | string;
+        regex: string;
+        description: string;
+        automaton: Automaton;
+        constructor(regex: string, description?: string);
+        member(sentence: string): string;
+        equiv(automaton: Automaton): string | undefined;
+    }
+}
+declare module "teacher/TeacherNoAutomaton" {
     import { Automaton } from "automaton/Automaton";
     import { myFunction } from "tools/Utilities";
-    type teacherConstructor = {
-        regex?: string;
-        f?: myFunction<string, boolean>;
-        counter_exemples?: string[];
-        alphabet?: string;
-    };
-    export class Teacher {
-        check_function?: myFunction<string, boolean>;
+    import { Teacher } from "teacher/Teacher";
+    export class TeacherNoAutomaton implements Teacher {
+        static counter: number;
+        check_function: myFunction<string, boolean>;
         counter_exemples: string[];
-        counter_exemples_pos: number;
         counter: number;
         description: string;
-        alphabet: string[];
+        alphabet: string[] | string;
         max_word_length: number;
         regex: string;
-        automaton?: Automaton;
-        constructor(description: string, param: teacherConstructor);
+        constructor(params: {
+            regex: string | myFunction<string, boolean>;
+            counter_exemples: string[];
+            alphabet: string[] | string;
+        }, description?: string);
         initiate_mapping(): [string, boolean][];
         member(sentence: string): string;
         equiv(automaton: Automaton): string | undefined;
     }
-    export let teacher_a_or_baStar: Teacher;
-    export let teacherPairZeroAndOne: Teacher;
-    export let teacherA3fromLast: Teacher;
-    export let teacherEvenAandThreeB: Teacher;
-    export let teacherNotAfourthPos: Teacher;
-    export let teacher_bStar_a_or_aStart_bStar: Teacher;
-    export let teacher_b_bStar_a__b_aOrb_star: Teacher;
-    export let binaryAddition: Teacher;
-    export let teachers: Teacher[];
+}
+declare module "teacher/Teacher" {
+    import { Automaton } from "automaton/Automaton";
+    import { TeacherAutomaton } from "teacher/TeacherAutomaton";
+    import { TeacherNoAutomaton } from "teacher/TeacherNoAutomaton";
+    export interface Teacher {
+        description: string;
+        alphabet: string | string[];
+        regex: string;
+        member(sentence: string): string;
+        equiv(automaton: Automaton): string | undefined;
+    }
+    export let teacher_a_or_baStar: TeacherAutomaton;
+    export let teacherPairZeroAndOne: TeacherAutomaton;
+    export let teacherA3fromLast: TeacherAutomaton;
+    export let teacherEvenAandThreeB: TeacherAutomaton;
+    export let teacherNotAfourthPos: TeacherAutomaton;
+    export let teacher_bStar_a_or_aStart_bStar: TeacherNoAutomaton;
+    export let teacher_b_bStar_a__b_aOrb_star: TeacherAutomaton;
+    export let binaryAddition: TeacherNoAutomaton;
+    export let teachers: (TeacherAutomaton | TeacherNoAutomaton)[];
 }
 declare module "lerners/LernerBase" {
     import { Automaton } from "automaton/Automaton";
-    import { Teacher } from "Teacher";
+    import { Teacher } from "teacher/Teacher";
     export type Map_string_string = {
         [key: string]: string;
     };
@@ -142,7 +166,7 @@ declare module "lerners/LernerBase" {
 }
 declare module "lerners/L_star" {
     import { Automaton } from "automaton/Automaton";
-    import { Teacher } from "Teacher";
+    import { Teacher } from "teacher/Teacher";
     import { LernerBase } from "lerners/LernerBase";
     export class L_star extends LernerBase {
         constructor(teacher: Teacher);
@@ -183,7 +207,7 @@ declare module "html_interactions/HTML_LernerBase" {
     }
 }
 declare module "html_interactions/HTML_L_star" {
-    import { Teacher } from "Teacher";
+    import { Teacher } from "teacher/Teacher";
     import { L_star } from "lerners/L_star";
     import { HTML_LernerBase } from "html_interactions/HTML_LernerBase";
     export class HTML_L_star extends HTML_LernerBase<L_star> {
@@ -195,7 +219,7 @@ declare module "html_interactions/HTML_L_star" {
 }
 declare module "lerners/NL_star" {
     import { Automaton } from "automaton/Automaton";
-    import { Teacher } from "Teacher";
+    import { Teacher } from "teacher/Teacher";
     import { LernerBase } from "lerners/LernerBase";
     export class NL_star extends LernerBase {
         prime_lines: string[];
@@ -213,7 +237,7 @@ declare module "lerners/NL_star" {
     }
 }
 declare module "html_interactions/HTML_NL_star" {
-    import { Teacher } from "Teacher";
+    import { Teacher } from "teacher/Teacher";
     import { NL_star } from "lerners/NL_star";
     import { HTML_LernerBase } from "html_interactions/HTML_LernerBase";
     export class HTML_NL_star extends HTML_LernerBase<NL_star> {
@@ -225,7 +249,7 @@ declare module "html_interactions/HTML_NL_star" {
     }
 }
 declare module "Main" {
-    import { Teacher } from "Teacher";
+    import { Teacher } from "teacher/Teacher";
     import { Automaton } from "automaton/Automaton";
     export let automatonDiv: HTMLDivElement, message: HTMLParagraphElement, tableHTML: HTMLTableElement, automatonHTML: HTMLDivElement, automatonDivList: [Automaton, Node][];
     export function initiate_global_vars(): void;
@@ -233,7 +257,6 @@ declare module "Main" {
     global {
         interface Window {
             Automaton: any;
-            Teacher: any;
             teachers: Teacher[];
             L_star: any;
             NL_star: any;

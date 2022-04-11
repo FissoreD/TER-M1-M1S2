@@ -30,6 +30,8 @@ def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName):
         print(f"{i} {comparator}")
         ax.plot(df[f"{i} {comparator}"], label=i)
     leg = ax.legend()
+    ax.set_xlabel("Regex")
+    ax.set_ylabel(comparator)
     savePlot(fig, fileName)
     # show(fig)
     return fig
@@ -41,8 +43,8 @@ def plotAllCsv():
     for fileName in allCsv:
         df = csvToDf(folderPrefix + fileName)
         partitions = {}
-        for col in df.columns:
-            if col in ["regex", "Alp Length"]:
+        for (pos, col) in enumerate(df.columns):
+            if pos < 2:
                 continue
             algo, comparator = col.split(" ", 1)
             if comparator not in partitions:

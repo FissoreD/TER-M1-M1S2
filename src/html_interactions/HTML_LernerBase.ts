@@ -185,11 +185,7 @@ export abstract class HTML_LernerBase<Lerner extends LernerBase> {
     acceptB.innerHTML = "In automaton";
     acceptB.addEventListener("click", () => {
       let aut_answer = this.automaton?.accept_word_nfa(input.value);
-      if (aut_answer![0]) {
-        answerP.innerHTML = `The word ${input.value} is accepted, here is a valid path : ${aut_answer![1]}`
-      } else {
-        answerP.innerHTML = `There is no valid path accepting the word ${input.value}`
-      }
+      answerP.innerHTML = `The word ${input.value} is${aut_answer ? "" : " not"} accepted`
     })
     automatonDiv.appendChild(acceptB);
     automatonDiv.appendChild(answerP);

@@ -1,4 +1,4 @@
-regex,Alp Length,L Member,L Equiv,L Aut State,L Aut Tran,NL Member,NL Equiv,NL Aut State,NL Aut Tran
+Regex,Length alphabet,L Membership queries,L Equivalence queries,L State nb in A,L Transition nb in A,NL Membership queries,NL Equivalence queries,NL State nb in A,NL Transition nb in A
 (a|b)*a,2,5,1,2,4,5,1,2,6
 (a|b)*a(a|b),2,14,2,4,8,15,2,3,11
 (a|b)*a(a|b)(a|b),2,35,2,8,16,24,2,4,16
@@ -7,3 +7,5 @@ regex,Alp Length,L Member,L Equiv,L Aut State,L Aut Tran,NL Member,NL Equiv,NL A
 (a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b),2,454,2,64,128,79,2,7,31
 (a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,1031,2,128,256,107,2,8,36
 (a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,2312,2,256,512,139,2,9,41
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,5129,2,512,1024,175,2,10,46
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,11274,2,1024,2048,215,2,11,51
