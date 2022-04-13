@@ -28,24 +28,32 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
             this.isAccepting = isAccepting;
             this.isInitial = isInitial;
             this.alphabet = alphabet;
-            this.transitions = new Map();
+            this.outTransitions = new Map();
+            this.inTransitions = new Map();
+            this.successor = new Set();
+            this.predecessor = new Set();
             for (const symbol of alphabet) {
-                this.transitions.set(symbol, []);
+                this.outTransitions.set(symbol, []);
             }
         }
         addTransition(symbol, state) {
-            this.transitions.get(symbol).push(state);
+            this.outTransitions.get(symbol).push(state);
+            this.successor.add(state);
+            state.predecessor.add(this);
+            state.inTransitions.get(symbol).push(state);
         }
     }
     exports.State = State;
     ;
     class Automaton {
-        constructor(json) {
-            this.initialStates = json.initialStates;
-            this.acceptingStates = json.acceptingStates;
+        constructor(stateList) {
+            this.allStates = Array.from(stateList);
+            this.initialStates = this.allStates.filter(s => s.isInitial);
+            this.acceptingStates = this.allStates.filter(s => s.isAccepting);
             this.currentStates = this.initialStates;
-            this.alphabet = Array.from(json.alphabet);
-            this.states = json.states;
+            this.alphabet = this.initialStates[0].alphabet;
+            this.states = new Map();
+            stateList.forEach(e => this.states.set(e.name, e));
             this.states_rename = new Map();
             this.set_state_rename();
         }
@@ -53,20 +61,20 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
             let counter_init = [0, this.initialStates.length, this.states.size - this.acceptingStates.length + 1];
             for (const [_name, state] of this.states) {
                 if (this.initialStates.includes(state)) {
-                    this.states_rename.set("q" + counter_init[0]++, state);
+                    this.states_rename.set(state.name, "q" + counter_init[0]++);
                 }
                 else if (this.acceptingStates.includes(state)) {
-                    this.states_rename.set("q" + counter_init[2]++, state);
+                    this.states_rename.set(state.name, "q" + counter_init[2]++);
                 }
                 else {
-                    this.states_rename.set("q" + counter_init[1]++, state);
+                    this.states_rename.set(state.name, "q" + counter_init[1]++);
                 }
             }
         }
         next_step(next_char) {
             let newCurrentState = [];
             this.currentStates.forEach(cs => {
-                let nextStates = cs.transitions.get(next_char);
+                let nextStates = cs.outTransitions.get(next_char);
                 nextStates.forEach(nextState => {
                     if (!newCurrentState.includes(nextState)) {
                         newCurrentState.push(nextState);
@@ -95,7 +103,7 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
             return Array.from(nextStates).some(e => e.isAccepting);
         }
         findTransition(state, symbol) {
-            return this.states.get(state.name).transitions.get(symbol);
+            return this.states.get(state.name).outTransitions.get(symbol);
         }
         restart() {
             this.currentStates = this.initialStates;
@@ -145,7 +153,7 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
             res = res.concat(Object.keys(triples).map(x => this.create_triple(x, triples[x].join(","))).join("\n"));
             res += "\n";
             res += "subgraph InitialStates\n";
-            res += this.initialStates.map(e => e).join("\n");
+            res += this.initialStates.map(e => e.name).join("\n");
             res += "\nend";
             res += "\n";
             res += "end\n";
@@ -189,7 +197,47 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
             return this.states.size;
         }
         transition_number() {
-            return Array.from(this.states).map(([_, state]) => Object.entries(state.transitions).map(next => next[1].length).reduce((a, b) => a + b)).reduce((prev, current) => prev + current);
+            return Array.from(this.states).map(e => Array.from(e[1].outTransitions)).flat().reduce((a, b) => a + b[1].length, 0);
+        }
+        minimize() {
+            let stateList = this.allStates;
+            let P = [new Set(), new Set()];
+            stateList.forEach(s => (s.isAccepting ? P[0] : P[1]).add(s));
+            let W = Array.from(P);
+            while (W.length > 0) {
+                let A = W.shift();
+                for (const letter of this.alphabet) {
+                    let X = new Set();
+                    A.forEach(e => X.add(e.inTransitions.get(letter)[0]));
+                    let Y = P.map(p => {
+                        let S1 = new Set(), S2 = new Set();
+                        for (const state of p) {
+                            if (X.has(state))
+                                S1.add(state);
+                            else
+                                S2.add(state);
+                        }
+                        return { y: p, S1: S1, S2: S2 };
+                    }).filter(({ S1, S2 }) => S1.size > 0 && S2.size > 0);
+                    for (const { y, S1, S2 } of Y) {
+                        if (W.includes(y)) {
+                            W.splice(W.indexOf(y), 1);
+                            W.push(S1);
+                            W.push(S2);
+                        }
+                        else {
+                            if (S1.size <= S2.size) {
+                                W.push(S1);
+                            }
+                            else {
+                                W.push(S2);
+                            }
+                        }
+                    }
+                }
+            }
+            console.log(P);
+            return P;
         }
     }
     exports.Automaton = Automaton;
@@ -199,33 +247,41 @@ define("automaton/automaton_type", ["require", "exports", "automaton/Automaton",
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.differenceAutomata = exports.complementAutomata = exports.unionAutomata = exports.intersectionAutomata = exports.minimizeAutomaton = exports.regexToAutomaton = exports.MyAutomatonToHis = exports.HisAutomaton2Mine = void 0;
     function HisAutomaton2Mine(aut) {
-        let res = {
-            alphabet: Array.from(aut.alphabet),
-            acceptingStates: aut.acceptingStates.map(e => e + ""),
-            startState: (typeof aut.initialState === "number") ? [aut.initialState + ""] : Array.from(aut.initialState).map(e => e + ""),
-            states: aut.states.map(e => e + ""),
-            transitions: aut.transitions.map(e => ({ fromState: e.fromState + "", symbol: e.symbol, toStates: e.toStates.map(e => e + "") }))
-        };
-        return new Automaton_js_1.Automaton(res);
+        let states = aut.states.map(e => new Automaton_js_1.State(e + "", aut.acceptingStates.map(e => e + "").includes(e + ""), (typeof aut.initialState == "number" ? aut.initialState + "" == e + "" : aut.initialState?.map(e => e + "").includes(e + "")) || false, aut.alphabet));
+        let statesMap = new Map(), statesSet = new Set();
+        for (const state of states) {
+            statesMap.set(state.name, state);
+            statesSet.add(state);
+        }
+        for (const transition of aut.transitions) {
+            let from = transition.fromState;
+            let symbol = transition.symbol;
+            let to = transition.toStates;
+            to.forEach(state => statesMap.get(from + "")?.addTransition(symbol, statesMap.get(state + "")));
+        }
+        return new Automaton_js_1.Automaton(statesSet);
     }
     exports.HisAutomaton2Mine = HisAutomaton2Mine;
     function MyAutomatonToHis(aut) {
-        let state2int = (state) => aut.states.indexOf(state);
-        let states = aut.states.map(e => state2int(e));
+        let stateList = Array.from(aut.states).map(e => e[1]);
+        let state2int = (state) => stateList.indexOf(state);
+        let states = stateList.map(e => state2int(e));
         let startState = states.length;
-        let transitions = aut.transitions.map(e => ({
-            fromState: state2int(e.fromState), symbol: e.symbol, toStates: e.toStates.map(e => state2int(e))
-        }));
-        if (aut.startState.length > 1) {
+        let transitions = stateList.map(state => Array.from(state.outTransitions).map(transition => ({
+            fromState: state2int(state),
+            symbol: transition[0],
+            toStates: transition[1].map(e => state2int(e))
+        })).flat()).flat();
+        if (aut.initialStates.length > 1) {
             transitions.push(({
                 fromState: startState,
                 symbol: "$",
-                toStates: aut.startState.map(e => state2int(e))
+                toStates: aut.initialStates.map(e => state2int(e))
             }));
             states.push(startState);
         }
         else
-            startState = state2int(aut.startState[0]);
+            startState = state2int(aut.initialStates[0]);
         let res = {
             acceptingStates: aut.acceptingStates.map(e => state2int(e)),
             alphabet: Array.from(aut.alphabet),
@@ -243,12 +299,12 @@ define("automaton/automaton_type", ["require", "exports", "automaton/Automaton",
     exports.regexToAutomaton = regexToAutomaton;
     function minimizeAutomaton(automaton) {
         console.log("1");
+        let provMyAut = HisAutomaton2Mine(noam_js_1.noam.fsm.convertStatesToNumbers(automaton));
+        console.log(provMyAut.matrix_to_mermaid());
         let hisMinimized = noam_js_1.noam.fsm.minimize(automaton);
         console.log("2");
         let statesToNumbers = noam_js_1.noam.fsm.convertStatesToNumbers(hisMinimized);
-        console.log("3");
         let minimized = HisAutomaton2Mine(statesToNumbers);
-        console.log("4");
         return minimized;
     }
     exports.minimizeAutomaton = minimizeAutomaton;
@@ -302,7 +358,7 @@ define("teacher/TeacherAutomaton", ["require", "exports", "automaton/automaton_t
             this.automaton = (0, automaton_type_js_1.regexToAutomaton)(regex);
             this.alphabet = this.automaton.alphabet;
             this.regex = regex;
-            this.description = description || `Automata accepting \\(regex(${regex}$)\\)`;
+            this.description = description || `Automaton accepting \\(regex(${regex})\\)`;
         }
         member(sentence) {
             return (0, Utilities_js_1.boolToString)(this.automaton.accept_word_nfa(sentence));
@@ -321,7 +377,7 @@ define("teacher/TeacherAutomaton", ["require", "exports", "automaton/automaton_t
                         continue;
                     explored.push(current);
                     for (const state of stateList) {
-                        let transition = Array.from(state.transitions);
+                        let transition = Array.from(state.outTransitions);
                         for (const [symbol, states] of transition) {
                             if (!explored.includes(states[0]) && state == current) {
                                 parent[stateList.indexOf(states[0])] =
@@ -407,14 +463,14 @@ define("teacher/Teacher", ["require", "exports", "teacher/TeacherAutomaton", "te
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.teachers = exports.binaryAddition = exports.teacher_b_bStar_a__b_aOrb_star = exports.teacher_bStar_a_or_aStart_bStar = exports.teacherNotAfourthPos = exports.teacherEvenAandThreeB = exports.teacherA3fromLast = exports.teacherPairZeroAndOne = exports.teacher_a_or_baStar = void 0;
     exports.teacher_a_or_baStar = new TeacherAutomaton_js_1.TeacherAutomaton("a+(ba)*");
-    exports.teacherPairZeroAndOne = new TeacherAutomaton_js_1.TeacherAutomaton("(00+11+(01+10)(00+11)*(01+10))*", `Automata accepting \\(L = \\{w \\in (0, 1)^* | \\#(w_0) \\% 2 = 0 \\land \\#(w_1) \\% 2 = 0\\}\\) <br/> → words with even nb of '0' and even nb of '1'`);
-    exports.teacherA3fromLast = new TeacherAutomaton_js_1.TeacherAutomaton("(a+b)*a(a+b)(a+b)", `Automata accepting \\(L = \\{w \\in (a, b)^* | w[-3] = a\\}\\) <br/>
+    exports.teacherPairZeroAndOne = new TeacherAutomaton_js_1.TeacherAutomaton("(00+11+(01+10)(00+11)*(01+10))*", `Automaton accepting \\(L = \\{w \\in (0, 1)^* | \\#(w_0) \\% 2 = 0 \\land \\#(w_1) \\% 2 = 0\\}\\) <br/> → words with even nb of '0' and even nb of '1'`);
+    exports.teacherA3fromLast = new TeacherAutomaton_js_1.TeacherAutomaton("(a+b)*a(a+b)(a+b)", `Automaton accepting \\(L = \\{w \\in (a, b)^* | w[-3] = a\\}\\) <br/>
     → words with an 'a' in the 3rd pos from end`);
-    exports.teacherEvenAandThreeB = new TeacherAutomaton_js_1.TeacherAutomaton("b*a(b+ab*a)*+(a+b)*ba*ba*b(a+b)*", `Automata accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\lor \\#(w_a) \\% 2 = 1\\}\\)
+    exports.teacherEvenAandThreeB = new TeacherAutomaton_js_1.TeacherAutomaton("b*a(b+ab*a)*+(a+b)*ba*ba*b(a+b)*", `Automaton accepting \\(L = \\{w \\in (a, b)^* | \\#(w_b) \\geq 3 \\lor \\#(w_a) \\% 2 = 1\\}\\)
   <br/> → words with at least 3 'b' or an odd nb of 'a'`);
-    exports.teacherNotAfourthPos = new TeacherAutomaton_js_1.TeacherAutomaton("((a+b)(a+b)(a+b)b)*(a+b+$)(a+b+$)(a+b+$)", `Automata accepting \\(L = \\{w \\in (a,b)^* \\land i \\in 4\\mathbb{N} | w[i] \\neq a \\land i \\leq len(w)\\}\\) <br/>
+    exports.teacherNotAfourthPos = new TeacherAutomaton_js_1.TeacherAutomaton("((a+b)(a+b)(a+b)b)*(a+b+$)(a+b+$)(a+b+$)", `Automaton accepting \\(L = \\{w \\in (a,b)^* \\land i \\in 4\\mathbb{N} | w[i] \\neq a \\land i \\leq len(w)\\}\\) <br/>
   → words without an 'a' in a position multiple of 4`);
-    exports.teacher_bStar_a_or_aStart_bStar = new TeacherNoAutomaton_js_1.TeacherNoAutomaton({ alphabet: "ab", regex: "((bb*a)|(a*b*))", counter_exemples: ["bba", "b", "aabb", "aba", "aa", "bbaa"] }, `Automata accepting \\(L = regex((bb^*a) + (a^*b^*))\\)`);
+    exports.teacher_bStar_a_or_aStart_bStar = new TeacherNoAutomaton_js_1.TeacherNoAutomaton({ alphabet: "ab", regex: "((bb*a)|(a*b*))", counter_exemples: ["bba", "b", "aabb", "aba", "aa", "bbaa"] }, `Automaton accepting \\(L = regex((bb^*a) + (a^*b^*))\\)`);
     exports.teacher_b_bStar_a__b_aOrb_star = new TeacherAutomaton_js_1.TeacherAutomaton("bb*($+a(b(a+b))*)");
     exports.binaryAddition = new TeacherNoAutomaton_js_1.TeacherNoAutomaton({
         alphabet: "012345678",
@@ -427,7 +483,7 @@ define("teacher/Teacher", ["require", "exports", "teacher/TeacherAutomaton", "te
             return fst_term + snd_term == trd_term;
         },
         counter_exemples: []
-    }, `Automata accepting the sum between binary words, exemple : <br>
+    }, `Automaton accepting the sum between binary words, exemple : <br>
   <pre>
   0101 + 
   1001 = 
@@ -556,14 +612,18 @@ define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function
                 return;
             var close_rep;
             var consistence_rep;
+            console.log(11);
             if (close_rep = this.is_close()) {
+                console.log(12);
                 this.add_elt_in_S(close_rep);
             }
             else if (consistence_rep = this.is_consistent()) {
+                console.log(13);
                 let new_col = consistence_rep[2];
                 this.add_column(new_col);
             }
             else {
+                console.log(14);
                 let automaton = this.make_automaton();
                 this.automaton = automaton;
                 let answer = this.make_equiv(automaton);
@@ -574,6 +634,7 @@ define("lerners/LernerBase", ["require", "exports", "tools/Utilities"], function
                     this.finish = true;
                 }
             }
+            console.log(15);
         }
         make_all_queries() {
             while (!this.finish) {
@@ -600,59 +661,28 @@ define("lerners/L_star", ["require", "exports", "automaton/Automaton", "lerners/
                 value = old_value + value;
             this.observation_table[key] = value;
         }
-        make_member(pref, suff) {
-            let word = pref + suff;
-            let answer;
-            for (let i = 0; i < word.length + 1; i++) {
-                let pref1 = word.substring(0, i);
-                let suff1 = word.substring(i);
-                if (pref1 == pref)
-                    continue;
-                if (this.E.includes(suff1)) {
-                    if ((this.S.includes(pref1) || this.SA.includes(pref1)) && this.observation_table[pref1]) {
-                        answer = this.observation_table[pref1].charAt(this.E.indexOf(suff1));
-                        this.update_observation_table(pref, answer);
-                        if (answer == undefined)
-                            throw 'Parameter is not a number!';
-                        return;
-                    }
-                }
-            }
-            answer = this.teacher.member(word);
-            this.update_observation_table(pref, answer);
-            this.member_number++;
-        }
-        make_equiv(a) {
-            let answer = this.teacher.equiv(a);
-            this.equiv_number++;
-            return answer;
-        }
         make_automaton() {
-            let wordForState = [], states = new Map(), acceptingStates = [], initialStates = [];
+            let wordForState = [], statesMap = new Map(), acceptingStates = [], initialStates = [], statesSet = new Set();
             this.S.forEach(s => {
-                if (!states.get(s)) {
-                    let name = this.observation_table[s];
+                let name = this.observation_table[s];
+                if (!statesMap.get(name)) {
                     let state = new Automaton_js_2.State(name, name[0] == "1", s == "", this.alphabet);
                     wordForState.push(s);
                     if (state.isAccepting)
                         acceptingStates.push(state);
                     if (state.isInitial)
                         initialStates.push(state);
-                    states.set(s, state);
+                    statesMap.set(name, state);
+                    statesSet.add(state);
                 }
             });
             for (const word of wordForState) {
                 let name = this.observation_table[word];
                 for (const symbol of this.alphabet) {
-                    states.get(name).transitions.get(symbol).push(states.get(this.observation_table[word + symbol]));
+                    statesMap.get(name).outTransitions.get(symbol).push(statesMap.get(this.observation_table[word + symbol]));
                 }
             }
-            this.automaton = new Automaton_js_2.Automaton({
-                states: states,
-                acceptingStates: acceptingStates,
-                alphabet: this.alphabet,
-                initialStates: initialStates
-            });
+            this.automaton = new Automaton_js_2.Automaton(statesSet);
             return this.automaton;
         }
         is_close() {
@@ -969,35 +999,33 @@ define("lerners/NL_star", ["require", "exports", "automaton/Automaton", "tools/U
             }
         }
         make_automaton() {
-            let wordForState = [], states = new Map(), acceptingStates = [], initialStates = [];
+            let wordForState = [], statesMap = new Map(), acceptingStates = [], initialStates = [], stateSet = new Set();
             this.prime_lines.forEach(s => {
-                if (!states.get(s)) {
+                if (this.S.includes(s)) {
                     let name = this.observation_table[s];
-                    let state = new Automaton_js_3.State(name, name[0] == "1", s == "", this.alphabet);
-                    wordForState.push(s);
-                    if (state.isAccepting)
-                        acceptingStates.push(state);
-                    if (state.isInitial)
-                        initialStates.push(state);
-                    states.set(s, state);
+                    if (!statesMap.get(name)) {
+                        let state = new Automaton_js_3.State(name, name[0] == "1", this.is_covered(name, this.observation_table[""]), this.alphabet);
+                        wordForState.push(s);
+                        if (state.isAccepting)
+                            acceptingStates.push(state);
+                        if (state.isInitial)
+                            initialStates.push(state);
+                        statesMap.set(name, state);
+                        stateSet.add(state);
+                    }
                 }
             });
             for (const word of wordForState) {
                 let name = this.observation_table[word];
                 for (const symbol of this.alphabet) {
-                    let next = states.get(this.observation_table[word + symbol]);
-                    for (const [name1, state] of states) {
-                        if (this.is_covered(name1, next.name))
-                            states.get(name).transitions.get(symbol).push(state);
+                    let rowNext = this.observation_table[word + symbol];
+                    for (const [name1, state] of statesMap) {
+                        if (this.is_covered(name1, rowNext))
+                            statesMap.get(name).outTransitions.get(symbol).push(state);
                     }
                 }
             }
-            this.automaton = new Automaton_js_3.Automaton({
-                states: states,
-                acceptingStates: acceptingStates,
-                alphabet: this.alphabet,
-                initialStates: initialStates
-            });
+            this.automaton = new Automaton_js_3.Automaton(stateSet);
             return this.automaton;
         }
         table_to_update_after_equiv(answer) {
@@ -1195,9 +1223,15 @@ define("lerners/Observation_table", ["require", "exports", "tools/Utilities"], f
     }
     exports.Observation_table = Observation_table;
 });
-define("test_nodejs/Automaton_minimize_test", ["require", "exports"], function (require, exports) {
+define("test_nodejs/Automaton_minimize_test", ["require", "exports", "automaton/Automaton"], function (require, exports, Automaton_js_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    let state1 = new Automaton_js_5.State("0", false, true, ['a', 'b']);
+    let state2 = new Automaton_js_5.State("1", true, false, ['a', 'b']);
+    let state3 = new Automaton_js_5.State("2", true, false, ['a', 'b']);
+    state1.addTransition('a', state2);
+    state2.addTransition('a', state3);
+    let a = new Automaton_js_5.Automaton(new Set([state1, state2, state3]));
 });
 define("test_nodejs/PrintFunction", ["require", "exports", "assert", "fs"], function (require, exports, assert_1, fs_1) {
     "use strict";
@@ -1212,7 +1246,7 @@ define("test_nodejs/PrintFunction", ["require", "exports", "assert", "fs"], func
         return `${L.teacher.regex},${L.teacher.alphabet.length},${L.member_number},${L.equiv_number},${L.automaton?.state_number()},${L.automaton?.transition_number()},${NL.member_number},${NL.equiv_number},${NL.automaton?.state_number()},${NL.automaton?.transition_number()}`;
     };
     exports.printCsvCompare = printCsvCompare;
-    exports.csvHead = "regex,Alp Length,L Member,L Equiv,L Aut State,L Aut Tran,NL Member,NL Equiv,NL Aut State,NL Aut Tran";
+    exports.csvHead = "Regex,Length alphabet,L Membership queries,L Equivalence queries,L State nb in A,L Transition nb in A,NL Membership queries,NL Equivalence queries,NL State nb in A,NL Transition nb in A";
     let fileNameToCsv = (fileName) => "./statistics/" + fileName + ".csv";
     let clearFile = (fileName) => (0, fs_1.writeFileSync)(fileNameToCsv(fileName), "");
     exports.clearFile = clearFile;
@@ -1239,14 +1273,15 @@ define("test_nodejs/LernerCompare", ["require", "exports", "lerners/NL_star", "l
         (0, PrintFunction_js_1.writeToFile)(fileName, (0, PrintFunction_js_1.printCsvCompare)(L, NL));
     }
 });
-define("test_nodejs/Test_wrost_DFA", ["require", "exports", "test_nodejs/PrintFunction", "lerners/L_star", "lerners/NL_star", "teacher/TeacherNoAutomaton"], function (require, exports, PrintFunction_js_2, L_star_js_4, NL_star_js_4, TeacherNoAutomaton_js_2) {
+define("test_nodejs/Test_wrost_DFA", ["require", "exports", "test_nodejs/PrintFunction", "lerners/L_star", "lerners/NL_star", "teacher/TeacherAutomaton"], function (require, exports, PrintFunction_js_2, L_star_js_4, NL_star_js_4, TeacherAutomaton_js_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    let toWrite = false;
     let fileName = "wrostDFA";
     (0, PrintFunction_js_2.clearFile)(fileName);
     (0, PrintFunction_js_2.writeToFile)(fileName, PrintFunction_js_2.csvHead);
     let regexList = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 4; i < 10; i++) {
         let counter_exemples = [];
         for (let j = Math.max(0, i - 3); j <= i + 3; j++) {
             counter_exemples.push("a".repeat(j));
@@ -1256,26 +1291,25 @@ define("test_nodejs/Test_wrost_DFA", ["require", "exports", "test_nodejs/PrintFu
             counter_exemples.push("a".repeat(j) + "a" + "b".repeat(i));
         }
         counter_exemples.push("bbbbbbbbbbbbbbbabbbbbab");
-        regexList.push(["(a|b)*a" + "(a|b)".repeat(i), counter_exemples]);
+        regexList.push(["(a+b)*a" + "(a+b)".repeat(i), counter_exemples]);
     }
     let printInfo = (algo, algoName) => {
         return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.state_number()}, transitions = ${algo.automaton?.transition_number()}`;
     };
     for (const [regex, counter_exemples] of regexList) {
-        let teacher = new TeacherNoAutomaton_js_2.TeacherNoAutomaton({
-            alphabet: "ab",
-            regex: regex,
-            counter_exemples: counter_exemples
-        });
+        let teacher = new TeacherAutomaton_js_3.TeacherAutomaton(regex);
         let L = new L_star_js_4.L_star(teacher);
         let NL = new NL_star_js_4.NL_star(teacher);
         console.log("==============================");
         console.log("Current regexp : ", regex);
+        console.log("In L*");
         L.make_all_queries();
         console.log(printInfo(L, "L*"));
+        console.log("In NL*");
         NL.make_all_queries();
         console.log(printInfo(NL, "NL*"));
-        (0, PrintFunction_js_2.writeToFile)(fileName, (0, PrintFunction_js_2.printCsvCompare)(L, NL));
+        if (toWrite)
+            (0, PrintFunction_js_2.writeToFile)(fileName, (0, PrintFunction_js_2.printCsvCompare)(L, NL));
     }
 });
 //# sourceMappingURL=out.js.map

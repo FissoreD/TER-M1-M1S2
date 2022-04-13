@@ -53,6 +53,8 @@ export class NL_star extends LernerBase {
 
   check_prime_lines() {
     this.prime_lines = [...this.S, ...this.SA].filter(l => this.is_prime(l));
+    console.log(this.prime_lines);
+
   }
 
   add_elt_in_S(new_elt: string): string[] {
@@ -60,9 +62,12 @@ export class NL_star extends LernerBase {
     added_list.forEach(e => {
       if (!this.prime_lines?.includes(e) && this.is_prime(e)) {
         this.prime_lines.push(e);
-        this.check_prime_lines();
       }
     })
+    console.log("In s before");
+    this.check_prime_lines();
+    console.log("In s aftere");
+
     return added_list;
   }
 
@@ -79,7 +84,11 @@ export class NL_star extends LernerBase {
       this.S.forEach(s => this.make_member(s, suffix));
       this.E.push(suffix);
     }
+    console.log("I'm in Add in elt function ");
+
     this.check_prime_lines()
+    console.log("Now I've made my check prime line");
+
   }
 
   /**
@@ -133,17 +142,18 @@ export class NL_star extends LernerBase {
   }
 
   make_automaton() {
-    let wordForState: string[] = [], states: Map<string, State> = new Map(),
-      acceptingStates: State[] = [], initialStates: State[] = [];
+    let wordForState: string[] = [], statesMap: Map<string, State> = new Map(),
+      acceptingStates: State[] = [], initialStates: State[] = [], stateSet: Set<State> = new Set();
     this.prime_lines.forEach(s => {
       if (this.S.includes(s)) {
         let name = this.observation_table[s];
-        if (!states.get(name)) {
+        if (!statesMap.get(name)) {
           let state = new State(name, name[0] == "1", this.is_covered(name, this.observation_table[""]), this.alphabet);
           wordForState.push(s);
           if (state.isAccepting) acceptingStates.push(state)
           if (state.isInitial) initialStates.push(state)
-          states.set(name, state);
+          statesMap.set(name, state);
+          stateSet.add(state)
         }
       }
     })
@@ -151,20 +161,15 @@ export class NL_star extends LernerBase {
       let name = this.observation_table[word]
       for (const symbol of this.alphabet) {
         let rowNext = this.observation_table[word + symbol]
-        for (const [name1, state] of states) {
+        for (const [name1, state] of statesMap) {
           if (this.is_covered(name1, rowNext))
-            states.get(name)!.transitions.get(symbol)!.push(state)
+            statesMap.get(name)!.outTransitions.get(symbol)!.push(state)
         }
       }
     }
-    this.automaton = new Automaton(
-      {
-        states: states,
-        acceptingStates: acceptingStates,
-        alphabet: this.alphabet,
-        initialStates: initialStates
-      }
-    )
+    console.log();
+
+    this.automaton = new Automaton(stateSet)
     return this.automaton;
   }
 

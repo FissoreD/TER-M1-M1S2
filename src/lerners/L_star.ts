@@ -15,34 +15,28 @@ export class L_star extends LernerBase {
   }
 
   make_automaton(): Automaton {
-    let wordForState: string[] = [], states: Map<string, State> = new Map(),
-      acceptingStates: State[] = [], initialStates: State[] = [];
+    let wordForState: string[] = [], statesMap: Map<string, State> = new Map(),
+      acceptingStates: State[] = [], initialStates: State[] = [], statesSet: Set<State> = new Set();
     this.S.forEach(s => {
       let name = this.observation_table[s];
-      if (!states.get(name)) {
+      if (!statesMap.get(name)) {
         let state = new State(name, name[0] == "1", s == "", this.alphabet);
         wordForState.push(s);
         if (state.isAccepting) acceptingStates.push(state)
         if (state.isInitial) initialStates.push(state)
-        states.set(name, state);
+        statesMap.set(name, state);
+        statesSet.add(state)
       }
     })
 
     for (const word of wordForState) {
       let name = this.observation_table[word]
       for (const symbol of this.alphabet) {
-        states.get(name)!.transitions.get(symbol)!.push(states.get(this.observation_table[word + symbol])!)
+        statesMap.get(name)!.outTransitions.get(symbol)!.push(statesMap.get(this.observation_table[word + symbol])!)
       }
     }
 
-    this.automaton = new Automaton(
-      {
-        states: states,
-        acceptingStates: acceptingStates,
-        alphabet: this.alphabet,
-        initialStates: initialStates
-      }
-    )
+    this.automaton = new Automaton(statesSet)
     return this.automaton;
   }
 

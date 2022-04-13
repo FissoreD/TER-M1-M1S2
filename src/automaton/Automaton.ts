@@ -1,8 +1,13 @@
+import { strict } from "assert";
+
 export class State {
   isAccepting: boolean;
   isInitial: boolean;
   alphabet: string[];
-  transitions: Map<string, State[]>
+  outTransitions: Map<string, State[]>;
+  inTransitions: Map<string, State[]>;
+  successors: Set<State>;
+  predecessor: Set<State>;
   name: string;
 
   constructor(name: string, isAccepting: boolean, isInitial: boolean, alphabet: string[]) {
@@ -10,14 +15,30 @@ export class State {
     this.isAccepting = isAccepting;
     this.isInitial = isInitial;
     this.alphabet = alphabet;
-    this.transitions = new Map()
+    this.outTransitions = new Map();
+    this.inTransitions = new Map();
+    this.successors = new Set();
+    this.predecessor = new Set();
     for (const symbol of alphabet) {
-      this.transitions.set(symbol, [])
+      this.outTransitions.set(symbol, []);
+      this.inTransitions.set(symbol, []);
     }
   }
 
   addTransition(symbol: string, state: State) {
-    this.transitions.get(symbol)!.push(state);
+    if (this.outTransitions.get(symbol)!.includes(state)) return
+    this.outTransitions.get(symbol)!.push(state);
+    this.successors.add(state);
+    state.predecessor.add(this);
+    state.inTransitions.get(symbol)!.push(this);
+  }
+
+  getSuccessor(symbol: string) {
+    return this.outTransitions.get(symbol)!
+  }
+
+  getPredecessor(symbol: string) {
+    return this.inTransitions.get(symbol)!
   }
 }
 
@@ -32,16 +53,19 @@ export class Automaton implements AutomatonJson {
   states: Map<string, State>;
   initialStates: State[];
   acceptingStates: State[];
+  allStates: State[];
   alphabet: string[];
   currentStates: State[];
   states_rename: Map<string, string>;
 
-  constructor(json: AutomatonJson) {
-    this.initialStates = json.initialStates;
-    this.acceptingStates = json.acceptingStates;
+  constructor(stateList: Set<State>) {
+    this.allStates = Array.from(stateList);
+    this.initialStates = this.allStates.filter(s => s.isInitial);
+    this.acceptingStates = this.allStates.filter(s => s.isAccepting);
     this.currentStates = this.initialStates;
-    this.alphabet = Array.from(json.alphabet);
-    this.states = json.states;
+    this.alphabet = this.initialStates[0].alphabet;
+    this.states = new Map();
+    stateList.forEach(e => this.states.set(e.name, e));
     this.states_rename = new Map();
     this.set_state_rename()
   }
@@ -62,7 +86,7 @@ export class Automaton implements AutomatonJson {
   next_step(next_char: string) {
     let newCurrentState: State[] = []
     this.currentStates.forEach(cs => {
-      let nextStates = cs.transitions.get(next_char)!;
+      let nextStates = cs.outTransitions.get(next_char)!;
       nextStates.forEach(nextState => {
         if (!newCurrentState.includes(nextState)) {
           newCurrentState.push(nextState)
@@ -82,31 +106,8 @@ export class Automaton implements AutomatonJson {
     return is_accepted;
   }
 
-  // find_transition(state: string, symbol: string) {
-  //   return this.transitions
-  //     .filter(e => e.fromState == state)
-  //     .find(e => e.symbol == symbol)!
-  // }
 
-
-  /* {TODO} */
   accept_word_nfa(word: string): boolean {
-    // let path: string[] = [];
-    // let recursive_explore = (word: string, index: number, current_state: State, state_path: string): boolean => {
-    //   if (index < word.length) {
-    //     let next_states = this.find_transition(current_state, word[index]).toStates;
-    //     return next_states.some(next_state => recursive_explore(word, index + 1, next_state, state_path + ", " + this.get_state_rename(next_state)))
-    //   } else {
-    //     if (this.acceptingStates.includes(current_state)) {
-    //       path = [state_path]
-    //       return true;
-    //     }
-    //     path.push(state_path)
-    //     return false;
-    //   }
-    // }
-    // console.log(1);
-
     let nextStates: Set<State> = new Set(this.initialStates);
     for (let index = 0; index < word.length && nextStates.size > 0; index++) {
       let nextStates2: Set<State> = new Set();
@@ -116,12 +117,11 @@ export class Automaton implements AutomatonJson {
       }
       nextStates = nextStates2;
     }
-    // console.log(2);
     return Array.from(nextStates).some(e => e.isAccepting);
   }
 
   findTransition(state: State, symbol: string) {
-    return this.states.get(state.name)!.transitions.get(symbol)!
+    return this.states.get(state.name)!.outTransitions.get(symbol)!
   }
 
   restart() {
@@ -185,15 +185,16 @@ export class Automaton implements AutomatonJson {
     res = res.concat(Object.keys(triples).map(x => this.create_triple(x, triples[x].join(","))).join("\n"));
     // res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;")
     res += "\n"
-    // res = res.concat(this.initialStates.map(e => `style ${e} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
-    res += "subgraph InitialStates\n";
+    res += "\nsubgraph InitialStates\n";
     res += this.initialStates.map(e => e.name).join("\n")
     res += "\nend"
     res += "\n"
     res += "end\n"
+    res = res.concat(this.acceptingStates.map(e => `style ${e.name} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
+    res += "\n"
     // Callback for tooltip on mouse over
     res = res.concat(Array.from(this.states).map(([name, _]) => `click ${name} undnamefinedCallback "${name}";`).join("\n"))
-    console.log(res);
+    // console.log(res);
     return res;
   }
 
@@ -243,69 +244,107 @@ export class Automaton implements AutomatonJson {
   }
 
   transition_number() {
-    return Array.from(this.states).map(e => Array.from(e[1].transitions)).flat().reduce((a, b) => a + b[1].length, 0)
+    return Array.from(this.states).map(e => Array.from(e[1].outTransitions)).flat().reduce((a, b) => a + b[1].length, 0)
   }
 
-  // minimize() {
-  //   let couples: string[][] = []
-  //   let separable = new Set();
-  //   for (let i1 = 0; i1 < this.states.size; i1++) {
-  //     for (let i2 = i1 + 1; i2 < this.states.size; i2++) {
-  //       if (this.acceptingStates.includes(this.states[i1]) != this.acceptingStates.includes(this.states[i2])) separable.add(`${this.states[i1]}-${this.states[i2]}`)
-  //       else couples.push([this.states[i1], this.states[i2]]);
-  //     }
-  //   }
-  //   while (true) {
-  //     let oldLength = couples.length;
-  //     couples = couples.filter(e => {
-  //       let fst = e[0], snd = e[1];
-  //       let tr0 = this.transitions.filter(t => t.fromState == fst);
-  //       let tr1 = this.transitions.filter(t => t.fromState == snd);
-  //       for (const letter of this.alphabet) {
-  //         let t1 = tr0.find(e => e.symbol == letter)?.toStates
-  //         let t2 = tr1.find(e => e.symbol == letter)?.toStates
-  //         if (t1 && t2) {
-  //           for (const x of t1) {
-  //             for (const y of t2) {
-  //               if (separable.has(`${x}-${y}`) || separable.has(`${y}-${x}`)) {
-  //                 separable.add(`${fst}-${snd}`)
-  //                 return false;
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //       return true;
-  //     })
-  //     if (couples.length == oldLength) break
-  //   }
 
-  //   for (const couple of couples) {
-  //     this.transitions.filter(e => e.fromState == couple[1]).forEach(
-  //       s => {
-  //         let tr;
-  //         if (tr = this.transitions.find(t => t.fromState == couple[0] && t.symbol == s.symbol)) {
-  //           for (const next of s.toStates) {
-  //             if (!tr.toStates.includes(next)) tr.toStates.push(next)
-  //           }
-  //         } else {
-  //           this.transitions.push({ fromState: couple[0], symbol: s.symbol, toStates: s.toStates })
-  //         }
-  //       }
-  //     )
-  //     if (this.initialStates.includes(couple[1])) {
-  //       this.initialStates = this.initialStates.filter(e => e != couple[1])
-  //       if (!this.initialStates.includes(couple[0])) this.initialStates.push(couple[0])
-  //     }
-  //     this.acceptingStates = this.acceptingStates.filter(e => e != couple[1])
-  //     this.states = this.states.filter(e => e != couple[1])
-  //     this.transitions = this.transitions.filter(e => e.fromState != couple[1])
-  //     this.transitions.forEach(e => e.toStates = e.toStates.filter(x => x != couple[1]))
-  //     this.transitions = this.transitions.filter(t => t.toStates.length != 0)
-  //   }
+  /**
+   * Usage of Filling table algorithm for Automaton Minimisation
+   * The automaton should be in DFA form else the algorithm won't work
+   */
+  minimize() {
 
-  //   this.set_state_rename()
-  //   console.log(Array.from(separable), couples);
-  //   return this;
-  // }
+    let stateList: State[] = [this.initialStates[0]];
+
+    // BFS to remove not reachable node from initial state
+    let toExplore = [this.initialStates[0]]
+    while (toExplore.length > 0) {
+      let newState = toExplore.shift()!
+      for (const successor of newState.successors) {
+        if (!stateList.includes(successor)) {
+          toExplore.push(successor)
+          stateList.push(successor)
+        }
+      }
+    }
+
+
+    let P: Set<State>[] = [new Set(), new Set()]; // P := {F, Q \ F}
+    stateList.forEach(s => (s.isAccepting ? P[0] : P[1]).add(s))
+    P = P.filter(p => p.size > 0)
+
+    let pLength = () => P.reduce((a, p) => a + p.size, 0)
+
+    let W: Set<State>[] = Array.from(P) // W := {F, Q \ F}
+    while (W.length > 0) {
+      let A = W.shift()!
+      for (const letter of this.alphabet) {
+        // X = the set of states for which a transition on letter leads to a state in A
+        let X: Set<State> = new Set()
+        A.forEach(e => {
+          let succ = e.inTransitions.get(letter)
+          if (succ) succ.forEach(s => X.add(s))
+        })
+
+        // let S1 = X ∩ Y and S2 = Y \ X and S3 = X \ Y and Y in P
+        let Y = P.map(p => {
+          let S1: Set<State> = new Set(),
+            S2: Set<State> = new Set();
+          for (const state of p) {
+            if (X.has(state)) S1.add(state)
+            else S2.add(state)
+          }
+          return { y: p, S1: S1, S2: S2 }
+        }).filter(({ S1, S2 }) => S1.size > 0 && S2.size > 0)
+        for (const { y, S1, S2 } of Y) {
+          // replace Y in P by the two sets X ∩ Y and Y \ X
+          P.splice(P.indexOf(y), 1)
+          P.push(S1)
+          P.push(S2)
+          if (pLength() != stateList.length) throw `Wanted ${stateList.length} had ${pLength()}`
+          if (W.includes(y)) {
+            W.splice(W.indexOf(y), 1)
+            W.push(S1)
+            W.push(S2)
+          } else {
+            if (S1.size <= S2.size) {
+              W.push(S1)
+            } else {
+              W.push(S2)
+            }
+          }
+        }
+      }
+    }
+
+    let oldStateToNewState: Map<State, State> = new Map();
+
+
+
+    let newStates = new Set(Array.from(P).filter(partition => partition.size > 0).map((partition, pos) => {
+      let representant = Array.from(partition)
+      let newState = new State(pos + "",
+        representant.some(e => e.isAccepting),
+        representant.some(e => e.isInitial),
+        representant[0].alphabet
+      )
+      partition.forEach(state => oldStateToNewState.set(state, newState))
+      return newState;
+    }));
+
+    for (const partition of P) {
+      for (const oldState of partition) {
+        for (const letter of this.alphabet) {
+          for (const successor of oldState.getSuccessor(letter)) {
+            if (!oldStateToNewState.get(oldState)!.outTransitions.get(letter)![0] || (oldStateToNewState.get(oldState)!.outTransitions.get(letter)![0].name != oldStateToNewState.get(successor)!.name))
+              oldStateToNewState.get(oldState)!.addTransition(letter, oldStateToNewState.get(successor)!)
+          }
+        }
+      }
+    }
+
+    console.log(Array.from(newStates).filter(s => s.isInitial).length);
+
+    return new Automaton(newStates)
+  }
 }

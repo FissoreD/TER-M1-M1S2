@@ -3,6 +3,7 @@ import { clearFile, csvHead, printCsvCompare, writeToFile } from "./PrintFunctio
 import { L_star } from "../lerners/L_star.js";
 import { NL_star } from "../lerners/NL_star.js";
 import { TeacherNoAutomaton } from "../teacher/TeacherNoAutomaton.js";
+import { TeacherAutomaton } from "../teacher/TeacherAutomaton.js";
 
 /**
  * About this file : 
@@ -15,12 +16,14 @@ import { TeacherNoAutomaton } from "../teacher/TeacherNoAutomaton.js";
  * interactions with the teacher.
  */
 
+let toWrite = false
+
 let fileName = "wrostDFA";
 clearFile(fileName)
 writeToFile(fileName, csvHead)
 
 let regexList: [string, string[]][] = []
-for (let i = 0; i < 10; i++) {
+for (let i = 8; i < 10; i++) {
   let counter_exemples: string[] = []
   for (let j = Math.max(0, i - 3); j <= i + 3; j++) {
     counter_exemples.push("a".repeat(j))
@@ -30,7 +33,7 @@ for (let i = 0; i < 10; i++) {
     counter_exemples.push("a".repeat(j) + "a" + "b".repeat(i))
   }
   counter_exemples.push("bbbbbbbbbbbbbbbabbbbbab")
-  regexList.push(["(a|b)*a" + "(a|b)".repeat(i), counter_exemples])
+  regexList.push(["(a+b)*a" + "(a+b)".repeat(i), counter_exemples])
 }
 
 
@@ -39,11 +42,14 @@ let printInfo = (algo: LernerBase, algoName: string) => {
 }
 
 for (const [regex, counter_exemples] of regexList) {
-  let teacher = new TeacherNoAutomaton({
+  let teacher1 = new TeacherNoAutomaton({
     alphabet: "ab",
-    regex: regex,
+    regex: regex.replace(/\+/g, "|"),
     counter_exemples: counter_exemples
   })
+  // let teacher2 = new TeacherAutomaton(regex);
+  let teacher = teacher1;
+
   let L = new L_star(teacher)
   let NL = new NL_star(teacher)
 
@@ -58,5 +64,5 @@ for (const [regex, counter_exemples] of regexList) {
   NL.make_all_queries();
   console.log(printInfo(NL, "NL*"));
 
-  writeToFile(fileName, printCsvCompare(L, NL))
+  if (toWrite) writeToFile(fileName, printCsvCompare(L, NL))
 }

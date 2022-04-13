@@ -13,7 +13,13 @@
     },
     {
       "command": "npm run wrostDFA",
-      "name": "Compare Algo Wrost DFA",
+      "name": "Wrost DFA",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "node dist/test_nodejs/Test_wrost_RFSA.js",
+      "name": "Wrost RFSA",
       "request": "launch",
       "type": "node-terminal"
     },
@@ -26,6 +32,12 @@
     {
       "command": "npm run nlstar",
       "name": "Test NL-Star",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "node dist/test_nodejs/Automaton_minimize_test.js",
+      "name": "Test Minimize",
       "request": "launch",
       "type": "node-terminal"
     },

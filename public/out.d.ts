@@ -3,7 +3,10 @@ declare module "automaton/Automaton" {
         isAccepting: boolean;
         isInitial: boolean;
         alphabet: string[];
-        transitions: Map<string, State[]>;
+        outTransitions: Map<string, State[]>;
+        inTransitions: Map<string, State[]>;
+        successor: Set<State>;
+        predecessor: Set<State>;
         name: string;
         constructor(name: string, isAccepting: boolean, isInitial: boolean, alphabet: string[]);
         addTransition(symbol: string, state: State): void;
@@ -18,10 +21,11 @@ declare module "automaton/Automaton" {
         states: Map<string, State>;
         initialStates: State[];
         acceptingStates: State[];
+        allStates: State[];
         alphabet: string[];
         currentStates: State[];
-        states_rename: Map<string, State>;
-        constructor(json: AutomatonJson);
+        states_rename: Map<string, string>;
+        constructor(stateList: Set<State>);
         set_state_rename(): void;
         next_step(next_char: string): void;
         accept_word(word: string): boolean;
@@ -35,9 +39,10 @@ declare module "automaton/Automaton" {
         color_node(toFill: boolean): void;
         create_triple(states: string, transition: string): string;
         create_entering_arrow(): string;
-        get_state_rename(name: string): State;
+        get_state_rename(name: string): string;
         state_number(): number;
-        transition_number(): any;
+        transition_number(): number;
+        minimize(): Set<State>[];
     }
 }
 declare module "automaton/automaton_type" {
@@ -171,8 +176,6 @@ declare module "lerners/L_star" {
     export class L_star extends LernerBase {
         constructor(teacher: Teacher);
         update_observation_table(key: string, value: string): void;
-        make_member(pref: string, suff: string): void;
-        make_equiv(a: Automaton): string | undefined;
         make_automaton(): Automaton;
         is_close(): string | undefined;
         is_consistent(): string[] | undefined;

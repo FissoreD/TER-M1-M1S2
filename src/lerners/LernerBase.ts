@@ -150,26 +150,28 @@ export abstract class LernerBase {
     if (this.finish) return;
     var close_rep;
     var consistence_rep;
-    console.log(11);
+    // console.log(11);
     if (close_rep = this.is_close()) {
-      console.log(12);
+      // console.log(12);
       this.add_elt_in_S(close_rep);
     } else if (consistence_rep = this.is_consistent()) {
-      console.log(13);
+      // console.log(13);
       let new_col = consistence_rep[2]
       this.add_column(new_col);
     } else {
-      console.log(14);
+      // console.log(14);
       let automaton = this.make_automaton();
       this.automaton = automaton;
       let answer = this.make_equiv(automaton);
+      console.log("Here is a breakpoint : LernerBar, Line 168");
+
       if (answer != undefined) {
         this.table_to_update_after_equiv(answer!)
       } else {
         this.finish = true;
       }
     }
-    console.log(15);
+    // console.log(15);
   }
 
   make_all_queries() {

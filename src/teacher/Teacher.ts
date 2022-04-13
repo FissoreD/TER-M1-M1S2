@@ -1,6 +1,9 @@
-import { Automaton } from "../automaton/Automaton.js";
+import { MyAutomatonToHis } from "../automaton/automaton_type.js";
+import { minimizeAutomaton } from "../automaton/automaton_type.js";
+import { Automaton, State } from "../automaton/Automaton.js";
 import { TeacherAutomaton } from "./TeacherAutomaton.js";
 import { TeacherNoAutomaton } from "./TeacherNoAutomaton.js";
+import { TeacherTakingAut } from "./TeacherTakingAut.js";
 
 export interface Teacher {
   description: string;
@@ -100,4 +103,20 @@ export let binaryAddition = new TeacherNoAutomaton(
   `,
 )
 
-export let teachers = [teacher_a_or_baStar, teacher_b_bStar_a__b_aOrb_star, binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]
+let automatonList: Automaton[] = []
+for (let n = 4; n < 10; n++) {
+  let states: State[] = new Array(n).fill(0).map((_, i) => new State(i + "", i == 0, i < n / 2, ['a', 'b']));
+
+  for (let i = 0; i < n - 1; i++)
+    states[i].addTransition('a', states[i + 1])
+  states[n - 1].addTransition('a', states[0]);
+  states[0].addTransition('b', states[0]);
+  for (let i = 2; i < n; i++)
+    states[i].addTransition('b', states[i - 1])
+  states[1].addTransition('b', states[n - 1])
+  automatonList.push(minimizeAutomaton(MyAutomatonToHis(new Automaton(new Set(states)))));
+}
+
+let badForNl = new TeacherTakingAut(automatonList[0]);
+
+export let teachers = [badForNl, teacher_a_or_baStar, teacher_b_bStar_a__b_aOrb_star, binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]
