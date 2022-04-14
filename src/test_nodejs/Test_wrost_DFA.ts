@@ -1,15 +1,14 @@
-import { LernerBase } from "../lerners/LernerBase.js";
+import { LearnerBase } from "../learners/LearnerBase.js";
 import { clearFile, csvHead, printCsvCompare, writeToFile } from "./PrintFunction.js";
-import { L_star } from "../lerners/L_star.js";
-import { NL_star } from "../lerners/NL_star.js";
+import { L_star } from "../learners/L_star.js";
+import { NL_star } from "../learners/NL_star.js";
 import { TeacherNoAutomaton } from "../teacher/TeacherNoAutomaton.js";
-import { TeacherAutomaton } from "../teacher/TeacherAutomaton.js";
 
 /**
  * About this file : 
  * The goal here is to compare L and NL algo in term
  * of the number of queries and equiv function that 
- * the lerner will ask to the teacher.
+ * the learner will ask to the teacher.
  * We measure in this way a particular kind of 
  * complexity of these algorithms and will try to 
  * test which one of the two algorithms will perform less
@@ -37,7 +36,7 @@ for (let i = 8; i < 10; i++) {
 }
 
 
-let printInfo = (algo: LernerBase, algoName: string) => {
+let printInfo = (algo: LearnerBase, algoName: string) => {
   return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.state_number()}, transitions = ${algo.automaton?.transition_number()}`;
 }
 

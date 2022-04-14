@@ -1,17 +1,11 @@
 import { Automaton, State } from "../automaton/Automaton.js";
 import { Teacher } from "../teacher/Teacher.js";
-import { LernerBase, Map_string_string } from "./LernerBase.js";
+import { LearnerBase, Map_string_string } from "./LearnerBase.js";
 
-export class L_star extends LernerBase {
+export class L_star extends LearnerBase {
 
   constructor(teacher: Teacher) {
     super(teacher)
-  }
-
-  update_observation_table(key: string, value: string) {
-    let old_value = this.observation_table[key];
-    if (old_value != undefined) value = old_value + value
-    this.observation_table[key] = value;
   }
 
   make_automaton(): Automaton {

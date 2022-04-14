@@ -1,12 +1,12 @@
-import { NL_star } from "../lerners/NL_star.js";
-import { L_star } from "../lerners/L_star.js";
+import { NL_star } from "../learners/NL_star.js";
+import { L_star } from "../learners/L_star.js";
 import { teachers } from "../teacher/Teacher.js";
 import { clearFile, csvHead, printCsvCompare, printInfo, writeToFile } from "./PrintFunction.js";
 /**
  * About this file : 
  * The goal here is to compare L and NL algo in term
  * of the number of queries and equiv function that 
- * the lerner will ask to the teacher.
+ * the learner will ask to the teacher.
  * We measure in this way a particular kind of 
  * complexity of these algorithms and will try to 
  * test which one of the two algorithms will perform less

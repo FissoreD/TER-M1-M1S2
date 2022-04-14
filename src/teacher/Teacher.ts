@@ -117,6 +117,6 @@ for (let n = 4; n < 10; n++) {
   automatonList.push(minimizeAutomaton(MyAutomatonToHis(new Automaton(new Set(states)))));
 }
 
-let badForNl = new TeacherTakingAut(automatonList[0]);
+let badForNl = new TeacherTakingAut(automatonList[1]);
 
 export let teachers = [badForNl, teacher_a_or_baStar, teacher_b_bStar_a__b_aOrb_star, binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]

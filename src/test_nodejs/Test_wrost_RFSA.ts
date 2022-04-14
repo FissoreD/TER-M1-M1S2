@@ -1,7 +1,7 @@
-import { LernerBase } from "../lerners/LernerBase.js";
+import { LearnerBase } from "../learners/LearnerBase.js";
 import { clearFile, csvHead, printCsvCompare, writeToFile } from "./PrintFunction.js";
-import { L_star } from "../lerners/L_star.js";
-import { NL_star } from "../lerners/NL_star.js";
+import { L_star } from "../learners/L_star.js";
+import { NL_star } from "../learners/NL_star.js";
 import { TeacherTakingAut } from "../teacher/TeacherTakingAut.js";
 import { Automaton, State } from "../automaton/Automaton.js";
 import { minimizeAutomaton, MyAutomatonToHis } from "../automaton/automaton_type.js";
@@ -10,7 +10,7 @@ import { minimizeAutomaton, MyAutomatonToHis } from "../automaton/automaton_type
  * About this file : 
  * The goal here is to compare L and NL algo in term
  * of the number of queries and equiv function that 
- * the lerner will ask to the teacher.
+ * the learner will ask to the teacher.
  * We measure in this way a particular kind of 
  * complexity of these algorithms and will try to 
  * test which one of the two algorithms will perform less
@@ -26,7 +26,8 @@ if (toWrite) {
 }
 
 let automatonList: Automaton[] = []
-for (let n = 4; n < 10; n++) {
+const N = 4, maxN = 10;
+for (let n = N; n < maxN; n++) {
   let states: State[] = new Array(n).fill(0).map((_, i) => new State(i + "", i == 0, i < n / 2, ['a', 'b']));
 
   for (let i = 0; i < n - 1; i++)
@@ -40,18 +41,19 @@ for (let n = 4; n < 10; n++) {
 }
 
 
-let printInfo = (algo: LernerBase, algoName: string) => {
+let printInfo = (algo: LearnerBase, algoName: string) => {
   return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.state_number()}, transitions = ${algo.automaton?.transition_number()}`;
 }
 
-for (const automaton of automatonList) {
+for (let i = 0; i < automatonList.length; i++) {
+  let automaton = automatonList[i]
   let teacher = new TeacherTakingAut(automaton, automaton.allStates.length + "")
 
   let L = new L_star(teacher)
   let NL = new NL_star(teacher)
 
-  console.log("=========================================================");
-  console.log("Current n : ", automaton.allStates.length);
+  console.log("=".repeat(100));
+  console.log("Current n : ", N + i);
 
   console.log("In L*");
 

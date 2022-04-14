@@ -5,11 +5,13 @@ declare module "automaton/Automaton" {
         alphabet: string[];
         outTransitions: Map<string, State[]>;
         inTransitions: Map<string, State[]>;
-        successor: Set<State>;
+        successors: Set<State>;
         predecessor: Set<State>;
         name: string;
         constructor(name: string, isAccepting: boolean, isInitial: boolean, alphabet: string[]);
         addTransition(symbol: string, state: State): void;
+        getSuccessor(symbol: string): State[];
+        getPredecessor(symbol: string): State[];
     }
     export interface AutomatonJson {
         states: Map<string, State>;
@@ -42,7 +44,7 @@ declare module "automaton/Automaton" {
         get_state_rename(name: string): string;
         state_number(): number;
         transition_number(): number;
-        minimize(): Set<State>[];
+        minimize(): Automaton;
     }
 }
 declare module "automaton/automaton_type" {
@@ -78,17 +80,23 @@ declare module "tools/Utilities" {
     export const count_str_occurrences: (str: string, obj: string) => number;
     export function boolToString(bool: boolean): string;
 }
-declare module "teacher/TeacherAutomaton" {
+declare module "teacher/TeacherTakingAut" {
     import { Automaton } from "automaton/Automaton";
     import { Teacher } from "teacher/Teacher";
-    export class TeacherAutomaton implements Teacher {
-        alphabet: string[] | string;
-        regex: string;
+    export class TeacherTakingAut implements Teacher {
         description: string;
+        alphabet: string | string[];
+        regex: string;
         automaton: Automaton;
-        constructor(regex: string, description?: string);
+        constructor(automaton: Automaton, description?: string, regex?: string);
         member(sentence: string): string;
         equiv(automaton: Automaton): string | undefined;
+    }
+}
+declare module "teacher/TeacherAutomaton" {
+    import { TeacherTakingAut } from "teacher/TeacherTakingAut";
+    export class TeacherAutomaton extends TeacherTakingAut {
+        constructor(regex: string, description?: string);
     }
 }
 declare module "teacher/TeacherNoAutomaton" {
@@ -118,6 +126,7 @@ declare module "teacher/Teacher" {
     import { Automaton } from "automaton/Automaton";
     import { TeacherAutomaton } from "teacher/TeacherAutomaton";
     import { TeacherNoAutomaton } from "teacher/TeacherNoAutomaton";
+    import { TeacherTakingAut } from "teacher/TeacherTakingAut";
     export interface Teacher {
         description: string;
         alphabet: string | string[];
@@ -133,15 +142,15 @@ declare module "teacher/Teacher" {
     export let teacher_bStar_a_or_aStart_bStar: TeacherNoAutomaton;
     export let teacher_b_bStar_a__b_aOrb_star: TeacherAutomaton;
     export let binaryAddition: TeacherNoAutomaton;
-    export let teachers: (TeacherAutomaton | TeacherNoAutomaton)[];
+    export let teachers: (TeacherTakingAut | TeacherNoAutomaton)[];
 }
-declare module "lerners/LernerBase" {
+declare module "learners/LearnerBase" {
     import { Automaton } from "automaton/Automaton";
     import { Teacher } from "teacher/Teacher";
     export type Map_string_string = {
         [key: string]: string;
     };
-    export abstract class LernerBase {
+    export abstract class LearnerBase {
         alphabet: string[];
         E: string[];
         S: string[];
@@ -156,10 +165,10 @@ declare module "lerners/LernerBase" {
         update_observation_table(key: string, value: string): void;
         make_member(pref: string, suff: string): void;
         make_equiv(a: Automaton): string | undefined;
-        add_elt_in_S(new_elt: string, after_member?: boolean): string[];
+        add_elt_in_S(new_elt: string, after_member?: boolean): void;
+        add_elt_in_E(new_elt: string): void;
         add_row(row_name: string, after_member?: boolean): void;
         move_from_SA_to_S(elt: string): void;
-        add_column(new_col: string): void;
         make_next_query(): void;
         make_all_queries(): void;
         abstract table_to_update_after_equiv(answer: string): void;
@@ -169,13 +178,12 @@ declare module "lerners/LernerBase" {
         same_row(a: string, b: string): boolean;
     }
 }
-declare module "lerners/L_star" {
+declare module "learners/L_star" {
     import { Automaton } from "automaton/Automaton";
     import { Teacher } from "teacher/Teacher";
-    import { LernerBase } from "lerners/LernerBase";
-    export class L_star extends LernerBase {
+    import { LearnerBase } from "learners/LearnerBase";
+    export class L_star extends LearnerBase {
         constructor(teacher: Teacher);
-        update_observation_table(key: string, value: string): void;
         make_automaton(): Automaton;
         is_close(): string | undefined;
         is_consistent(): string[] | undefined;
@@ -183,18 +191,18 @@ declare module "lerners/L_star" {
         table_to_update_after_equiv(answer: string): void;
     }
 }
-declare module "html_interactions/HTML_LernerBase" {
+declare module "html_interactions/HTML_LearnerBase" {
     import { Automaton } from "automaton/Automaton";
-    import { LernerBase } from "lerners/LernerBase";
+    import { LearnerBase } from "learners/LearnerBase";
     import { myFunction } from "tools/Utilities";
-    export abstract class HTML_LernerBase<Lerner extends LernerBase> {
-        lerner: Lerner;
+    export abstract class HTML_LearnerBase<T extends LearnerBase> {
+        learner: T;
         table_header: HTMLTableSectionElement;
         table_body: HTMLTableSectionElement;
         pile_actions: myFunction<void, void>[];
         automaton: Automaton | undefined;
         table_counter: number;
-        constructor(lerner: Lerner);
+        constructor(learner: T);
         draw_table(): void;
         add_row_html(parent: HTMLTableSectionElement, fst: string | undefined, head: string | undefined, row_elts: string[], colspan?: number, rowspan?: number): HTMLTableRowElement;
         clear_table(): void;
@@ -211,27 +219,27 @@ declare module "html_interactions/HTML_LernerBase" {
 }
 declare module "html_interactions/HTML_L_star" {
     import { Teacher } from "teacher/Teacher";
-    import { L_star } from "lerners/L_star";
-    import { HTML_LernerBase } from "html_interactions/HTML_LernerBase";
-    export class HTML_L_star extends HTML_LernerBase<L_star> {
+    import { L_star } from "learners/L_star";
+    import { HTML_LearnerBase } from "html_interactions/HTML_LearnerBase";
+    export class HTML_L_star extends HTML_LearnerBase<L_star> {
         constructor(teacher: Teacher);
         close_message(close_rep: string): string;
         consistent_message(s1: string, s2: string, new_col: string): string;
         table_to_update_after_equiv(answer: string): void;
     }
 }
-declare module "lerners/NL_star" {
+declare module "learners/NL_star" {
     import { Automaton } from "automaton/Automaton";
     import { Teacher } from "teacher/Teacher";
-    import { LernerBase } from "lerners/LernerBase";
-    export class NL_star extends LernerBase {
+    import { LearnerBase } from "learners/LearnerBase";
+    export class NL_star extends LearnerBase {
         prime_lines: string[];
         constructor(teacher: Teacher);
         is_prime(row_key: string): boolean;
         row_union(row1: string, row2: string): string;
         is_covered(row1: string, row2: string): boolean;
         check_prime_lines(): void;
-        add_elt_in_S(new_elt: string): string[];
+        add_elt_in_S(new_elt: string): void;
         add_elt_in_E(new_elt: string): void;
         is_close(): string | undefined;
         is_consistent(): string[] | undefined;
@@ -241,9 +249,9 @@ declare module "lerners/NL_star" {
 }
 declare module "html_interactions/HTML_NL_star" {
     import { Teacher } from "teacher/Teacher";
-    import { NL_star } from "lerners/NL_star";
-    import { HTML_LernerBase } from "html_interactions/HTML_LernerBase";
-    export class HTML_NL_star extends HTML_LernerBase<NL_star> {
+    import { NL_star } from "learners/NL_star";
+    import { HTML_LearnerBase } from "html_interactions/HTML_LearnerBase";
+    export class HTML_NL_star extends HTML_LearnerBase<NL_star> {
         constructor(teacher: Teacher);
         add_row_html(parent: HTMLTableSectionElement, fst: string | undefined, head: string | undefined, row_elts: string[], colspan?: number, rowspan?: number): HTMLTableRowElement;
         close_message(close_rep: string): string;
@@ -284,7 +292,7 @@ declare module "html_interactions/listeners" {
     export function listener_automaton_click_button(a: Automaton): void;
     export function set_text(): void;
 }
-declare module "lerners/Observation_table" {
+declare module "learners/Observation_table" {
     export class Observation_table {
         private columns;
         private rows;
@@ -300,10 +308,10 @@ declare module "lerners/Observation_table" {
 }
 declare module "test_nodejs/Automaton_minimize_test" { }
 declare module "test_nodejs/PrintFunction" {
-    import { L_star } from "lerners/L_star";
-    import { NL_star } from "lerners/NL_star";
-    import { LernerBase } from "lerners/LernerBase";
-    export let printInfo: (algo: LernerBase, algoName: string) => string;
+    import { L_star } from "learners/L_star";
+    import { NL_star } from "learners/NL_star";
+    import { LearnerBase } from "learners/LearnerBase";
+    export let printInfo: (algo: LearnerBase, algoName: string) => string;
     export let printCsvCompare: (L: L_star, NL: NL_star) => string;
     export let csvHead: string;
     export let clearFile: (fileName: string) => void;
@@ -311,3 +319,4 @@ declare module "test_nodejs/PrintFunction" {
 }
 declare module "test_nodejs/LernerCompare" { }
 declare module "test_nodejs/Test_wrost_DFA" { }
+declare module "test_nodejs/Test_wrost_RFSA" { }

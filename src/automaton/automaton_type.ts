@@ -84,22 +84,13 @@ export function regexToAutomaton(regex: string): Automaton {
 export function minimizeAutomaton(automaton: HisAutomaton): Automaton {
   automaton = noam.fsm.convertEnfaToNfa(automaton);
   automaton = noam.fsm.convertNfaToDfa(automaton);
-  // // HELP PROFESSORI
 
-  console.log("1");
-
-  // PROF debug : 
-  // let provMyAut = HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton))
-  // console.log(provMyAut.matrix_to_mermaid());
-
-
+  console.log("1 - Converting state to numbers ", automaton.states.length);
   // let automaton = noam.fsm.minimize(automaton)
-  console.log("2");
-
   let statesToNumbers = noam.fsm.convertStatesToNumbers(automaton)
-  console.log("3");
+  console.log("2 - Minimizing automaton ", statesToNumbers.states.length);
   let minimized = HisAutomaton2Mine(statesToNumbers).minimize()
-  console.log("4");
+  console.log("3 - Minimization OK, ", minimized.allStates.length);
   return minimized
 }
 

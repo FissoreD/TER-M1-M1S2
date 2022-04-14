@@ -1,10 +1,10 @@
 import { Automaton } from "../automaton/Automaton.js";
 import { Teacher } from "../teacher/Teacher.js";
-import { boolToString, generate_prefix_list } from "../tools/Utilities.js";
+import { boolToString, generate_prefix_list, generate_suffix_list } from "../tools/Utilities.js";
 
 export type Map_string_string = { [key: string]: string };
 
-export abstract class LernerBase {
+export abstract class LearnerBase {
   alphabet: string[];
   E: string[];
   S: string[];
@@ -36,8 +36,8 @@ export abstract class LernerBase {
   }
 
   /**
-   * 1. Takes a string in parameter and s in {@link S} and e in {@link E}  
-   * 2. Asks to the {@link teacher} if question is accepted  
+   * 1. Takes s in {@link S} and e in {@link E} which creating a word 
+   * 2. Asks to the {@link teacher} if word is accepted  
    * 3. Updates {@link observation_table} wrt the answer  
    * No modification is performed in {@link S}, {@link E} or {@link SA} sets
    */
@@ -66,7 +66,7 @@ export abstract class LernerBase {
   /**
    * Takes in parameter an {@link Automaton} and ask 
    * to the teacher if the automaton knows the language.
-   * If so : the Lerner has learnt the language
+   * If so : the Learner has learnt the language
    * Else : it appends the counter-exemple to {@link S}
    * @param a an Automaton
    * @returns undefined if {@link a} recognize the teacher's language, a counter-exemple (as a string) otherwise.
@@ -83,11 +83,11 @@ export abstract class LernerBase {
    * @param new_elt the {@link new_elt} to add in {@link S}
    * @returns the list of added elt in SA or S
    */
-  add_elt_in_S(new_elt: string, after_member = false): string[] {
+  add_elt_in_S(new_elt: string, after_member = false): void {
     let added_list: string[] = [];
     let prefix_list = generate_prefix_list(new_elt);
     for (const prefix of prefix_list) {
-      if (this.S.includes(prefix)) return added_list;
+      if (this.S.includes(prefix)) return;
       if (this.SA.includes(prefix)) {
         this.move_from_SA_to_S(prefix);
         this.alphabet.forEach(a => {
@@ -113,7 +113,23 @@ export abstract class LernerBase {
       }
       after_member = false;
     }
-    return added_list;
+    return;
+  }
+
+
+  /**
+  * For all suffix suff of {@link new_elt} if suff is not in {@link E} :
+  * add suff to {@link E} and make queries for every elt in {@link SA} and
+  * {@link S} relating to the new column suff
+  */
+  add_elt_in_E(new_elt: string) {
+    let suffix_list = generate_suffix_list(new_elt);
+    for (const suffix of suffix_list) {
+      if (this.E.includes(suffix)) break;
+      this.SA.forEach(s => this.make_member(s, suffix));
+      this.S.forEach(s => this.make_member(s, suffix));
+      this.E.push(suffix);
+    }
   }
 
   /**
@@ -136,14 +152,16 @@ export abstract class LernerBase {
     this.S.push(elt);
   }
 
-  add_column(new_col: string) {
-    let L = [this.SA, this.S];
-    L.forEach(l => l.forEach(s => this.make_member(s, new_col)));
-    this.E.push(new_col);
-  }
+  // add_column(new_col: string) {
+  //   let L = [this.SA, this.S];
+  //   L.forEach(l => l.forEach(s => this.make_member(s, new_col)));
+  //   this.E.push(new_col);
+  //   console.log("Adding a column", new_col);
+
+  // }
 
   /**
-   * The lerner finds the next question according to 
+   * The learner finds the next question according to 
    * current context
    */
   make_next_query() {
@@ -157,14 +175,12 @@ export abstract class LernerBase {
     } else if (consistence_rep = this.is_consistent()) {
       // console.log(13);
       let new_col = consistence_rep[2]
-      this.add_column(new_col);
+      this.add_elt_in_E(new_col);
     } else {
       // console.log(14);
       let automaton = this.make_automaton();
       this.automaton = automaton;
       let answer = this.make_equiv(automaton);
-      console.log("Here is a breakpoint : LernerBar, Line 168");
-
       if (answer != undefined) {
         this.table_to_update_after_equiv(answer!)
       } else {
@@ -181,7 +197,7 @@ export abstract class LernerBase {
   }
 
   /**
-   * Every lerner can update differently the observation table according to its implementation
+   * Every learner can update differently the observation table according to its implementation
    * @param answer the answer of teacher after equiv question
    */
   abstract table_to_update_after_equiv(answer: string): void;

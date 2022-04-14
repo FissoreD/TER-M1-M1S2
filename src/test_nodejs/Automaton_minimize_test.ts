@@ -1,5 +1,3 @@
-// import { intersectionAutomata, minimizeAutomaton, regexToAutomaton } from "../automaton/automaton_type.js";
-
 import { Automaton, State } from "../automaton/Automaton.js";
 
 
@@ -17,6 +15,3 @@ console.log("-".repeat(70));
 
 console.log(a.minimize().matrix_to_mermaid());
 console.log();
-
-
-// console.log(JSON.stringify(a.minimize(), null, 4));

@@ -65,16 +65,16 @@ export class TeacherTakingAut implements Teacher {
     console.log("Diff2");
     let diff2 = differenceAutomata(automMinimized, this.automaton!);
     // BREAKPOINT AFTER DIFF 
-    console.log("Counter * Exemples");
+    // console.log("Counter * Exemples");
 
     let counterEx1 = counterExemple(diff1);
     let counterEx2 = counterExemple(diff2);
     // AFTER COUNTEREXEMPLE
-    console.log(`C1 = { ${counterEx1} }, C2 = { ${counterEx2} }`);
+    // console.log(`C1 = { ${counterEx1} }, C2 = { ${counterEx2} }`);
 
     if (counterEx1 == undefined) return counterEx2;
     if (counterEx2 == undefined) return counterEx1;
-    return counterEx1! < counterEx2! ? counterEx1 : counterEx2;
+    return counterEx1 < counterEx2 ? counterEx1 : counterEx2;
   }
 
 }

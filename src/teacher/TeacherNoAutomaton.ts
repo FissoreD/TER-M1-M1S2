@@ -22,7 +22,7 @@ export class TeacherNoAutomaton implements Teacher {
     this.counter = 0;
     this.description = description;
     this.alphabet = params.alphabet;
-    this.regex = params.regex.toString()
+    this.regex = (typeof params.regex == 'string') ? params.regex : "Learner with function"
   }
 
   initiate_mapping() {
@@ -53,10 +53,10 @@ export class TeacherNoAutomaton implements Teacher {
     let acceptedByTeacher = this.counter_exemples.filter(e => this.check_function(e))
     // HERE OTHER PROBLEM
     console.log("This 2", automaton.state_number(), automaton.transition_number());
-    let acceptedByLerner = this.counter_exemples.filter(e => automaton.accept_word_nfa(e))
+    let acceptedByLearner = this.counter_exemples.filter(e => automaton.accept_word_nfa(e))
     console.log("This 3");
-    let symetricDifference = acceptedByLerner.filter(e => !acceptedByTeacher.includes(e)).
-      concat(acceptedByTeacher.filter(e => !acceptedByLerner.includes(e)))
+    let symetricDifference = acceptedByLearner.filter(e => !acceptedByTeacher.includes(e)).
+      concat(acceptedByTeacher.filter(e => !acceptedByLearner.includes(e)))
     console.log("This 4");
     return symetricDifference ? symetricDifference[0] : undefined;
   }

@@ -1,11 +1,11 @@
-import { L_star } from "../lerners/L_star.js";
-import { NL_star } from "../lerners/NL_star.js";
-import { LernerBase } from "../lerners/LernerBase.js";
+import { L_star } from "../learners/L_star.js";
+import { NL_star } from "../learners/NL_star.js";
+import { LearnerBase } from "../learners/LearnerBase.js";
 import { strict } from "assert";
 import { appendFile, appendFileSync, writeFile, writeFileSync } from "fs";
 
 
-export let printInfo = (algo: LernerBase, algoName: string) => {
+export let printInfo = (algo: LearnerBase, algoName: string) => {
   return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.state_number()}, transitions = ${algo.automaton?.transition_number()}`;
 }
 

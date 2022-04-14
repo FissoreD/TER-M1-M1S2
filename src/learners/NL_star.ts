@@ -1,9 +1,9 @@
 import { Automaton, State } from "../automaton/Automaton.js";
 import { Teacher } from "../teacher/Teacher.js";
 import { generate_suffix_list } from "../tools/Utilities.js";
-import { LernerBase, Map_string_string } from "./LernerBase.js";
+import { LearnerBase, Map_string_string } from "./LearnerBase.js";
 
-export class NL_star extends LernerBase {
+export class NL_star extends LearnerBase {
   prime_lines: string[];
 
   constructor(teacher: Teacher) {
@@ -14,13 +14,9 @@ export class NL_star extends LernerBase {
   is_prime(row_key: string): boolean {
     if (this.prime_lines == undefined) this.prime_lines = []
     let row_value = this.observation_table[row_key];
-
     if (row_value.length < 2 || parseInt(row_value) == 0) return true;
 
     let res = "0".repeat(row_value.length)
-
-    // let res = ""
-    // for (let i = 0; i < row_value.length; i++) res += "0";
 
     Object.values(this.observation_table).forEach(value => {
       if (value != row_value && this.is_covered(value, row_value)) {
@@ -53,43 +49,21 @@ export class NL_star extends LernerBase {
 
   check_prime_lines() {
     this.prime_lines = [...this.S, ...this.SA].filter(l => this.is_prime(l));
-    console.log(this.prime_lines);
-
   }
 
-  add_elt_in_S(new_elt: string): string[] {
-    let added_list = super.add_elt_in_S(new_elt);
-    added_list.forEach(e => {
-      if (!this.prime_lines?.includes(e) && this.is_prime(e)) {
-        this.prime_lines.push(e);
-      }
-    })
-    console.log("In s before");
-    this.check_prime_lines();
-    console.log("In s aftere");
-
-    return added_list;
-  }
-
-  /**
-  * For all suffix suff of {@link new_elt} if suff is not in {@link E} :
-  * add suff to {@link E} and make queries for every elt in {@link SA} and
-  * {@link S} relating to the new column suff
-  */
-  add_elt_in_E(new_elt: string) {
-    let suffix_list = generate_suffix_list(new_elt);
-    for (const suffix of suffix_list) {
-      if (this.E.includes(suffix)) break;
-      this.SA.forEach(s => this.make_member(s, suffix));
-      this.S.forEach(s => this.make_member(s, suffix));
-      this.E.push(suffix);
-    }
-    console.log("I'm in Add in elt function ");
-
+  add_elt_in_S(new_elt: string) {
+    super.add_elt_in_S(new_elt);
     this.check_prime_lines()
-    console.log("Now I've made my check prime line");
-
+    return;
   }
+
+  add_elt_in_E(new_elt: string): void {
+    super.add_elt_in_E(new_elt);
+    this.check_prime_lines()
+    return;
+  }
+
+
 
   /**
    * @returns the first `s` in {@link SA} st `s` is a prime line and 
@@ -105,40 +79,37 @@ export class NL_star extends LernerBase {
    * and there is an "a" in alphabet st row(s1 + a) is not covered row(s2 + a)
    */
   is_consistent(): string[] | undefined {
-    for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
-      for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
-        let s1 = this.S[s1_ind];
-        let s2 = this.S[s2_ind];
-        let value_s1 = this.observation_table[s1];
-        let value_s2 = this.observation_table[s2];
-        if (this.is_covered(value_s1, value_s2)) {
-          for (const a of this.alphabet) {
-            let value_s1_p = this.observation_table[s1 + a]
-            let value_s2_p = this.observation_table[s2 + a]
-            if (!this.is_covered(value_s1_p, value_s2_p)) {
-              for (let i = 0; i < this.E.length; i++) {
-                if (this.observation_table[s1 + a][i] <
-                  this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i])) {
-                  return [s1, s2, a + this.E[i]]
-                }
+    let testCovering = (s1: string, s2: string): string[] | undefined => {
+      let value_s1 = this.observation_table[s1];
+      let value_s2 = this.observation_table[s2];
+      if (this.is_covered(value_s1, value_s2)) {
+        for (const a of this.alphabet) {
+          let value_s1_p = this.observation_table[s1 + a]
+          let value_s2_p = this.observation_table[s2 + a]
+          if (!this.is_covered(value_s1_p, value_s2_p)) {
+            for (let i = 0; i < this.E.length; i++) {
+              if (this.observation_table[s1 + a][i] <
+                this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i])) {
+                return [s1, s2, a + this.E[i]]
               }
             }
           }
-        } else if (this.is_covered(value_s2, value_s1)) {
-          for (const a of this.alphabet) {
-            let value_s1_p = this.observation_table[s1 + a]
-            let value_s2_p = this.observation_table[s2 + a]
-            if (!this.is_covered(value_s2_p, value_s1_p))
-              for (let i = 0; i < this.E.length; i++) {
-                if (this.observation_table[s1 + a][i] <
-                  this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i])) {
-                  return [s2, s1, a + this.E[i]]
-                }
-              }
-          }
+        }
+        return;
+      }
+
+      for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
+        for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
+          let s1 = this.S[s1_ind];
+          let s2 = this.S[s2_ind];
+          let test1 = testCovering(s1, s2);
+          if (test1) return test1;
+          let test2 = testCovering(s2, s1);
+          if (test2) return test1;
         }
       }
     }
+    return;
   }
 
   make_automaton() {
@@ -167,8 +138,6 @@ export class NL_star extends LernerBase {
         }
       }
     }
-    console.log();
-
     this.automaton = new Automaton(stateSet)
     return this.automaton;
   }

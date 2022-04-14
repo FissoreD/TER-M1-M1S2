@@ -2,8 +2,8 @@ import { Teacher, teachers } from "./teacher/Teacher.js";
 import { HTML_L_star } from "./html_interactions/HTML_L_star.js";
 import { HTML_NL_star } from "./html_interactions/HTML_NL_star.js";
 import { Automaton } from "./automaton/Automaton.js";
-import { L_star } from "./lerners/L_star.js";
-import { NL_star } from "./lerners/NL_star.js";
+import { L_star } from "./learners/L_star.js";
+import { NL_star } from "./learners/NL_star.js";
 import * as autFunction from "./automaton/automaton_type.js";
 import { TeacherAutomaton } from "./teacher/TeacherAutomaton.js";
 
@@ -37,7 +37,7 @@ export function initiate_global_vars() {
     current_automaton = algoSelector[0].checked ?
       new HTML_L_star(currentTeacher) :
       new HTML_NL_star(currentTeacher);
-    teacherDescription.innerHTML = current_automaton.lerner.teacher.description;
+    teacherDescription.innerHTML = current_automaton.learner.teacher.description;
     // @ts-ignore
     MathJax.typeset();
   }

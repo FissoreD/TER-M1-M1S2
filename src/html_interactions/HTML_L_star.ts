@@ -1,15 +1,15 @@
 import { Teacher } from "../teacher/Teacher.js";
-import { L_star } from "../lerners/L_star.js";
-import { HTML_LernerBase } from "./HTML_LernerBase.js";
+import { L_star } from "../learners/L_star.js";
+import { HTML_LearnerBase } from "./HTML_LearnerBase.js";
 
-export class HTML_L_star extends HTML_LernerBase<L_star> {
+export class HTML_L_star extends HTML_LearnerBase<L_star> {
   constructor(teacher: Teacher) {
     super(new L_star(teacher));
   }
 
   close_message(close_rep: string) {
     return `The table is not closed since
-        \\(\\{row(${close_rep}) = ${this.lerner.observation_table[close_rep]} \\land 0 \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) = ${this.lerner.observation_table[close_rep]}\\}\\)
+        \\(\\{row(${close_rep}) = ${this.learner.observation_table[close_rep]} \\land 0 \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) = ${this.learner.observation_table[close_rep]}\\}\\)
         I'm going to move ${close_rep} from SA to S`
   }
 
@@ -21,6 +21,6 @@ export class HTML_L_star extends HTML_LernerBase<L_star> {
   }
 
   table_to_update_after_equiv(answer: string) {
-    this.lerner.add_elt_in_S(answer!, true);
+    this.learner.add_elt_in_S(answer!, true);
   }
 }

@@ -12,6 +12,7 @@
     "nlstar": "node ./dist/test_nodejs/NL_star_test.js",
     "compare": "node ./dist/test_nodejs/LernerCompare.js",
     "wrostDFA": "node dist/test_nodejs/Test_wrost_DFA.js",
+    "wrostRFSA": "node dist/test_nodejs/Test_wrost_RFSA.js",
     "clean": "rimraf dist",
     "compile": "cross-env-shell babel src -d dist --source-maps --extensions '.ts'",
     "compilew": "cross-env-shell babel src -d dist --source-maps --extensions '.ts' -w",
