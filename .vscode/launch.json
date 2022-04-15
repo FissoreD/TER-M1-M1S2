@@ -44,7 +44,7 @@
     {
       "type": "pwa-chrome",
       "request": "launch",
-      "name": "Launch Chrome index hidden",
+      "name": "Chrome Test",
       "url": "http://localhost:5500/index.html",
       "webRoot": "${workspaceFolder}",
       "sourceMaps": true,

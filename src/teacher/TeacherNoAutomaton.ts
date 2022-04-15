@@ -1,43 +1,35 @@
 import { Automaton } from "../automaton/Automaton.js";
 import { boolToString, myFunction } from "../tools/Utilities.js";
+import { equivalenceFunction } from "./Equiv.js";
 import { Teacher } from "./Teacher.js";
 
 export class TeacherNoAutomaton implements Teacher {
   static counter = 0;
 
   check_function: myFunction<string, boolean>;
-  counter_exemples: string[];
+  counter_examples: string[];
   counter: number;
   description: string;
-  alphabet: string[] | string;
+  alphabet: string[];
   max_word_length = 8;
   regex: string;
 
   constructor(params: {
-    regex: string | myFunction<string, boolean>, counter_exemples: string[], alphabet:
+    regex: string | myFunction<string, boolean>, counter_examples: string[], alphabet:
     string[] | string
   }, description: string = "") {
-    this.check_function = (typeof params.regex == 'string') ? s => s.match(new RegExp(`^(${params.regex})$`)) != undefined : params.regex as myFunction<string, boolean>;
-    this.counter_exemples = params.counter_exemples;
+
     this.counter = 0;
     this.description = description;
-    this.alphabet = params.alphabet;
+    this.alphabet = Array.from(params.alphabet);
     this.regex = (typeof params.regex == 'string') ? params.regex : "Learner with function"
-  }
 
-  initiate_mapping() {
-    let res: [string, boolean][] = [["", this.check_function!("")]]
-    let alphabet = Array.from(this.alphabet).sort()
-    let level = [""]
-    while (res[res.length - 1][0].length < this.max_word_length) {
-      let res1: string[] = []
-      level.forEach(e => alphabet.forEach(a => {
-        res.push([e + a, this.check_function!(e + a)])
-        res1.push(e + a)
-      }))
-      level = res1
-    }
-    return res;
+    this.check_function =
+      (typeof params.regex == 'string') ?
+        s => s.match(new RegExp(`^(${params.regex})$`)) != undefined :
+        params.regex as myFunction<string, boolean>;
+
+    this.counter_examples = params.counter_examples;
   }
 
   /*
@@ -49,16 +41,7 @@ export class TeacherNoAutomaton implements Teacher {
   }
 
   equiv(automaton: Automaton): string | undefined {
-    console.log("This 1");
-    let acceptedByTeacher = this.counter_exemples.filter(e => this.check_function(e))
-    // HERE OTHER PROBLEM
-    console.log("This 2", automaton.state_number(), automaton.transition_number());
-    let acceptedByLearner = this.counter_exemples.filter(e => automaton.accept_word_nfa(e))
-    console.log("This 3");
-    let symetricDifference = acceptedByLearner.filter(e => !acceptedByTeacher.includes(e)).
-      concat(acceptedByTeacher.filter(e => !acceptedByLearner.includes(e)))
-    console.log("This 4");
-    return symetricDifference ? symetricDifference[0] : undefined;
+    return equivalenceFunction(this, automaton);
   }
 
 }

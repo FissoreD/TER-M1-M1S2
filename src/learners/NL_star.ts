@@ -1,7 +1,6 @@
 import { Automaton, State } from "../automaton/Automaton.js";
 import { Teacher } from "../teacher/Teacher.js";
-import { generate_suffix_list } from "../tools/Utilities.js";
-import { LearnerBase, Map_string_string } from "./LearnerBase.js";
+import { LearnerBase } from "./LearnerBase.js";
 
 export class NL_star extends LearnerBase {
   prime_lines: string[];
@@ -62,8 +61,6 @@ export class NL_star extends LearnerBase {
     this.check_prime_lines()
     return;
   }
-
-
 
   /**
    * @returns the first `s` in {@link SA} st `s` is a prime line and 

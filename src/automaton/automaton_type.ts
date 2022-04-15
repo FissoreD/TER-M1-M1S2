@@ -82,15 +82,16 @@ export function regexToAutomaton(regex: string): Automaton {
 }
 
 export function minimizeAutomaton(automaton: HisAutomaton): Automaton {
+  console.log("1 - Converting Enfa to NFA", automaton.states.length);
   automaton = noam.fsm.convertEnfaToNfa(automaton);
+  console.log("2 - Converting NFA to DFA", automaton.states.length);
   automaton = noam.fsm.convertNfaToDfa(automaton);
-
-  console.log("1 - Converting state to numbers ", automaton.states.length);
+  console.log("3 - Converting state to numbers ", automaton.states.length);
   // let automaton = noam.fsm.minimize(automaton)
   let statesToNumbers = noam.fsm.convertStatesToNumbers(automaton)
-  console.log("2 - Minimizing automaton ", statesToNumbers.states.length);
+  console.log("4 - Minimizing automaton ", statesToNumbers.states.length);
   let minimized = HisAutomaton2Mine(statesToNumbers).minimize()
-  console.log("3 - Minimization OK, ", minimized.allStates.length);
+  console.log("5 - Minimization OK, ", minimized.allStates.length);
   return minimized
 }
 

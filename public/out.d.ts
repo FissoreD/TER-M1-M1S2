@@ -79,16 +79,30 @@ declare module "tools/Utilities" {
     export const generate_suffix_list: (str: string) => string[];
     export const count_str_occurrences: (str: string, obj: string) => number;
     export function boolToString(bool: boolean): string;
+    export function allStringFromAlphabet(params: {
+        alphabet: string[] | string;
+        maxLength: number;
+    }): string[];
+}
+declare module "teacher/Equiv" {
+    import { Automaton } from "automaton/Automaton";
+    import { Teacher } from "teacher/Teacher";
+    export let equivalenceFunction: (teacher: Teacher, automaton: Automaton, counter_exemples?: string[] | undefined) => string | undefined;
 }
 declare module "teacher/TeacherTakingAut" {
     import { Automaton } from "automaton/Automaton";
     import { Teacher } from "teacher/Teacher";
     export class TeacherTakingAut implements Teacher {
         description: string;
-        alphabet: string | string[];
+        alphabet: string[];
         regex: string;
         automaton: Automaton;
-        constructor(automaton: Automaton, description?: string, regex?: string);
+        constructor(params: {
+            automaton: Automaton;
+            description?: string;
+            regex?: string;
+            counter_examples?: string[];
+        });
         member(sentence: string): string;
         equiv(automaton: Automaton): string | undefined;
     }
@@ -109,7 +123,7 @@ declare module "teacher/TeacherNoAutomaton" {
         counter_exemples: string[];
         counter: number;
         description: string;
-        alphabet: string[] | string;
+        alphabet: string[];
         max_word_length: number;
         regex: string;
         constructor(params: {
@@ -117,7 +131,6 @@ declare module "teacher/TeacherNoAutomaton" {
             counter_exemples: string[];
             alphabet: string[] | string;
         }, description?: string);
-        initiate_mapping(): [string, boolean][];
         member(sentence: string): string;
         equiv(automaton: Automaton): string | undefined;
     }
@@ -129,8 +142,10 @@ declare module "teacher/Teacher" {
     import { TeacherTakingAut } from "teacher/TeacherTakingAut";
     export interface Teacher {
         description: string;
-        alphabet: string | string[];
+        alphabet: string[];
+        counter_examples?: string[];
         regex: string;
+        automaton?: Automaton;
         member(sentence: string): string;
         equiv(automaton: Automaton): string | undefined;
     }
@@ -147,7 +162,7 @@ declare module "teacher/Teacher" {
 declare module "learners/LearnerBase" {
     import { Automaton } from "automaton/Automaton";
     import { Teacher } from "teacher/Teacher";
-    export type Map_string_string = {
+    export type ObservationTable = {
         [key: string]: string;
     };
     export abstract class LearnerBase {
@@ -155,7 +170,7 @@ declare module "learners/LearnerBase" {
         E: string[];
         S: string[];
         SA: string[];
-        observation_table: Map_string_string;
+        observation_table: ObservationTable;
         teacher: Teacher;
         member_number: number;
         equiv_number: number;
@@ -187,7 +202,6 @@ declare module "learners/L_star" {
         make_automaton(): Automaton;
         is_close(): string | undefined;
         is_consistent(): string[] | undefined;
-        same_row(a: string, b: string): boolean;
         table_to_update_after_equiv(answer: string): void;
     }
 }

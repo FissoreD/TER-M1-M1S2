@@ -5,6 +5,7 @@ import { NL_star } from "../learners/NL_star.js";
 import { TeacherTakingAut } from "../teacher/TeacherTakingAut.js";
 import { Automaton, State } from "../automaton/Automaton.js";
 import { minimizeAutomaton, MyAutomatonToHis } from "../automaton/automaton_type.js";
+import { allStringFromAlphabet } from "../tools/Utilities.js";
 
 /**
  * About this file : 
@@ -26,8 +27,11 @@ if (toWrite) {
 }
 
 let automatonList: Automaton[] = []
-const N = 4, maxN = 10;
+let counter_examples = allStringFromAlphabet({ alphabet: "ab", maxLength: 14 })
+const N = 2, maxN = 12;
 for (let n = N; n < maxN; n++) {
+  console.log("Creating test with", n, "power");
+
   let states: State[] = new Array(n).fill(0).map((_, i) => new State(i + "", i == 0, i < n / 2, ['a', 'b']));
 
   for (let i = 0; i < n - 1; i++)
@@ -47,7 +51,11 @@ let printInfo = (algo: LearnerBase, algoName: string) => {
 
 for (let i = 0; i < automatonList.length; i++) {
   let automaton = automatonList[i]
-  let teacher = new TeacherTakingAut(automaton, automaton.allStates.length + "")
+  let teacher = new TeacherTakingAut({
+    automaton: automaton,
+    description: (N + i) + "",
+    counter_examples: counter_examples
+  })
 
   let L = new L_star(teacher)
   let NL = new NL_star(teacher)
@@ -56,9 +64,9 @@ for (let i = 0; i < automatonList.length; i++) {
   console.log("Current n : ", N + i);
 
   console.log("In L*");
-
   L.make_all_queries();
   console.log(printInfo(L, "L*"));
+
   console.log("In NL*");
   NL.make_all_queries();
   console.log(printInfo(NL, "NL*"));

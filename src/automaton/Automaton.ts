@@ -108,16 +108,23 @@ export class Automaton implements AutomatonJson {
 
 
   accept_word_nfa(word: string): boolean {
+    if (word.length == 0)
+      return this.initialStates.some(e => e.isAccepting);
     let nextStates: Set<State> = new Set(this.initialStates);
     for (let index = 0; index < word.length && nextStates.size > 0; index++) {
       let nextStates2: Set<State> = new Set();
       const symbol = word[index];
       for (const state of nextStates) {
-        Array.from(this.findTransition(state, symbol)).forEach(e => nextStates2.add(e))
+        for (const nextState of this.findTransition(state, symbol)) {
+          nextStates2.add(nextState)
+          if (index == word.length - 1 && nextState.isAccepting)
+            return true
+        }
+        // Array.from(this.findTransition(state, symbol)).forEach(e => nextStates2.add(e))
       }
       nextStates = nextStates2;
     }
-    return Array.from(nextStates).some(e => e.isAccepting);
+    return false;
   }
 
   findTransition(state: State, symbol: string) {
@@ -166,8 +173,8 @@ export class Automaton implements AutomatonJson {
   }
 
   matrix_to_mermaid(): string {
-    let res = "flowchart LR\n";
-    res = res.concat("subgraph Automaton\ndirection LR\n")
+    let mermaidTxt = "flowchart LR\n";
+    mermaidTxt = mermaidTxt.concat("subgraph Automaton\ndirection LR\n")
     // res = res.concat("\n" + this.create_entering_arrow() + "\n");
     let triples: { [id: string]: string[] } = {}
     for (const [name, state] of this.states) {
@@ -182,20 +189,20 @@ export class Automaton implements AutomatonJson {
         }
       }
     }
-    res = res.concat(Object.keys(triples).map(x => this.create_triple(x, triples[x].join(","))).join("\n"));
+    mermaidTxt = mermaidTxt.concat(Object.keys(triples).map(x => this.create_triple(x, triples[x].join(","))).join("\n"));
     // res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;")
-    res += "\n"
-    res += "\nsubgraph InitialStates\n";
-    res += this.initialStates.map(e => e.name).join("\n")
-    res += "\nend"
-    res += "\n"
-    res += "end\n"
-    res = res.concat(this.acceptingStates.map(e => `style ${e.name} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
-    res += "\n"
+    mermaidTxt += "\n"
+    mermaidTxt += "\nsubgraph InitialStates\n";
+    mermaidTxt += this.initialStates.map(e => e.name).join("\n")
+    mermaidTxt += "\nend"
+    mermaidTxt += "\n"
+    mermaidTxt += "end\n"
+    mermaidTxt = mermaidTxt.concat(this.acceptingStates.map(e => `style ${e.name} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
+    mermaidTxt += "\n"
     // Callback for tooltip on mouse over
-    res = res.concat(Array.from(this.states).map(([name, _]) => `click ${name} undnamefinedCallback "${name}";`).join("\n"))
-    // console.log(res);
-    return res;
+    mermaidTxt = mermaidTxt.concat(Array.from(this.states).map(([name, _]) => `click ${name} undnamefinedCallback "${name}";`).join("\n"))
+    // console.log(mermaidTxt);
+    return mermaidTxt;
   }
 
 
@@ -268,7 +275,6 @@ export class Automaton implements AutomatonJson {
       }
     }
 
-
     let P: Set<State>[] = [new Set(), new Set()]; // P := {F, Q \ F}
     stateList.forEach(s => (s.isAccepting ? P[0] : P[1]).add(s))
     P = P.filter(p => p.size > 0)
@@ -319,8 +325,6 @@ export class Automaton implements AutomatonJson {
 
     let oldStateToNewState: Map<State, State> = new Map();
 
-
-
     let newStates = new Set(Array.from(P).filter(partition => partition.size > 0).map((partition, pos) => {
       let representant = Array.from(partition)
       let newState = new State(pos + "",
@@ -342,8 +346,6 @@ export class Automaton implements AutomatonJson {
         }
       }
     }
-
-    console.log(Array.from(newStates).filter(s => s.isInitial).length);
 
     return new Automaton(newStates)
   }

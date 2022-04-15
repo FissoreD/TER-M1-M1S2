@@ -17,12 +17,15 @@ let fileName = "randomRegex";
 clearFile(fileName)
 writeToFile(fileName, csvHead)
 
-for (const teacher of teachers) {
-  let L = new L_star(teacher)
-  let NL = new NL_star(teacher)
+for (let index = 0; index < teachers.length; index++) {
+  const teacher = teachers[index];
+  teacher.description = index + "";
+
+  let L = new L_star(teacher);
+  let NL = new NL_star(teacher);
 
   console.log("==============================");
-  console.log("Current regexp : ", teacher.regex);
+  console.log("Current regexp : ", teacher.regex, teacher.description);
 
   L.make_all_queries()
   printInfo(L, "L*")

@@ -7,8 +7,10 @@ import { TeacherTakingAut } from "./TeacherTakingAut.js";
 
 export interface Teacher {
   description: string;
-  alphabet: string | string[];
+  alphabet: string[];
+  counter_examples?: string[];
   regex: string;
+  automaton?: Automaton;
   member(sentence: string): string;
   equiv(automaton: Automaton): string | undefined;
 }
@@ -59,7 +61,7 @@ export let teacherNotAfourthPos = new TeacherAutomaton(
  * a teacher accepting the regex bb*a + a*b*
  */
 export let teacher_bStar_a_or_aStart_bStar = new TeacherNoAutomaton(
-  { alphabet: "ab", regex: "((bb*a)|(a*b*))", counter_exemples: ["bba", "b", "aabb", "aba", "aa", "bbaa"] },
+  { alphabet: "ab", regex: "((bb*a)|(a*b*))", counter_examples: ["bba", "b", "aabb", "aba", "aa", "bbaa"] },
   `Automaton accepting \\(L = regex((bb^*a) + (a^*b^*))\\)`)
 
 /**
@@ -74,14 +76,12 @@ export let binaryAddition = new TeacherNoAutomaton(
       let charToBin = (char: string) =>
         (parseInt(char) >>> 0).toString(2).padStart(3, "0")
       let sentenceAr = Array.from(sentence).map(e => charToBin(e))
-      // console.log(sentence)
       let fst_term = parseInt(sentenceAr.map(e => e[0]).join(''), 2);
       let snd_term = parseInt(sentenceAr.map(e => e[1]).join(''), 2);
       let trd_term = parseInt(sentenceAr.map(e => e[2]).join(''), 2);
-      // console.log(fst_term, snd_term, trd_term);
       return fst_term + snd_term == trd_term;
     },
-    counter_exemples: []
+    counter_examples: []
   },
   `Automaton accepting the sum between binary words, exemple : <br>
   <pre>
@@ -104,7 +104,7 @@ export let binaryAddition = new TeacherNoAutomaton(
 )
 
 let automatonList: Automaton[] = []
-for (let n = 4; n < 10; n++) {
+for (let n = 4; n < 5 + 1; n++) {
   let states: State[] = new Array(n).fill(0).map((_, i) => new State(i + "", i == 0, i < n / 2, ['a', 'b']));
 
   for (let i = 0; i < n - 1; i++)
@@ -117,6 +117,6 @@ for (let n = 4; n < 10; n++) {
   automatonList.push(minimizeAutomaton(MyAutomatonToHis(new Automaton(new Set(states)))));
 }
 
-let badForNl = new TeacherTakingAut(automatonList[1]);
+let badForNl = new TeacherTakingAut({ automaton: automatonList[0] });
 
 export let teachers = [badForNl, teacher_a_or_baStar, teacher_b_bStar_a__b_aOrb_star, binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]

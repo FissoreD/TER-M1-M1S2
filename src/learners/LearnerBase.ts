@@ -2,14 +2,14 @@ import { Automaton } from "../automaton/Automaton.js";
 import { Teacher } from "../teacher/Teacher.js";
 import { boolToString, generate_prefix_list, generate_suffix_list } from "../tools/Utilities.js";
 
-export type Map_string_string = { [key: string]: string };
+export type ObservationTable = { [key: string]: string };
 
 export abstract class LearnerBase {
   alphabet: string[];
   E: string[];
   S: string[];
   SA: string[];
-  observation_table: Map_string_string;
+  observation_table: ObservationTable;
   teacher: Teacher;
   member_number: number;
   equiv_number: number;
@@ -152,14 +152,6 @@ export abstract class LearnerBase {
     this.S.push(elt);
   }
 
-  // add_column(new_col: string) {
-  //   let L = [this.SA, this.S];
-  //   L.forEach(l => l.forEach(s => this.make_member(s, new_col)));
-  //   this.E.push(new_col);
-  //   console.log("Adding a column", new_col);
-
-  // }
-
   /**
    * The learner finds the next question according to 
    * current context
@@ -168,7 +160,7 @@ export abstract class LearnerBase {
     if (this.finish) return;
     var close_rep;
     var consistence_rep;
-    // console.log(11);
+    // console.log("Entering make next query");
     if (close_rep = this.is_close()) {
       // console.log(12);
       this.add_elt_in_S(close_rep);
@@ -183,6 +175,7 @@ export abstract class LearnerBase {
       let answer = this.make_equiv(automaton);
       if (answer != undefined) {
         this.table_to_update_after_equiv(answer!)
+        this.automaton = undefined;
       } else {
         this.finish = true;
       }
@@ -192,7 +185,7 @@ export abstract class LearnerBase {
 
   make_all_queries() {
     while (!this.finish) {
-      this.make_next_query()
+      this.make_next_query();
     }
   }
 

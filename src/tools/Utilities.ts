@@ -24,3 +24,18 @@ export const count_str_occurrences = (str: string, obj: string) =>
 export function boolToString(bool: boolean): string {
   return bool ? "1" : "0";
 }
+
+export function allStringFromAlphabet(params: { alphabet: string[] | string, maxLength: number }) {
+  let res: string[] = [""]
+  let alphabet = Array.from(params.alphabet).sort()
+  let level = [""]
+  while (res[res.length - 1].length < params.maxLength) {
+    let res1: string[] = []
+    level.forEach(e => alphabet.forEach(a => {
+      res.push(e + a)
+      res1.push(e + a)
+    }))
+    level = res1
+  }
+  return res;
+}

@@ -15,24 +15,25 @@ import { TeacherNoAutomaton } from "../teacher/TeacherNoAutomaton.js";
  * interactions with the teacher.
  */
 
-let toWrite = false
+let toWrite = true
 
 let fileName = "wrostDFA";
 clearFile(fileName)
 writeToFile(fileName, csvHead)
 
 let regexList: [string, string[]][] = []
-for (let i = 8; i < 10; i++) {
-  let counter_exemples: string[] = []
+const minN = 0, maxN = 10;
+for (let i = minN; i < maxN; i++) {
+  let counter_examples: string[] = []
   for (let j = Math.max(0, i - 3); j <= i + 3; j++) {
-    counter_exemples.push("a".repeat(j))
-    counter_exemples.push("a".repeat(j) + "b")
-    counter_exemples.push("a".repeat(j) + "b" + "a".repeat(i))
-    counter_exemples.push("a".repeat(j) + "b" + "b".repeat(i))
-    counter_exemples.push("a".repeat(j) + "a" + "b".repeat(i))
+    counter_examples.push("a".repeat(j))
+    counter_examples.push("a".repeat(j) + "b")
+    counter_examples.push("a".repeat(j) + "b" + "a".repeat(i))
+    counter_examples.push("a".repeat(j) + "b" + "b".repeat(i))
+    counter_examples.push("a".repeat(j) + "a" + "b".repeat(i))
   }
-  counter_exemples.push("bbbbbbbbbbbbbbbabbbbbab")
-  regexList.push(["(a+b)*a" + "(a+b)".repeat(i), counter_exemples])
+  counter_examples.push("bbbbbbbbbbbbbbbabbbbbab")
+  regexList.push(["(a+b)*a" + "(a+b)".repeat(i), counter_examples])
 }
 
 
@@ -40,12 +41,13 @@ let printInfo = (algo: LearnerBase, algoName: string) => {
   return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.state_number()}, transitions = ${algo.automaton?.transition_number()}`;
 }
 
-for (const [regex, counter_exemples] of regexList) {
+for (let index = 0; index < regexList.length; index++) {
+  const [regex, counter_examples] = regexList[index]
   let teacher1 = new TeacherNoAutomaton({
     alphabet: "ab",
     regex: regex.replace(/\+/g, "|"),
-    counter_exemples: counter_exemples
-  })
+    counter_examples: counter_examples,
+  }, (minN + index) + "")
   // let teacher2 = new TeacherAutomaton(regex);
   let teacher = teacher1;
 

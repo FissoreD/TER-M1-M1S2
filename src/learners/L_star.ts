@@ -1,6 +1,6 @@
 import { Automaton, State } from "../automaton/Automaton.js";
 import { Teacher } from "../teacher/Teacher.js";
-import { LearnerBase, Map_string_string } from "./LearnerBase.js";
+import { LearnerBase } from "./LearnerBase.js";
 
 export class L_star extends LearnerBase {
 
@@ -64,11 +64,6 @@ export class L_star extends LearnerBase {
       }
     }
   }
-
-  same_row(a: string, b: string) {
-    return this.observation_table[a] == this.observation_table[b];
-  }
-
 
   table_to_update_after_equiv(answer: string): void {
     this.add_elt_in_S(answer);
