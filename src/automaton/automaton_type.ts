@@ -109,7 +109,7 @@ export function unionAutomata(a1: Automaton, a2: Automaton): Automaton {
 }
 
 export function complementAutomata(a1: Automaton): Automaton {
-  return minimizeAutomaton(noam.fsm.complement(MyAutomatonToHis(a1)))
+  return HisAutomaton2Mine(noam.fsm.complement(MyAutomatonToHis(minimizeAutomaton(MyAutomatonToHis(a1)))))
 }
 
 export function differenceAutomata(a1: Automaton, a2: Automaton): Automaton {

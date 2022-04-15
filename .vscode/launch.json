@@ -12,6 +12,12 @@
       "type": "node-terminal"
     },
     {
+      "command": "npm run benchmark",
+      "name": "Benchmark",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
       "command": "npm run wrostDFA",
       "name": "Wrost DFA",
       "request": "launch",

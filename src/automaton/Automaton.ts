@@ -1,5 +1,3 @@
-import { strict } from "assert";
-
 export class State {
   isAccepting: boolean;
   isInitial: boolean;
@@ -40,6 +38,10 @@ export class State {
   getPredecessor(symbol: string) {
     return this.inTransitions.get(symbol)!
   }
+
+  static bottom(alphabet: string[]) {
+    return new State("bottom", false, false, alphabet)
+  }
 }
 
 export interface AutomatonJson {
@@ -59,6 +61,7 @@ export class Automaton implements AutomatonJson {
   states_rename: Map<string, string>;
 
   constructor(stateList: Set<State>) {
+    this.complete(stateList)
     this.allStates = Array.from(stateList);
     this.initialStates = this.allStates.filter(s => s.isInitial);
     this.acceptingStates = this.allStates.filter(s => s.isAccepting);
@@ -68,6 +71,19 @@ export class Automaton implements AutomatonJson {
     stateList.forEach(e => this.states.set(e.name, e));
     this.states_rename = new Map();
     this.set_state_rename()
+  }
+
+  complete(stateList: Set<State>) {
+    let alphabet = stateList.values().next().value.alphabet
+    let bottom = State.bottom(alphabet)
+    for (const state of stateList) {
+      for (const symbol of alphabet) {
+        if (this.findTransition(state, symbol).length == 0) {
+          stateList.add(bottom);
+          state.addTransition(symbol, bottom);
+        }
+      }
+    }
   }
 
   set_state_rename() {
@@ -128,7 +144,7 @@ export class Automaton implements AutomatonJson {
   }
 
   findTransition(state: State, symbol: string) {
-    return this.states.get(state.name)!.outTransitions.get(symbol)!
+    return state!.outTransitions.get(symbol)!
   }
 
   restart() {

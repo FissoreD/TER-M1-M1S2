@@ -18,9 +18,10 @@ import { TeacherNoAutomaton } from "../teacher/TeacherNoAutomaton.js";
 let toWrite = true
 
 let fileName = "wrostDFA";
-clearFile(fileName)
-writeToFile(fileName, csvHead)
-
+if (toWrite) {
+  clearFile(fileName)
+  writeToFile(fileName, csvHead)
+}
 let regexList: [string, string[]][] = []
 const minN = 0, maxN = 10;
 for (let i = minN; i < maxN; i++) {

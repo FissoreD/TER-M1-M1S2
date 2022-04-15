@@ -4,6 +4,7 @@ import { Automaton, State } from "../automaton/Automaton.js";
 import { TeacherAutomaton } from "./TeacherAutomaton.js";
 import { TeacherNoAutomaton } from "./TeacherNoAutomaton.js";
 import { TeacherTakingAut } from "./TeacherTakingAut.js";
+import { txtToAutomaton } from "../tools/Utilities.js";
 
 export interface Teacher {
   description: string;
@@ -119,4 +120,12 @@ for (let n = 4; n < 5 + 1; n++) {
 
 let badForNl = new TeacherTakingAut({ automaton: automatonList[0] });
 
-export let teachers = [badForNl, teacher_a_or_baStar, teacher_b_bStar_a__b_aOrb_star, binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]
+let test = new TeacherTakingAut({
+  automaton: txtToAutomaton(`[0]
+  a,[0]->[0]
+  b,[0]->[1]
+  b,[1]->[1]
+  [0]`)
+})
+
+export let teachers = [test, badForNl, teacher_a_or_baStar, teacher_b_bStar_a__b_aOrb_star, binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]

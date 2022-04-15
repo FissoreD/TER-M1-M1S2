@@ -46,9 +46,7 @@ export let equivalenceFunction = (teacher: Teacher, automaton: Automaton): strin
       return "";
     }
     let automMinimized = minimizeAutomaton(MyAutomatonToHis(automaton));
-    console.log("Diff1");
     let diff1 = differenceAutomata(teacher.automaton!, automMinimized);
-    console.log("Diff2");
     let diff2 = differenceAutomata(automMinimized, teacher.automaton!);
     // BREAKPOINT AFTER DIFF 
     // console.log("Counter * Exemples");
