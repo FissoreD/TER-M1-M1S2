@@ -1,11 +1,11 @@
-Regex,Length alphabet,Description,L Membership queries,L Equivalence queries,L State nb in A,L Transition nb in A,NL Membership queries,NL Equivalence queries,NL State nb in A,NL Transition nb in A
-Teacher with automaton,2,0,5,1,2,4,5,1,2,5
-Teacher with automaton,2,1,35,3,6,12,34,3,6,12
-a+(ba)*,2,2,31,3,5,10,35,4,5,15
-bb*($+a(b(a+b))*),2,3,27,3,5,10,65,4,4,14
-Learner with function,9,4,19,1,2,18,19,1,2,24
-(a+b)*a(a+b)(a+b),2,5,35,2,8,16,24,2,4,16
-b*a(b+ab*a)*+(a+b)*ba*ba*b(a+b)*,2,6,69,3,7,14,76,4,6,34
-((a+b)(a+b)(a+b)b)*(a+b+$)(a+b+$)(a+b+$),2,7,29,2,5,10,35,2,5,17
-(00+11+(01+10)(00+11)*(01+10))*,2,8,19,2,4,8,24,4,4,8
-((bb*a)|(a*b*)),2,9,53,3,6,12,47,3,4,15
+Regex,Length alphabet,Description,L Membership queries,NL Membership queries,L Equivalence queries,NL Equivalence queries,L State nb in A,NL State nb in A,L Transition nb in A,NL Transition nb in A
+Teacher with automaton,2,0,335,265,7,6,18,12,36,126
+Teacher with automaton,2,1,35,34,3,3,6,6,12,12
+a+(ba)*,2,2,31,35,3,4,5,5,10,15
+bb*($+a(b(a+b))*),2,3,27,65,3,4,5,4,10,14
+Learner with function,9,4,19,19,1,1,2,2,18,24
+(a+b)*a(a+b)(a+b),2,5,35,24,2,2,8,4,16,16
+b*a(b+ab*a)*+(a+b)*ba*ba*b(a+b)*,2,6,69,76,3,4,7,6,14,34
+((a+b)(a+b)(a+b)b)*(a+b+$)(a+b+$)(a+b+$),2,7,29,35,2,2,5,5,10,17
+(00+11+(01+10)(00+11)*(01+10))*,2,8,19,24,2,4,4,4,8,8
+((bb*a)|(a*b*)),2,9,53,47,3,3,6,4,12,15

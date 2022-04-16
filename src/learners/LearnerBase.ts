@@ -126,7 +126,9 @@ export abstract class LearnerBase {
     let suffix_list = generate_suffix_list(new_elt);
     for (const suffix of suffix_list) {
       if (this.E.includes(suffix)) break;
-      this.SA.forEach(s => this.make_member(s, suffix));
+      this.SA.forEach(s => {
+        this.make_member(s, suffix)
+      });
       this.S.forEach(s => this.make_member(s, suffix));
       this.E.push(suffix);
     }
@@ -176,6 +178,7 @@ export abstract class LearnerBase {
         this.finish = true;
       }
     }
+    console.log(`Member number : ${this.member_number}, Equiv number  = ${this.equiv_number}`);
   }
 
   make_all_queries() {

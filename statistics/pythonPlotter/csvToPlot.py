@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from os import listdir
 import os
+import numpy as np
 
 folderPrefix = ["statistics/", "../"][0]
 plotFolder = "plots/"
@@ -28,7 +29,8 @@ def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName: str):
     ax.set_title(f'Comparing {comparator}')
     for i in algos:
         print(f"{i} {comparator}")
-        ax.plot(df['Description'], df[f"{i} {comparator}"], label=i)
+        ax.plot(df['Description'],
+                df[f"{i} {comparator}"], label=i)
     leg = ax.legend()
     ax.set_xlabel("Regex")
     ax.set_ylabel(comparator)
@@ -45,8 +47,7 @@ def plotAllCsv():
         if not os.path.exists(folderPath):
             os.mkdir(folderPath)
         df = csvToDf(folderPrefix + fileName)
-        partitions = {}
-        infos = {"algo": set(), "x": set(), "comp": set()}
+        infos = {"algo": set(), "comp": set()}
         for (pos, col) in enumerate(df.columns):
             if pos < 3:
                 continue
