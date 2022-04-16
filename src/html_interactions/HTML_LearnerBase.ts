@@ -1,6 +1,6 @@
 import { Automaton } from "../automaton/Automaton.js";
 import { LearnerBase } from "../learners/LearnerBase.js";
-import { automatonDiv, clear_automaton_HTML, message, tableHTML } from "../Main.js";
+import { addHistoryElement, automatonDiv, centerDivClone, clear_automaton_HTML } from "../Main.js";
 import { myFunction } from "../tools/Utilities.js";
 
 export abstract class HTML_LearnerBase<T extends LearnerBase> {
@@ -10,18 +10,20 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   table_body: HTMLTableSectionElement;
   pile_actions: myFunction<void, void>[];
   automaton: Automaton | undefined;
+  tableHTML: HTMLTableElement;
   table_counter = 0;
 
   constructor(learner: T) {
     this.learner = learner;
-
-    this.table_header = tableHTML.createTHead();
-    this.table_body = tableHTML.createTBody();
     this.pile_actions = [() => this.draw_table()];
+
+    this.tableHTML = $('#table')![0] as HTMLTableElement;
+    this.table_header = this.tableHTML.createTHead();
+    this.table_body = this.tableHTML.createTBody();
   }
 
   draw_table() {
-    this.add_row_html(this.table_header, "Table" + this.table_counter++, undefined, this.learner.E, 2);
+    this.add_row_html(this.table_header!, "Table" + this.table_counter++, undefined, this.learner.E, 2);
 
     /**
      The first {@link S}.length rows of the table start with the S symbol
@@ -29,7 +31,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
     var fst: string | undefined = "S";
     for (var s of this.learner.S) {
       const row = Array.from(this.learner.observation_table[s]);
-      this.add_row_html(this.table_body, fst, s, row, 1, fst ? this.learner.S.length : 1);
+      this.add_row_html(this.table_body!, fst, s, row, 1, fst ? this.learner.S.length : 1);
       fst = undefined;
     }
     /**
@@ -38,7 +40,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
     var fst: string | undefined = "SA";
     for (var s of this.learner.SA) {
       const row = Array.from(this.learner.observation_table[s]);
-      this.add_row_html(this.table_body, fst, s, row, 1, fst ? this.learner.SA.length : 1);
+      this.add_row_html(this.table_body!, fst, s, row, 1, fst ? this.learner.SA.length : 1);
       fst = undefined;
     }
 
@@ -71,15 +73,20 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   }
 
   clear_table() {
-    this.table_body.innerHTML = "";
-    this.table_header.innerHTML = "";
+    this.table_body!.innerHTML = "";
+    this.table_header!.innerHTML = "";
   }
 
+  next_step() {
+    document.getElementById('centerDiv')!.replaceWith(centerDivClone());
+    document.getElementById('table')!.innerHTML = this.tableHTML.innerHTML;
+    document.getElementById('tableHead')?.classList.remove('up')
+    console.log(document.getElementById('table')!.innerHTML, this.tableHTML.innerHTML);
 
-  graphic_next_step() {
     if (this.learner.finish) {
-      if (message.innerHTML != "")
-        message.innerHTML = "The Teacher has accepted the automaton";
+      if (this.message().innerHTML != "")
+        this.message().innerHTML = "The Teacher has accepted the automaton";
+      return;
     }
     else if (this.pile_actions.length > 0) {
       this.pile_actions.shift()!()
@@ -87,20 +94,21 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
     else if (!this.close_action()) { }
     else if (!this.consistence_action()) { }
     else this.send_automaton_action()
-    message.innerHTML =
-      `Queries = ${this.learner.member_number} - Membership = ${this.learner.equiv_number}` + (this.learner.automaton ? ` - States = ${this.learner.automaton?.state_number()} - Transitions = ${this.learner.automaton?.transition_number()}` : ``) + `<br> ${message.innerHTML}`
+    this.message().innerHTML =
+      `Queries = ${this.learner.member_number} - Membership = ${this.learner.equiv_number}` + (this.learner.automaton ? ` - States = ${this.learner.automaton?.state_number()} - Transitions = ${this.learner.automaton?.transition_number()}` : ``) + `<br> ${this.message().innerHTML}`
     // @ts-ignore
     MathJax.typeset()
     document.getElementById('messageHead')?.classList.remove('up');
+    addHistoryElement(this.automaton);
   }
 
   close_action(): boolean {
     const close_rep = this.learner.is_close();
     if (close_rep != undefined) {
-      message.innerText =
+      this.message().innerText =
         this.close_message(close_rep);
       this.pile_actions.push(() => {
-        message.innerText = "";
+        this.message().innerText = "";
         this.learner.add_elt_in_S(close_rep);
         this.clear_table();
         this.draw_table();
@@ -116,9 +124,9 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
       let s1 = consistence_rep[0];
       let s2 = consistence_rep[1];
       let new_col = consistence_rep[2]
-      message.innerText = this.consistent_message(s1, s2, new_col);
+      this.message().innerText = this.consistent_message(s1, s2, new_col);
       this.pile_actions.push(() => {
-        message.innerText = "";
+        this.message().innerText = "";
         this.learner.add_elt_in_E(new_col);
         this.clear_table();
         this.draw_table();
@@ -129,24 +137,24 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   }
 
   send_automaton_action() {
-    message.innerText =
+    this.message().innerText =
       `The table is consistent and closed, I will send an automaton`;
     let automaton = this.learner.make_automaton();
 
     this.automaton = automaton;
     this.pile_actions.push(() => {
-      message.innerHTML = "";
+      this.message().innerHTML = "";
       automaton.initiate_graph();
       this.add_automaton_listener();
       let answer = this.learner.make_equiv(automaton);
 
 
       if (answer != undefined) {
-        message.innerText =
+        this.message().innerText =
           `The sent automaton is not valid, 
           here is a counter-exemple ${answer}`;
         this.pile_actions.push(() => {
-          message.innerHTML = "";
+          this.message().innerHTML = "";
           clear_automaton_HTML();
           this.table_to_update_after_equiv(answer!)
           this.clear_table();
@@ -193,13 +201,19 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   }
 
   go_to_end() {
-    if (this.learner.finish) return
-    this.learner.make_all_queries()
-    this.clear_table()
-    this.draw_table()
-    clear_automaton_HTML();
-    this.learner.automaton?.initiate_graph()
-    this.graphic_next_step()
+    // if (this.learner.finish) return
+    while (!this.learner.finish) {
+      this.next_step();
+    }
+    // this.learner.make_all_queries()
+    // this.clear_table()
+    // this.draw_table()
+    // clear_automaton_HTML();
+    // this.learner.automaton?.initiate_graph()
+    // this.next_step()
   }
 
+  message() {
+    return document.getElementById('message')!
+  }
 }

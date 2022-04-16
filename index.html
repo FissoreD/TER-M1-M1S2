@@ -57,8 +57,10 @@
         <button class="bottom_button" id="go_to_end">Run algo</button>
     </div>
 
+    <div class="marginColumn hide" id="leftCol"><span>◀</span></div>
+    <div class="marginColumn hide" id="rightCol"><span>▶</span></div>
 
-    <div>
+    <div id="centerDiv">
         <div>
             <div class="head" id="messageHead">Message</div>
             <div class="innerHead">
@@ -88,12 +90,13 @@
         </div>
     </div>
 
+
     <script type="module" src="dist/Main.js"></script>
 
     <script>
         let hideShow = elt => elt.classList.toggle('up');
         Array.from(document.getElementsByClassName('head')).forEach(e => {
-            e.onclick = () => hideShow(e);
+            e.setAttribute('onclick', 'this.classList.toggle("up")')
             e.classList.toggle("up");
         })
     </script>
