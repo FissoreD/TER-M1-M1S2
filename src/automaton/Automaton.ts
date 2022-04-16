@@ -180,8 +180,9 @@ export class Automaton implements AutomatonJson {
 
     // Mark current node = initial state
     this.color_node(true);
-    $(".mermaid")[0].after($(".mermaidTooltip")[0])
-    $('svg')[0].style.height = 'auto'
+    $(".mermaid")[0].after($(".mermaidTooltip")[0]);
+    $('svg')[0].style.height = 'auto';
+    document.getElementById('automatonHead')?.classList.remove('up');
   }
 
   get_current_graph_node(node: State) {
@@ -217,7 +218,7 @@ export class Automaton implements AutomatonJson {
     mermaidTxt += "\n"
     // Callback for tooltip on mouse over
     mermaidTxt = mermaidTxt.concat(Array.from(this.states).map(([name, _]) => `click ${name} undnamefinedCallback "${name}";`).join("\n"))
-    // console.log(mermaidTxt);
+    console.log(mermaidTxt);
     return mermaidTxt;
   }
 

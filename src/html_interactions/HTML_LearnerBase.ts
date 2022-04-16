@@ -41,6 +41,8 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
       this.add_row_html(this.table_body, fst, s, row, 1, fst ? this.learner.SA.length : 1);
       fst = undefined;
     }
+
+    document.getElementById('tableHead')?.classList.remove('up');
   }
 
   add_row_html(
@@ -89,6 +91,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
       `Queries = ${this.learner.member_number} - Membership = ${this.learner.equiv_number}` + (this.learner.automaton ? ` - States = ${this.learner.automaton?.state_number()} - Transitions = ${this.learner.automaton?.transition_number()}` : ``) + `<br> ${message.innerHTML}`
     // @ts-ignore
     MathJax.typeset()
+    document.getElementById('messageHead')?.classList.remove('up');
   }
 
   close_action(): boolean {
@@ -158,8 +161,6 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   abstract close_message(close_rep: string): string;
 
   abstract consistent_message(s1: string, s2: string, new_col: string): string;
-
-  // abstract add_automaton_listener(): void;
 
   abstract table_to_update_after_equiv(answer: string): void;
 

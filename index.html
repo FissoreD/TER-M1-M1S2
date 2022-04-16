@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="css/htmlStyle.css">
     <link rel="stylesheet" href="css/tableHtml.css">
     <link rel="stylesheet" href="css/nextStepButton.css">
+    <link rel="stylesheet" href="css/sectionHead.css">
+    <link rel="stylesheet" href="css/buttonStyle.css">
     <link rel="shortcut icon" href="#">
 
     <script src="public/polyfill.min.js"></script>
@@ -25,8 +27,7 @@
 </head>
 
 <body>
-    <h1> Learning languages </h1>
-    <h2> An implementation of L* and NL* algorithms </h2>
+    <h1> Learning algorithms : L* vs NL* </h1>
 
     <div class="preset">
         <div>
@@ -47,7 +48,7 @@
         <div>
             <p>Enter your regular expression</p>
             <input id="input-regex">
-            <button id="button-regex">Send teacher</button>
+            <button id="button-regex" class="button-19">Send teacher</button>
         </div>
     </div>
     <p class="description" id="teacher_description"></p>
@@ -55,38 +56,45 @@
         <button class="bottom_button" id="next_step">Next step</button>
         <button class="bottom_button" id="go_to_end">Run algo</button>
     </div>
-    <table class="mainTable">
-        <thead>
-            <tr>
-                <td>
-                    Observation Table
-                </td>
-                <td>
-                    Automaton
-                </td>
-            </tr>
-        </thead>
-        <tr>
-            <td>
-                <div class="box">
-                    <table id="table" class="styled-table"> </table>
-                </div>
-            </td>
-            <td>
+
+
+    <div>
+        <div>
+            <div class="head" id="messageHead">Message</div>
+            <div class="innerHead">
                 <span id="message"></span>
-                <div class="automaton-div" id="automaton-div">
-                    <div class="mermaid" id='automaton-mermaid'></div>
-                    <div id="input-automaton" class="box"></div>
-                </div>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div>
+            <div class="head" id="automatonHead">Automaton</div>
+            <div class="automaton-div innerHead" id="automaton-div">
+                <div class="mermaid" id='automaton-mermaid'></div>
+            </div>
+            <div id="input-automaton" class="box"></div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div>
+            <div class="head" id="tableHead">Observation table</div>
+            <div class="box innerHead">
+                <table id="table" class="styled-table"> </table>
+            </div>
+        </div>
     </div>
 
-    <!-- <script src="public/out.js"></script>
-    <script>require(['Main']);</script> -->
-
     <script type="module" src="dist/Main.js"></script>
+
+    <script>
+        let hideShow = elt => elt.classList.toggle('up');
+        Array.from(document.getElementsByClassName('head')).forEach(e => {
+            e.onclick = () => hideShow(e);
+            e.classList.toggle("up");
+        })
+    </script>
 </body>
 
 </html>

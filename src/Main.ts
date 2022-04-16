@@ -82,6 +82,8 @@ export function initiate_global_vars() {
 }
 
 export function clear_automaton_HTML() {
+  // document.getElementsByClassName('mermaidTooltip')[0]?.remove();
+  document.getElementById('automatonHead')?.classList.add('up');
   automatonDiv.innerHTML = "";
   automatonHTML.innerHTML = "";
 }
@@ -105,7 +107,7 @@ try {
   window.onload = function () {
     initiate_global_vars();
     // @ts-ignore
-    resizableGrid($(".mainTable")[0]);
+    // resizableGrid($(".mainTable")[0]);
   }
   window.Automaton = Automaton;
   window.teachers = teachers;
