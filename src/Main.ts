@@ -82,7 +82,7 @@ export function initiate_global_vars() {
 }
 
 export function clear_automaton_HTML() {
-  // document.getElementsByClassName('mermaidTooltip')[0]?.remove();
+  document.getElementsByClassName('mermaidTooltip')[0]?.remove();
   document.getElementById('automatonHead')?.classList.add('up');
   automatonDiv.innerHTML = "";
   automatonHTML.innerHTML = "";

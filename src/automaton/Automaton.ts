@@ -160,6 +160,7 @@ export class Automaton implements AutomatonJson {
   }
 
   initiate_graph() {
+    document.getElementById('automatonHead')?.classList.remove('up');
     let automatonHTML = $("#automaton-mermaid")[0];
     automatonHTML.removeAttribute('data-processed')
     automatonHTML.innerHTML = this.matrix_to_mermaid();
@@ -175,14 +176,13 @@ export class Automaton implements AutomatonJson {
       let smaller_circle = circle.cloneNode() as HTMLElement;
       // @ts-ignore
       smaller_circle.attributes['r'].value -= 4
-      circle.parentNode!.insertBefore(smaller_circle, circle.nextSibling)
+      circle.parentNode!.insertBefore(smaller_circle, circle.nextSibling);
     });
 
     // Mark current node = initial state
     this.color_node(true);
     $(".mermaid")[0].after($(".mermaidTooltip")[0]);
     $('svg')[0].style.height = 'auto';
-    document.getElementById('automatonHead')?.classList.remove('up');
   }
 
   get_current_graph_node(node: State) {
