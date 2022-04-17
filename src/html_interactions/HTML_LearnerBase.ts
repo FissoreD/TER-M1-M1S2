@@ -1,6 +1,6 @@
 import { Automaton } from "../automaton/Automaton.js";
 import { LearnerBase } from "../learners/LearnerBase.js";
-import { addHistoryElement, automatonDiv, centerDivClone, clear_automaton_HTML } from "../Main.js";
+import { addHistoryElement, automatonDiv, centerDivClone, clear_automaton_HTML, historyHTML } from "../Main.js";
 import { myFunction } from "../tools/Utilities.js";
 
 export abstract class HTML_LearnerBase<T extends LearnerBase> {
@@ -12,12 +12,13 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   automaton: Automaton | undefined;
   tableHTML: HTMLTableElement;
   table_counter = 0;
+  stopNextStep = false;
 
   constructor(learner: T) {
     this.learner = learner;
     this.pile_actions = [() => this.draw_table()];
 
-    this.tableHTML = $('#table')![0] as HTMLTableElement;
+    this.tableHTML = document.createElement('table');
     this.table_header = this.tableHTML.createTHead();
     this.table_body = this.tableHTML.createTBody();
   }
@@ -78,27 +79,28 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   }
 
   next_step() {
+    if (this.stopNextStep) return;
     document.getElementById('centerDiv')!.replaceWith(centerDivClone());
-    document.getElementById('table')!.innerHTML = this.tableHTML.innerHTML;
-    document.getElementById('tableHead')?.classList.remove('up')
-    console.log(document.getElementById('table')!.innerHTML, this.tableHTML.innerHTML);
-
-    if (this.learner.finish) {
-      if (this.message().innerHTML != "")
-        this.message().innerHTML = "The Teacher has accepted the automaton";
-      return;
-    }
-    else if (this.pile_actions.length > 0) {
-      this.pile_actions.shift()!()
-    }
+    if (this.pile_actions.length > 0) this.pile_actions.shift()!()
     else if (!this.close_action()) { }
     else if (!this.consistence_action()) { }
     else this.send_automaton_action()
     this.message().innerHTML =
       `Queries = ${this.learner.member_number} - Membership = ${this.learner.equiv_number}` + (this.learner.automaton ? ` - States = ${this.learner.automaton?.state_number()} - Transitions = ${this.learner.automaton?.transition_number()}` : ``) + `<br> ${this.message().innerHTML}`
+    if (this.learner.finish) {
+      this.message().innerHTML += "The Teacher has accepted the automaton";
+      this.stopNextStep = true
+    }
     // @ts-ignore
     MathJax.typeset()
     document.getElementById('messageHead')?.classList.remove('up');
+    document.getElementById('tableHead')?.classList.remove('up');
+    document.getElementById('teacher_description')?.classList.remove('up');
+
+    document.getElementById('table')!.innerHTML = this.tableHTML.innerHTML;
+    document.getElementById('teacher_description')!.innerHTML = this.learner.teacher.description;
+    // @ts-ignore
+    MathJax.typeset();
     addHistoryElement(this.automaton);
   }
 

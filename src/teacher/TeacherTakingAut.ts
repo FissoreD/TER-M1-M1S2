@@ -15,7 +15,7 @@ export class TeacherTakingAut implements Teacher {
     this.automaton = minimizeAutomaton(MyAutomatonToHis(params.automaton));
     this.alphabet = params.automaton.alphabet;
     this.regex = params.regex || "Teacher with automaton"
-    this.description = params.description || "";
+    this.description = params.description || "Teacher with automaton";
     this.counter_examples = params.counter_examples;
   }
 

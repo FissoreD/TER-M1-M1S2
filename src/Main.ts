@@ -42,7 +42,6 @@ export function initiate_global_vars() {
 
   let current_automaton: HTML_NL_star | HTML_L_star,
     teacherSelector = $("#teacher-switch")[0] as HTMLSelectElement,
-    teacherDescription = $("#teacher_description")[0] as HTMLParagraphElement,
     algoSelector = Array.from($(".algo-switch")) as HTMLInputElement[],
     mapTeacherValue: { [id: string]: Teacher } = {},
     counter = 0,
@@ -55,7 +54,9 @@ export function initiate_global_vars() {
     current_automaton = algoSelector[0].checked ?
       new HTML_L_star(currentTeacher) :
       new HTML_NL_star(currentTeacher);
-    teacherDescription.innerHTML = current_automaton.learner.teacher.description;
+    $("#teacher_description")[0].innerHTML = current_automaton.learner.teacher.description;
+    console.log("The description is ", current_automaton.learner.teacher.description);
+
     // @ts-ignore
     MathJax.typeset();
     clearHistory();
@@ -118,7 +119,6 @@ export function addHistoryElement(automaton?: Automaton) {
 }
 
 function changeMainDivContent() {
-  console.log(historyHTML, historyPosition, historyHTML[historyPosition], historyHTML[historyPosition]);
   document.getElementById('centerDiv')!.innerHTML = historyHTML[historyPosition][0].innerHTML!;
 }
 

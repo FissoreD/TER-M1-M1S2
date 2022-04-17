@@ -20,9 +20,11 @@ export class TeacherNoAutomaton implements Teacher {
   }, description: string = "") {
 
     this.counter = 0;
-    this.description = description;
+    this.description = (typeof params.regex == 'string') ? "Automaton with regex : " + params.regex :
+      // @ts-ignore
+      `Teacher with function<br><pre> ${js_beautify(params.regex.toString())}</pre>`;
     this.alphabet = Array.from(params.alphabet);
-    this.regex = (typeof params.regex == 'string') ? params.regex : "Learner with function"
+    this.regex = (typeof params.regex == 'string') ? params.regex : "Teacher with function"
 
     this.check_function =
       (typeof params.regex == 'string') ?

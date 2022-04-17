@@ -2,13 +2,17 @@
   --marginColumns: 2%;
 }
 
-.head {
+.head,
+.headSpecial {
   background-color: rgb(0, 128, 0);
   border-top-left-radius: 4pt;
   border-top-right-radius: 4pt;
   text-align: center;
   padding: 5pt;
   color: aliceblue;
+}
+
+.head {
   cursor: pointer;
 }
 
@@ -32,10 +36,6 @@
   position: absolute;
   right: var(--marginColumns);
   transform: translateX(-50%);
-}
-
-.separator {
-  padding: 2pt;
 }
 
 .innerHead {
@@ -64,13 +64,6 @@
   z-index: 1;
 }
 
-.marginColumn span {
-  height: 100%;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
 .marginColumn.hide {
   display: none;
 }
@@ -82,10 +75,19 @@
 
 #rightCol {
   right: 0;
+  text-align: left;
+}
+
+#leftCol {
+  text-align: right;
 }
 
 #centerDiv {
   margin-left: var(--marginColumns);
   margin-right: var(--marginColumns);
   padding: 3px;
+}
+
+#centerDiv>div {
+  border-bottom: solid 5pt transparent;
 }

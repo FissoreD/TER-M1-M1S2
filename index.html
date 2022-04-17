@@ -14,12 +14,17 @@
     <link rel="stylesheet" href="css/buttonStyle.css">
     <link rel="shortcut icon" href="#">
 
+    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.14.3/js/lib/beautify.js"></script>
+    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.14.3/js/lib/beautify-css.js"></script>
+    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.14.3/js/lib/beautify-html.js"></script>
+
     <script src="public/polyfill.min.js"></script>
     <script src="public/tex-mml-chtml.js"></script>
     <script src="public/mermaid.min.js"></script>
     <script src="public/require.js"></script>
     <script src="public/jquery.min.js"></script>
     <script src="public/myGeneralFunction.js"></script>
+
 
     <script>
         mermaid.initialize({ startOnLoad: false });
@@ -51,7 +56,6 @@
             <button id="button-regex" class="button-19">Send teacher</button>
         </div>
     </div>
-    <p class="description" id="teacher_description"></p>
     <div class="bottom_page">
         <button class="bottom_button" id="next_step">Next step</button>
         <button class="bottom_button" id="go_to_end">Run algo</button>
@@ -61,14 +65,20 @@
     <div class="marginColumn hide" id="rightCol"><span>▶</span></div>
 
     <div id="centerDiv">
+
+        <div>
+            <div class="headSpecial" id="descriptionHead">Teacher Description</div>
+            <div class="innerHead">
+                <span id="teacher_description"></p>
+            </div>
+        </div>
+
         <div>
             <div class="head" id="messageHead">Message</div>
             <div class="innerHead">
                 <span id="message"></span>
             </div>
         </div>
-
-        <div class="separator"></div>
 
         <div>
             <div class="head" id="automatonHead">Automaton</div>
@@ -79,8 +89,6 @@
                 <div id="input-automaton" class="box"></div>
             </div>
         </div>
-
-        <div class="separator"></div>
 
         <div>
             <div class="head" id="tableHead">Observation table</div>
@@ -98,7 +106,7 @@
         Array.from(document.getElementsByClassName('head')).forEach(e => {
             e.setAttribute('onclick', 'this.classList.toggle("up")')
             e.classList.toggle("up");
-        })
+        });
     </script>
 </body>
 

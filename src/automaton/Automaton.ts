@@ -191,7 +191,7 @@ export class Automaton implements AutomatonJson {
 
   matrix_to_mermaid(): string {
     let mermaidTxt = "flowchart LR\n";
-    mermaidTxt = mermaidTxt.concat("subgraph Automaton\ndirection LR\n")
+    mermaidTxt = mermaidTxt.concat("\ndirection LR\n")
     // res = res.concat("\n" + this.create_entering_arrow() + "\n");
     let triples: { [id: string]: string[] } = {}
     for (const [name, state] of this.states) {
@@ -213,7 +213,6 @@ export class Automaton implements AutomatonJson {
     mermaidTxt += this.initialStates.map(e => e.name).join("\n")
     mermaidTxt += "\nend"
     mermaidTxt += "\n"
-    mermaidTxt += "end\n"
     mermaidTxt = mermaidTxt.concat(this.acceptingStates.map(e => `style ${e.name} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
     mermaidTxt += "\n"
     // Callback for tooltip on mouse over
