@@ -1,9 +1,6 @@
-import { MyAutomatonToHis } from "../automaton/automaton_type.js";
-import { minimizeAutomaton } from "../automaton/automaton_type.js";
 import { Automaton, State } from "../automaton/Automaton.js";
 import { TeacherAutomaton } from "./TeacherAutomaton.js";
 import { TeacherNoAutomaton } from "./TeacherNoAutomaton.js";
-import { TeacherTakingAut } from "./TeacherTakingAut.js";
 import { allStringFromAlphabet } from "../tools/Utilities.js";
 
 export interface Teacher {
@@ -74,16 +71,6 @@ export let binaryAddition = new TeacherNoAutomaton(
   {
     alphabet: "012345678",
     regex: sentence => {
-      let _ = `  
-       * Automaton calculating addition between binary integers:
-       * exemple : 
-       * 0101 + 
-       * 1001 =
-       * 1110
-       * is a valid exemple that can be sent to the automaton with the encoding 3516
-       * 3 = 011 (the 1st col), 5 = 101 (the 2nd col), 
-       * 1 = 001 (the 3rd col), 6 = 110 (the 4th col) 
-       **/ `
       let charToBin = (char: string) =>
         (parseInt(char) >>> 0).toString(2).padStart(3, "0")
       let sentenceAr = Array.from(sentence).map(e => charToBin(e))
@@ -93,54 +80,15 @@ export let binaryAddition = new TeacherNoAutomaton(
       return fst_term + snd_term == trd_term;
     },
     counter_examples: allStringFromAlphabet({ alphabet: '012345678', maxLength: 3 })
-  }
-)
+  }, `  
+       * Automaton calculating addition between binary integers:
+       * exemple : 
+       * 0101 + 
+       * 1001 =
+       * 1110
+       * is a valid exemple that can be sent to the automaton with the encoding 3516
+       * 3 = 011 (the 1st col), 5 = 101 (the 2nd col), 
+       * 1 = 001 (the 3rd col), 6 = 110 (the 4th col) 
+       **/ `)
 
-let automaton: Automaton;
-{
-  let n = 4;
-  let states: State[] = new Array(n).fill(0).map((_, i) => new State(i + "", i == 0, i < n / 2, ['a', 'b']));
-
-  for (let i = 0; i < n - 1; i++)
-    states[i].addTransition('a', states[i + 1])
-  states[n - 1].addTransition('a', states[0]);
-  states[0].addTransition('b', states[0]);
-  for (let i = 2; i < n; i++)
-    states[i].addTransition('b', states[i - 1])
-  states[1].addTransition('b', states[n - 1])
-  automaton = minimizeAutomaton(MyAutomatonToHis(new Automaton(new Set(states))));
-}
-
-
-let badForNl = new TeacherTakingAut({ automaton });
-
-let test = new TeacherTakingAut({
-  automaton: Automaton.strToAutomaton(`[6]
-a,[0]->[1]
-b,[0]->[6]
-a,[1]->[9]
-b,[1]->[5]
-a,[2]->[3]
-b,[2]->[1]
-a,[3]->[0]
-b,[3]->[6]
-a,[4]->[1]
-b,[4]->[5]
-a,[5]->[7]
-b,[5]->[3]
-a,[6]->[4]
-b,[6]->[2]
-a,[7]->[4]
-b,[7]->[8]
-a,[8]->[10]
-b,[8]->[4]
-a,[9]->[9]
-b,[9]->[2]
-a,[10]->[8]
-b,[10]->[2]
-[0]
-[1]`),
-  description: "Test with 5 states"
-})
-
-export let teachers = [test, badForNl, teacher_a_or_baStar, teacher_b_bStar_a__b_aOrb_star, binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]
+export let teachers = [teacher_a_or_baStar, teacher_b_bStar_a__b_aOrb_star, binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]
