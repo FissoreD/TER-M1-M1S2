@@ -1,3 +1,4 @@
+from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import pandas as pd
 from os import listdir
@@ -28,9 +29,15 @@ def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName: str):
     fig, ax = plt.subplots()
     ax.set_title(f'Comparing {comparator}')
     for i in algos:
-        print(f"{i} {comparator}")
-        ax.plot(df['Description'],
-                df[f"{i} {comparator}"], label=i)
+        def objective(x, a, b, c, d, f):
+            return (a * x) + (b * x**2) + (c * x**3) + (d * x**4) + f
+        x, y = df['Description'], df[f"{i} {comparator}"]
+        popt, _ = curve_fit(objective, x, y)
+        a, b, c, d, f = popt
+        x_line = np.arange(min(x), max(x), 1)
+        y_line = objective(x_line, a, b, c, d,  f)
+        print(f"{i} {comparator} {fileName}")
+        ax.plot(x_line, y_line, '--', label=i)
     leg = ax.legend()
     ax.set_xlabel("Regex")
     ax.set_ylabel(comparator)
@@ -41,12 +48,16 @@ def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName: str):
 
 def plotAllCsv():
     allCsv = allCsvNameInDirectory()
-    print("This are allCSV", allCsv)
+    print("These are allCSV", allCsv)
     for fileName in allCsv:
+        print(fileName)
         folderPath = folderPrefix + plotFolder + fileName[:-4] + "/"
         if not os.path.exists(folderPath):
             os.mkdir(folderPath)
         df = csvToDf(folderPrefix + fileName)
+        df = df.groupby('L State nb in A')
+        df = df.mean()
+        df = df.reset_index()
         infos = {"algo": set(), "comp": set()}
         for (pos, col) in enumerate(df.columns):
             if pos < 3:
@@ -56,7 +67,7 @@ def plotAllCsv():
             infos["comp"].add(comparator)
         for comparator in infos["comp"]:
             fig = plotCsv(df, comparator, infos["algo"],
-                          f"{folderPath}/{comparator}.png")
+                          f"{folderPath}{comparator}.png")
             # return fig
 
 

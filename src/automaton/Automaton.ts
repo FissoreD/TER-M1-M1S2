@@ -8,11 +8,11 @@ export class State {
   predecessor: Set<State>;
   name: string;
 
-  constructor(name: string, isAccepting: boolean, isInitial: boolean, alphabet: string[]) {
+  constructor(name: string, isAccepting: boolean, isInitial: boolean, alphabet: string[] | string) {
     this.name = name;
     this.isAccepting = isAccepting;
     this.isInitial = isInitial;
-    this.alphabet = alphabet;
+    this.alphabet = Array.from(alphabet);
     this.outTransitions = new Map();
     this.inTransitions = new Map();
     this.successors = new Set();
@@ -60,7 +60,8 @@ export class Automaton implements AutomatonJson {
   currentStates: State[];
   states_rename: Map<string, string>;
 
-  constructor(stateList: Set<State>) {
+  constructor(stateList: Set<State> | State[]) {
+    stateList = new Set(stateList);
     this.complete(stateList)
     this.allStates = Array.from(stateList);
     this.initialStates = this.allStates.filter(s => s.isInitial);
@@ -175,7 +176,8 @@ export class Automaton implements AutomatonJson {
       circle.style.stroke = "black"
       let smaller_circle = circle.cloneNode() as HTMLElement;
       // @ts-ignore
-      smaller_circle.attributes['r'].value -= 4
+      smaller_circle.attributes['r'].value -= 4;
+      smaller_circle.style.fill = "#ECECFF"
       circle.parentNode!.insertBefore(smaller_circle, circle.nextSibling);
     });
 
@@ -218,7 +220,54 @@ export class Automaton implements AutomatonJson {
     // Callback for tooltip on mouse over
     mermaidTxt = mermaidTxt.concat(Array.from(this.states).map(([name, _]) => `click ${name} undnamefinedCallback "${name}";`).join("\n"))
     console.log(mermaidTxt);
+
+    this.automatonToDot()
     return mermaidTxt;
+  }
+
+  automatonToDot() {
+    let txt = "digraph {rankdir = LR\n"
+    let triples: { [id: string]: string[] } = {}
+    for (const [name, state] of this.states) {
+      for (let j = 0; j < this.alphabet.length; j++) {
+        for (const nextState of this.findTransition(state, this.alphabet[j])) {
+          let stateA_concat_stateB = name + '&' + nextState.name;
+          if (triples[stateA_concat_stateB]) {
+            triples[stateA_concat_stateB].push(this.alphabet[j])
+          } else {
+            triples[stateA_concat_stateB] = [this.alphabet[j]]
+          }
+        }
+      }
+    }
+    txt = txt.concat(Object.keys(triples).map(x => {
+      let [states, transition] = [x, triples[x].join(",")]
+      let split = states.split("&");
+      let A = split[0], B = split[1];
+      let A_rename = this.get_state_rename(A);
+      let B_rename = this.get_state_rename(B);
+      return `${A_rename} -> ${B_rename} [label = "${transition}"]\n${A_rename} [shape=circle]`
+    }).join("\n"));
+
+    this.initialStates.forEach(s => {
+      let rename = this.get_state_rename(s.name);
+      txt = txt.concat(`\nI${rename} [label="", style=invis, width=0]\nI${rename} -> ${rename}`);
+    });
+
+    this.acceptingStates.forEach(s => {
+      let rename = this.get_state_rename(s.name);
+      txt = txt.concat(`\n${rename} [shape=doublecircle]`)
+      console.log("here");
+
+    })
+
+    txt += "\n}"
+    try {
+      //@ts-ignore
+      d3.select("#graph").graphviz()
+        .renderDot(txt)
+    } catch { }
+    return txt
   }
 
 
@@ -364,5 +413,69 @@ export class Automaton implements AutomatonJson {
     }
 
     return new Automaton(newStates)
+  }
+
+  static strToAutomaton(content: String) {
+    const SYMBOL_LIST = Array.from("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+    let sContent = content.split("\n");
+    let IN_INITIAL = 0, IN_TRANSITION = 1, IN_ACCEPTING = 2;
+    let statePhase = IN_INITIAL;
+    const initalState: string[] = [], acceptingStates: string[] = [],
+      transitions: { current: string, symbol: string, next: string }[] = [],
+      statesName: Set<string> = new Set(), alphabetSet: Set<string> = new Set();
+    for (const line of sContent) {
+      if (!line.includes("-")) {
+        let stateName = line.substring(line.indexOf('[') + 1, line.indexOf(']'));
+        statesName.add(stateName)
+        if (statePhase == IN_INITIAL) {
+          initalState.push(stateName);
+        } else {
+          statePhase = IN_ACCEPTING;
+          acceptingStates.push(stateName)
+        }
+      } else if (line.match(/[a-zA-Z0-9]+/)) {
+        statePhase = IN_TRANSITION;
+        let split = line.match(/[A-Za-z0-9]+/g)!;
+        let current = split[1];
+        let symbol = split[0];
+        let next = split[2];
+        transitions.push({
+          current: current,
+          next: next,
+          symbol: symbol
+        })
+        statesName.add(current);
+        statesName.add(next);
+        alphabetSet.add(symbol);
+      }
+    }
+    let alphabet = Array.from(alphabetSet);
+    let alphabetOneLetter = SYMBOL_LIST.splice(0, alphabet.length)
+    let stateMap: Map<string, State> = new Map();
+    let stateSet: Set<State> = new Set();
+    statesName.forEach(e => {
+      let state = new State(e, acceptingStates.includes(e), initalState.includes(e), alphabetOneLetter)
+      stateMap.set(e, state);
+      stateSet.add(state)
+    });
+    transitions.forEach(({ current, symbol, next }) =>
+      stateMap.get(current)!.addTransition(
+        alphabetOneLetter[alphabet.indexOf(symbol)],
+        stateMap.get(next)!)
+    )
+
+    let automaton = new Automaton(stateSet);
+    return automaton;
+
+  }
+
+  toString() {
+    let txt: String[] = [];
+    this.initialStates.forEach(e => txt.push('[' + e.name + "]"));
+    this.allStates.forEach(state =>
+      state.outTransitions.forEach((nextStates, symbol) => nextStates.forEach(next => txt.push(`${symbol},[${state.name}]->[${next.name}]`))));
+    this.acceptingStates.forEach(e => txt.push("[" + e.name + "]"));
+    return txt.join('\n');
   }
 }

@@ -1,10 +1,10 @@
-Regex,Length alphabet,Description,L Membership queries,L Equivalence queries,L State nb in A,L Transition nb in A,NL Membership queries,NL Equivalence queries,NL State nb in A,NL Transition nb in A
-Teacher with automaton,2,2,5,1,2,4,8,2,2,4
-Teacher with automaton,2,3,14,2,3,6,19,3,3,6
-Teacher with automaton,2,4,35,3,6,12,34,3,6,12
-Teacher with automaton,2,5,59,3,10,20,76,4,10,20
-Teacher with automaton,2,6,149,5,20,40,167,5,20,40
-Teacher with automaton,2,7,300,6,35,70,395,6,35,70
-Teacher with automaton,2,8,607,5,70,140,851,6,70,140
-Teacher with automaton,2,9,1313,8,126,252,2285,8,126,252
-Teacher with automaton,2,10,2709,9,252,504,4553,6,252,504
+Regex,Length alphabet,Description,L Membership queries,NL Membership queries,L Equivalence queries,NL Equivalence queries,L State nb in A,NL State nb in A,L Transition nb in A,NL Transition nb in A
+Teacher with automaton,2,2,5,8,1,2,2,2,4,4
+Teacher with automaton,2,3,14,19,2,3,3,3,6,6
+Teacher with automaton,2,4,35,34,3,3,6,6,12,12
+Teacher with automaton,2,5,59,76,3,4,10,10,20,20
+Teacher with automaton,2,6,149,167,5,5,20,20,40,40
+Teacher with automaton,2,7,300,395,6,6,35,35,70,70
+Teacher with automaton,2,8,607,851,5,6,70,70,140,140
+Teacher with automaton,2,9,1313,2285,8,8,126,126,252,252
+Teacher with automaton,2,10,2709,4553,9,6,252,252,504,504

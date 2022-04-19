@@ -18,7 +18,7 @@ import { allStringFromAlphabet } from "../tools/Utilities.js";
  * interactions with the teacher.
  */
 
-let toWrite = true
+let toWrite = false
 
 let fileName = "wrostRFSA";
 if (toWrite) {
@@ -28,7 +28,7 @@ if (toWrite) {
 
 let automatonList: Automaton[] = []
 let counter_examples = allStringFromAlphabet({ alphabet: "ab", maxLength: 14 })
-const N = 2, maxN = 12;
+const N = 2, maxN = 11;
 for (let n = N; n < maxN; n++) {
   console.log("Creating test with", n, "power");
 

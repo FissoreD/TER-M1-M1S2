@@ -8,10 +8,11 @@ declare module "automaton/Automaton" {
         successors: Set<State>;
         predecessor: Set<State>;
         name: string;
-        constructor(name: string, isAccepting: boolean, isInitial: boolean, alphabet: string[]);
+        constructor(name: string, isAccepting: boolean, isInitial: boolean, alphabet: string[] | string);
         addTransition(symbol: string, state: State): void;
         getSuccessor(symbol: string): State[];
         getPredecessor(symbol: string): State[];
+        static bottom(alphabet: string[]): State;
     }
     export interface AutomatonJson {
         states: Map<string, State>;
@@ -27,7 +28,8 @@ declare module "automaton/Automaton" {
         alphabet: string[];
         currentStates: State[];
         states_rename: Map<string, string>;
-        constructor(stateList: Set<State>);
+        constructor(stateList: Set<State> | State[]);
+        complete(stateList: Set<State>): void;
         set_state_rename(): void;
         next_step(next_char: string): void;
         accept_word(word: string): boolean;
@@ -38,6 +40,7 @@ declare module "automaton/Automaton" {
         initiate_graph(): void;
         get_current_graph_node(node: State): ChildNode;
         matrix_to_mermaid(): string;
+        automatonToDot(): string;
         color_node(toFill: boolean): void;
         create_triple(states: string, transition: string): string;
         create_entering_arrow(): string;
@@ -45,6 +48,8 @@ declare module "automaton/Automaton" {
         state_number(): number;
         transition_number(): number;
         minimize(): Automaton;
+        static strToAutomaton(content: String): Automaton;
+        toString(): string;
     }
 }
 declare module "automaton/automaton_type" {
@@ -59,12 +64,12 @@ declare module "automaton/automaton_type" {
         initialState?: number | number[];
         states: number[];
         transitions: HisTransition[];
-        acceptingStates: number[];
+        acceptingStates: number[] | number[][];
     }
     export function HisAutomaton2Mine(aut: HisAutomaton): Automaton;
     export function MyAutomatonToHis(aut: Automaton): HisAutomaton;
     export function regexToAutomaton(regex: string): Automaton;
-    export function minimizeAutomaton(automaton: HisAutomaton): Automaton;
+    export function minimizeAutomaton(automatonInput: HisAutomaton | Automaton): Automaton;
     export function intersectionAutomata(a1: Automaton, a2: Automaton): Automaton;
     export function unionAutomata(a1: Automaton, a2: Automaton): Automaton;
     export function complementAutomata(a1: Automaton): Automaton;
@@ -87,7 +92,7 @@ declare module "tools/Utilities" {
 declare module "teacher/Equiv" {
     import { Automaton } from "automaton/Automaton";
     import { Teacher } from "teacher/Teacher";
-    export let equivalenceFunction: (teacher: Teacher, automaton: Automaton, counter_exemples?: string[] | undefined) => string | undefined;
+    export let equivalenceFunction: (teacher: Teacher, automaton: Automaton) => string | undefined;
 }
 declare module "teacher/TeacherTakingAut" {
     import { Automaton } from "automaton/Automaton";
@@ -97,6 +102,7 @@ declare module "teacher/TeacherTakingAut" {
         alphabet: string[];
         regex: string;
         automaton: Automaton;
+        counter_examples?: string[];
         constructor(params: {
             automaton: Automaton;
             description?: string;
@@ -120,7 +126,7 @@ declare module "teacher/TeacherNoAutomaton" {
     export class TeacherNoAutomaton implements Teacher {
         static counter: number;
         check_function: myFunction<string, boolean>;
-        counter_exemples: string[];
+        counter_examples: string[];
         counter: number;
         description: string;
         alphabet: string[];
@@ -128,7 +134,7 @@ declare module "teacher/TeacherNoAutomaton" {
         regex: string;
         constructor(params: {
             regex: string | myFunction<string, boolean>;
-            counter_exemples: string[];
+            counter_examples: string[];
             alphabet: string[] | string;
         }, description?: string);
         member(sentence: string): string;
@@ -215,20 +221,22 @@ declare module "html_interactions/HTML_LearnerBase" {
         table_body: HTMLTableSectionElement;
         pile_actions: myFunction<void, void>[];
         automaton: Automaton | undefined;
+        tableHTML: HTMLTableElement;
         table_counter: number;
+        stopNextStep: boolean;
         constructor(learner: T);
         draw_table(): void;
         add_row_html(parent: HTMLTableSectionElement, fst: string | undefined, head: string | undefined, row_elts: string[], colspan?: number, rowspan?: number): HTMLTableRowElement;
         clear_table(): void;
-        graphic_next_step(): void;
+        next_step(): void;
         close_action(): boolean;
         consistence_action(): boolean;
         send_automaton_action(): void;
         abstract close_message(close_rep: string): string;
         abstract consistent_message(s1: string, s2: string, new_col: string): string;
         abstract table_to_update_after_equiv(answer: string): void;
-        add_automaton_listener(): void;
         go_to_end(): void;
+        message(): HTMLElement;
     }
 }
 declare module "html_interactions/HTML_L_star" {
@@ -276,8 +284,13 @@ declare module "html_interactions/HTML_NL_star" {
 declare module "Main" {
     import { Teacher } from "teacher/Teacher";
     import { Automaton } from "automaton/Automaton";
-    export let automatonDiv: HTMLDivElement, message: HTMLParagraphElement, tableHTML: HTMLTableElement, automatonHTML: HTMLDivElement, automatonDivList: [Automaton, Node][];
+    export let automatonDiv: HTMLDivElement, automatonHTML: HTMLDivElement, automatonDivList: [Automaton, Node][], historyHTML: [HTMLElement, Automaton?][], historyPosition: number, backupCenterDiv: Node;
+    export function centerDivClone(): Node;
     export function initiate_global_vars(): void;
+    export function addHistoryElement(automaton?: Automaton): void;
+    export function goForeward(): void;
+    export function goBackward(): void;
+    export function clear_table(): void;
     export function clear_automaton_HTML(): void;
     global {
         interface Window {
@@ -287,6 +300,9 @@ declare module "Main" {
             NL_star: any;
             autFunction: any;
             automatonDivList: [Automaton, Node][];
+            historyHTML: [Node, Automaton?][];
+            historyPosition: number;
+            automaton: Automaton;
         }
     }
 }
@@ -331,6 +347,8 @@ declare module "test_nodejs/PrintFunction" {
     export let clearFile: (fileName: string) => void;
     export let writeToFile: (fileName: string, content: string) => void;
 }
+declare module "test_nodejs/CompareBenchMark" { }
+declare module "test_nodejs/GenerateAutomaton" { }
 declare module "test_nodejs/LernerCompare" { }
 declare module "test_nodejs/Test_wrost_DFA" { }
 declare module "test_nodejs/Test_wrost_RFSA" { }

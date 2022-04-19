@@ -178,7 +178,7 @@ export abstract class LearnerBase {
         this.finish = true;
       }
     }
-    console.log(`Member number : ${this.member_number}, Equiv number  = ${this.equiv_number}`);
+    // console.log(`Member number : ${this.member_number}, Equiv number  = ${this.equiv_number}`);
   }
 
   make_all_queries() {

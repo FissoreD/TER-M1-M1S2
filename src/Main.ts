@@ -57,8 +57,6 @@ export function initiate_global_vars() {
     $("#teacher_description")[0].innerHTML = current_automaton.learner.teacher.description;
     console.log("The description is ", current_automaton.learner.teacher.description);
 
-    // @ts-ignore
-    MathJax.typeset();
     clearHistory();
   }
 
@@ -119,7 +117,13 @@ export function addHistoryElement(automaton?: Automaton) {
 }
 
 function changeMainDivContent() {
-  document.getElementById('centerDiv')!.innerHTML = historyHTML[historyPosition][0].innerHTML!;
+  let historyHead = Array.from(historyHTML[historyPosition][0].getElementsByClassName('head'))
+  let currentHead = Array.from(document.getElementsByClassName('head'))
+  historyHead.forEach((e, pos) => {
+    if (currentHead[pos].classList.contains('up')) e.classList.add('up');
+    else e.classList.remove('up');
+  })
+  document.getElementById('centerDiv')!.innerHTML = historyHTML[historyPosition][0].innerHTML;
 }
 
 function clearHistory() {
@@ -172,6 +176,7 @@ declare global {
     automatonDivList: [Automaton, Node][];
     historyHTML: [Node, Automaton?][];
     historyPosition: number;
+    automaton: Automaton;
   }
 }
 

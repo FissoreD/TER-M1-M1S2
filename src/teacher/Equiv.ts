@@ -47,17 +47,22 @@ export let equivalenceFunction = (teacher: Teacher, automaton: Automaton): strin
     }
     let automMinimized = minimizeAutomaton(MyAutomatonToHis(automaton));
     let diff1 = differenceAutomata(teacher.automaton!, automMinimized);
+
+    let counterEx1 = counterExemple(diff1);
+    if (counterEx1) return counterEx1;
+
     let diff2 = differenceAutomata(automMinimized, teacher.automaton!);
+
+    let counterEx2 = counterExemple(diff2);
+    return counterEx2;
     // BREAKPOINT AFTER DIFF 
     // console.log("Counter * Exemples");
 
-    let counterEx1 = counterExemple(diff1);
-    let counterEx2 = counterExemple(diff2);
     // AFTER COUNTEREXEMPLE
-    console.log(`C1 = { ${counterEx1} }, C2 = { ${counterEx2} }`, automaton.state_number());
+    // console.log(`C1 = { ${counterEx1} }, C2 = { ${counterEx2} }`, automaton.state_number());
 
-    if (counterEx1 == undefined) return counterEx2;
-    if (counterEx2 == undefined) return counterEx1;
-    return counterEx1 < counterEx2 ? counterEx1 : counterEx2;
+    // if (counterEx1 == undefined) return counterEx2;
+    // if (counterEx2 == undefined) return counterEx1;
+    // return counterEx1 < counterEx2 ? counterEx1 : counterEx2;
   }
 }

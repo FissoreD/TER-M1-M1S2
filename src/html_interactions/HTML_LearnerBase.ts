@@ -91,8 +91,6 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
       this.message().innerHTML += "The Teacher has accepted the automaton";
       this.stopNextStep = true
     }
-    // @ts-ignore
-    MathJax.typeset()
     document.getElementById('messageHead')?.classList.remove('up');
     document.getElementById('tableHead')?.classList.remove('up');
     document.getElementById('teacher_description')?.classList.remove('up');
@@ -100,7 +98,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
     document.getElementById('table')!.innerHTML = this.tableHTML.innerHTML;
     document.getElementById('teacher_description')!.innerHTML = this.learner.teacher.description;
     // @ts-ignore
-    MathJax.typeset();
+    // MathJax.typeset();
     addHistoryElement(this.automaton);
   }
 
@@ -144,17 +142,17 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
     let automaton = this.learner.make_automaton();
 
     this.automaton = automaton;
+    window.automaton = automaton;
     this.pile_actions.push(() => {
       this.message().innerHTML = "";
       automaton.initiate_graph();
-      this.add_automaton_listener();
+      $('#input-automaton')[0].classList.remove('hide');
       let answer = this.learner.make_equiv(automaton);
 
 
       if (answer != undefined) {
         this.message().innerText =
-          `The sent automaton is not valid, 
-          here is a counter-exemple ${answer}`;
+          `The sent automaton is not valid, here is a counter-exemple ${answer}`;
         this.pile_actions.push(() => {
           this.message().innerHTML = "";
           clear_automaton_HTML();
@@ -174,45 +172,8 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
 
   abstract table_to_update_after_equiv(answer: string): void;
 
-  add_automaton_listener() {
-    let input = document.createElement("input");
-    let setB = document.createElement("button");
-    setB.innerHTML = "Reinitialize automaton";
-    setB.addEventListener('click', () => {
-      this.automaton!.restart();
-      this.automaton!.initiate_graph();
-    })
-    let nextB = document.createElement("button")
-    nextB.innerHTML = "Next char";
-    nextB.addEventListener('click', () => {
-      this.automaton!.draw_next_step(input.value[0])
-      input.value = input.value.slice(1);
-    });
-    automatonDiv.appendChild(input);
-    automatonDiv.appendChild(nextB);
-    automatonDiv.appendChild(setB);
-    let acceptB = document.createElement("button");
-    let answerP = document.createElement("p");
-    acceptB.innerHTML = "In automaton";
-    acceptB.addEventListener("click", () => {
-      let aut_answer = this.automaton?.accept_word_nfa(input.value);
-      answerP.innerHTML = `The word ${input.value} is${aut_answer ? "" : " not"} accepted`
-    })
-    automatonDiv.appendChild(acceptB);
-    automatonDiv.appendChild(answerP);
-  }
-
   go_to_end() {
-    // if (this.learner.finish) return
-    while (!this.learner.finish) {
-      this.next_step();
-    }
-    // this.learner.make_all_queries()
-    // this.clear_table()
-    // this.draw_table()
-    // clear_automaton_HTML();
-    // this.learner.automaton?.initiate_graph()
-    // this.next_step()
+    while (!this.learner.finish) this.next_step();
   }
 
   message() {

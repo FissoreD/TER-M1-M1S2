@@ -26,16 +26,12 @@
 
 .head::after {
   content: "▲";
-  position: absolute;
-  right: var(--marginColumns);
-  transform: translateX(-50%);
+  text-align: right;
+  float: right;
 }
 
 .head.up::after {
   content: "▼";
-  position: absolute;
-  right: var(--marginColumns);
-  transform: translateX(-50%);
 }
 
 .innerHead {
@@ -48,7 +44,12 @@
   border-bottom-left-radius: 4pt;
   border-bottom-right-radius: 4pt;
   padding: 5pt;
+  border: solid 1pt red;
+  border-width: 0 1pt 1pt 1pt;
+  /* max-height: 500pt; */
+  /* overflow: auto; */
 }
+
 
 .head.up+* {
   height: 0;
@@ -64,7 +65,7 @@
   z-index: 1;
 }
 
-.marginColumn.hide {
+.hide {
   display: none;
 }
 
@@ -74,7 +75,7 @@
 }
 
 #rightCol {
-  right: 0;
+  right: 8px;
   text-align: left;
 }
 
@@ -90,4 +91,23 @@
 
 #centerDiv>div {
   border-bottom: solid 5pt transparent;
+}
+
+.automatonLogo {
+  width: 15pt;
+}
+
+.automatonLogo:hover {
+  cursor: pointer;
+  zoom: 1.2;
+}
+
+.automaton-div div:empty {
+  display: none;
+}
+
+#messageBox {
+  position: sticky;
+  top: 0px;
+  z-index: 5;
 }

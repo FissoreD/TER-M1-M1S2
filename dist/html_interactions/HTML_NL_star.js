@@ -1,10 +1,6 @@
-import{NL_star}from"../learners/NL_star.js";import{HTML_LearnerBase}from"./HTML_LearnerBase.js";export class HTML_NL_star extends HTML_LearnerBase{constructor(teacher){super(new NL_star(teacher))}add_row_html(parent,fst,head,row_elts,colspan=1,rowspan=1){let row=super.add_row_html(parent,fst,head,row_elts,colspan,rowspan);if(head!=undefined&&this.learner.prime_lines.includes(head)){row.className+="prime-row"}return row}close_message(close_rep){return`
-    The table is not closed since
-    \\(\\{row(${close_rep}) = ${this.learner.observation_table[close_rep]} \\land ${close_rep} \\in SA\\}\\) but \\(\\{\\nexists s \\in S | row(s) \\sqsupseteq ${this.learner.observation_table[close_rep]}\\}\\)
-    I'm going to move "${close_rep}" from SA to S`}consistent_message(s1,s2,new_col){return`
-    The table is not consistent :
-    take \\(${s1?s1:"\u03B5"}\\in S \\land ${s2?s2:"\u03B5"} \\in S \\land ${new_col[0]} \\in \\Sigma \\)
-    \\(\\{row(${s1?s1:"\u03B5"}) \\sqsubseteq row(${s2?s2:"\u03B5"})\\}\\)
-    but \\(\\{row(${s1?s1:"\u03B5"} \\circ ${new_col[0]}) \\not\\sqsubseteq row(${s2?s2:"\u03B5"} \\circ ${new_col[0]})\\}\\)
-    I'm going to add the column \\(${new_col} \\in \\Sigma \\circ E\\) since \\(T(${s1?s1:"\u03B5"} \\circ ${new_col}) > T(${s2?s2:"\u03B5"} \\circ ${new_col})\\)`}table_to_update_after_equiv(answer){this.learner.add_elt_in_E(answer)}}
+import{NL_star}from"../learners/NL_star.js";import{HTML_LearnerBase}from"./HTML_LearnerBase.js";export class HTML_NL_star extends HTML_LearnerBase{constructor(teacher){super(new NL_star(teacher))}add_row_html(parent,fst,head,row_elts,colspan=1,rowspan=1){let row=super.add_row_html(parent,fst,head,row_elts,colspan,rowspan);if(head!=undefined&&this.learner.prime_lines.includes(head)){row.className+="prime-row"}return row}close_message(close_rep){let row=this.learner.observation_table[close_rep];return`The table is not closed since there is row(${close_rep}) = "${row}" where "${close_rep}" is in SA and there is no row s in S such that s ⊑ ${row}.
+    "${close_rep}" will be moved from SA to S.`}consistent_message(s1,s2,new_col){let fstChar=new_col[0],sndChar=new_col.length==1?"\u03B5":new_col.substring(1);return`The table is not consistent since :
+        row(${s1?s1:"\u03B5"}) ⊑ row(${s2?s2:"\u03B5"}) where ${s1?s1:"\u03B5"}, ${s2?s2:"\u03B5"} ∈ S but row(${s1+new_col[0]}) ⋢ row(${s2+new_col[0]});
+        The column "${new_col}" will be added in E since T(${s1+new_col}) ≠ T(${s2+new_col}) 
+        [Note : ${new_col} = ${fstChar} ∘ ${sndChar} and ${fstChar} ∈ Σ and ${sndChar} ∈ E]`}table_to_update_after_equiv(answer){this.learner.add_elt_in_E(answer)}}
 //# sourceMappingURL=HTML_NL_star.js.map

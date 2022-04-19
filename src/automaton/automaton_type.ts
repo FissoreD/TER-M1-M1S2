@@ -3,8 +3,8 @@ import { Automaton, AutomatonJson, State } from "../automaton/Automaton.js";
 import { noam } from '../../public/noam.js';
 
 interface HisTransition {
-  fromState: number,
-  toStates: number[],
+  fromState: number | number[],
+  toStates: number[] | number[][],
   symbol: string
 }
 
@@ -13,7 +13,7 @@ interface HisAutomaton {
   initialState?: number | number[],
   states: number[],
   transitions: HisTransition[],
-  acceptingStates: number[]
+  acceptingStates: number[] | number[][]
 }
 
 export function HisAutomaton2Mine(aut: HisAutomaton): Automaton {
@@ -81,18 +81,52 @@ export function regexToAutomaton(regex: string): Automaton {
   return minimizeAutomaton(res);
 }
 
-export function minimizeAutomaton(automaton: HisAutomaton): Automaton {
-  console.log("1 - Converting Enfa to NFA", automaton.states.length);
+export function minimizeAutomaton(automatonInput: HisAutomaton | Automaton): Automaton {
+  let automaton = automatonInput instanceof Automaton ?
+    MyAutomatonToHis(automatonInput) : automatonInput
+
+  let log = (message: string, aut: HisAutomaton | Automaton) => {
+    console.log(message, automaton.states.length);
+    if ((aut instanceof Automaton ? aut.state_number() : aut.states.length) > 10000)
+      console.error(message, automaton.states.length);
+  }
+
+  log("1 - Converting Enfa to NFA", automaton);
   automaton = noam.fsm.convertEnfaToNfa(automaton);
-  console.log("2 - Converting NFA to DFA", automaton.states.length);
+  log("2 - Converting NFA to DFA", automaton);
   automaton = noam.fsm.convertNfaToDfa(automaton);
-  console.log("3 - Converting state to numbers ", automaton.states.length);
-  // let automaton = noam.fsm.minimize(automaton)
-  let statesToNumbers = noam.fsm.convertStatesToNumbers(automaton)
-  console.log("4 - Minimizing automaton ", statesToNumbers.states.length);
-  let minimized = HisAutomaton2Mine(statesToNumbers).minimize()
-  console.log("5 - Minimization OK, ", minimized.allStates.length);
-  return minimized
+  log("3 - Converting state to numbers ", automaton);
+
+  let numToList = (elt: number | number[]) => typeof elt == 'number' ? [elt] : elt!
+  try {
+    let statesToNumbers = HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton))
+    // let automaton1 = {
+    //   acceptingStates: automaton.acceptingStates.map(e => e.toString()),
+    //   initialStates: numToList(automaton.initialState!).toString(),
+    //   transitions: automaton.transitions.map(({ fromState, symbol, toStates }) => ({ fromState: numToList(fromState).toString(), toStates: toStates.map(e => e.toString()), symbol: symbol }))
+    // }
+    // let hasInitialState = false
+    // let stateMap: Map<string, State> = new Map(), stateSet: Set<State> = new Set();
+    // for (const e of automaton.states) {
+    //   let state = new State(e.toString(), automaton1.acceptingStates.includes(e.toString()), e.toString() == automaton1.initialStates, automaton.alphabet);
+    //   stateMap.set(state.name, state);
+    //   if (!hasInitialState)
+    //     hasInitialState = e.toString() == automaton1.initialStates
+    //   stateSet.add(state);
+    // }
+
+    // automaton1.transitions.forEach(t => {
+    //   t.toStates.forEach(next =>
+    //     stateMap.get(t.fromState)!.addTransition(t.symbol, stateMap.get(next)!
+    //     ))
+    // })
+    log("4 - Minimizing automaton ", statesToNumbers);
+    let minimized = statesToNumbers.minimize()
+    log("5 - Minimization OK, ", minimized);
+    return minimized
+  } catch {
+    throw 'Error'
+  }
 }
 
 export function intersectionAutomata(a1: Automaton, a2: Automaton): Automaton {

@@ -15,7 +15,7 @@ import { TeacherNoAutomaton } from "../teacher/TeacherNoAutomaton.js";
  * interactions with the teacher.
  */
 
-let toWrite = true
+let toWrite = false
 
 let fileName = "wrostDFA";
 if (toWrite) {
