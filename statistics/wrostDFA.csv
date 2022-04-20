@@ -1,0 +1,11 @@
+Regex,Length alphabet,Description,L Membership queries,NL Membership queries,L Equivalence queries,NL Equivalence queries,L State nb in A,NL State nb in A,L Transition nb in A,NL Transition nb in A
+(a|b)*a,2,0,5,5,1,1,2,2,4,6
+(a|b)*a(a|b),2,1,14,15,2,2,4,3,8,11
+(a|b)*a(a|b)(a|b),2,2,35,24,2,2,8,4,16,16
+(a|b)*a(a|b)(a|b)(a|b),2,3,84,35,2,2,16,5,32,21
+(a|b)*a(a|b)(a|b)(a|b)(a|b),2,4,197,55,2,2,32,6,64,26
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b),2,5,454,79,2,2,64,7,128,31
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,6,1031,107,2,2,128,8,256,36
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,7,2312,139,2,2,256,9,512,41
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,8,5129,175,2,2,512,10,1024,46
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,9,11274,215,2,2,1024,11,2048,51

@@ -71,8 +71,9 @@ sorting=ynt
 \theoremstyle{definition}
 \newtheorem{exmp}{Example}
 \newtheorem{theorem}{Theorem}
-
-
+\newtheorem{definition}{Definition}[section]
+\newtheorem{notation}{Notation}
+\newtheorem{lemma}{Lemma}
 
 \graphicspath{img/}
 

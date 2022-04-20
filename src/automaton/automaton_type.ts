@@ -1,11 +1,10 @@
-
-// @ts-nocheck
-import { Automaton, AutomatonJson } from "../automaton/Automaton.js";
+import { Automaton, AutomatonJson, State } from "../automaton/Automaton.js";
+// @ts-ignore
 import { noam } from '../../public/noam.js';
 
 interface HisTransition {
-  fromState: number,
-  toStates: number[],
+  fromState: number | number[],
+  toStates: number[] | number[][],
   symbol: string
 }
 
@@ -14,35 +13,58 @@ interface HisAutomaton {
   initialState?: number | number[],
   states: number[],
   transitions: HisTransition[],
-  acceptingStates: number[]
+  acceptingStates: number[] | number[][]
 }
 
 export function HisAutomaton2Mine(aut: HisAutomaton): Automaton {
-  let res: AutomatonJson = {
-    alphabet: Array.from(aut.alphabet),
-    acceptingStates: aut.acceptingStates.map(e => e + ""),
-    startState: (typeof aut.initialState === "number") ? [aut.initialState + ""] : Array.from(aut.initialState!).map(e => e + ""),
-    states: aut.states.map(e => e + ""),
-    transitions: aut.transitions.map(e => ({ fromState: e.fromState + "", symbol: e.symbol, toStates: e.toStates.map(e => e + "") }))
+
+  let states: State[] = aut.states.map(
+    e => new State(
+      e + "",
+      aut.acceptingStates.some(x => x + "" == e + ""),
+      (typeof aut.initialState == "number" ? aut.initialState + "" == e + "" : aut.initialState?.some(x => x + "" == e + "")) || false,
+      aut.alphabet))
+
+  let statesMap: Map<string, State> = new Map(),
+    statesSet: Set<State> = new Set();
+  for (const state of states) {
+    statesMap.set(state.name, state)
+    statesSet.add(state)
   }
-  return new Automaton(res);
+
+  for (const transition of aut.transitions) {
+    let from = transition.fromState
+    let symbol = transition.symbol
+    let to = transition.toStates
+    to.forEach(state =>
+      statesMap.get(from + "")?.addTransition(symbol, statesMap.get(state + "")!))
+  }
+
+  return new Automaton(statesSet);
 }
 
 export function MyAutomatonToHis(aut: Automaton): HisAutomaton {
-  let state2int = (state: string) => aut.states.indexOf(state);
-  let states = aut.states.map(e => state2int(e))
+  let stateList = Array.from(aut.states).map(e => e[1]);
+  let state2int = (state: State) => stateList.indexOf(state);
+  let states = stateList.map(e => state2int(e))
   let startState = states.length;
-  let transitions = aut.transitions.map(e => ({
-    fromState: state2int(e.fromState), symbol: e.symbol, toStates: e.toStates.map(e => state2int(e))
-  }))
-  if (aut.startState.length > 1) {
+  let transitions: HisTransition[] = stateList.map(state => Array.from(state.outTransitions).map(transition =>
+  ({
+    fromState: state2int(state),
+    symbol: transition[0],
+    toStates: transition[1].map(e => state2int(e))
+  })).flat()).flat();
+  //   )) aut.transitions.map(e => ({
+  //   fromState: state2int(e.fromState), symbol: e.symbol, toStates: e.toStates.map(e => state2int(e))
+  // }))
+  if (aut.initialStates.length > 1) {
     transitions.push(({
       fromState: startState,
       symbol: "$",
-      toStates: aut.startState.map(e => state2int(e))
+      toStates: aut.initialStates.map(e => state2int(e))
     }));
     states.push(startState)
-  } else startState = state2int(aut.startState[0])
+  } else startState = state2int(aut.initialStates[0])
   let res: HisAutomaton = {
     acceptingStates: aut.acceptingStates.map(e => state2int(e)),
     alphabet: Array.from(aut.alphabet),
@@ -53,19 +75,62 @@ export function MyAutomatonToHis(aut: Automaton): HisAutomaton {
   return res;
 }
 
+/** Return the mDFA for a regex */
 export function regexToAutomaton(regex: string): Automaton {
-  let res = noam.fsm.minimize(noam.fsm.convertEnfaToNfa(noam.re.string.toAutomaton(regex)));
-  return HisAutomaton2Mine(res);
+  let res = noam.re.string.toAutomaton(regex);
+  return minimizeAutomaton(res);
 }
 
-export function minimizeAutomaton(automaton: HisAutomaton): Automaton {
+export function minimizeAutomaton(automatonInput: HisAutomaton | Automaton): Automaton {
+  let automaton = automatonInput instanceof Automaton ?
+    MyAutomatonToHis(automatonInput) : automatonInput
+
+  let log = (message: string, aut: HisAutomaton | Automaton) => {
+    console.log(message, automaton.states.length);
+    if ((aut instanceof Automaton ? aut.state_number() : aut.states.length) > 5000)
+      console.error(message, automaton.states.length);
+  }
+
+  log("1 - Converting Enfa to NFA", automaton);
   automaton = noam.fsm.convertEnfaToNfa(automaton);
+  log("2 - Converting NFA to DFA", automaton);
   automaton = noam.fsm.convertNfaToDfa(automaton);
-  automaton = noam.fsm.minimize(automaton);
-  return HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton))
+  log("3 - Converting state to numbers ", automaton);
+
+  let numToList = (elt: number | number[]) => typeof elt == 'number' ? [elt] : elt!
+  try {
+    let statesToNumbers = HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton))
+    // let automaton1 = {
+    //   acceptingStates: automaton.acceptingStates.map(e => e.toString()),
+    //   initialStates: numToList(automaton.initialState!).toString(),
+    //   transitions: automaton.transitions.map(({ fromState, symbol, toStates }) => ({ fromState: numToList(fromState).toString(), toStates: toStates.map(e => e.toString()), symbol: symbol }))
+    // }
+    // let hasInitialState = false
+    // let stateMap: Map<string, State> = new Map(), stateSet: Set<State> = new Set();
+    // for (const e of automaton.states) {
+    //   let state = new State(e.toString(), automaton1.acceptingStates.includes(e.toString()), e.toString() == automaton1.initialStates, automaton.alphabet);
+    //   stateMap.set(state.name, state);
+    //   if (!hasInitialState)
+    //     hasInitialState = e.toString() == automaton1.initialStates
+    //   stateSet.add(state);
+    // }
+
+    // automaton1.transitions.forEach(t => {
+    //   t.toStates.forEach(next =>
+    //     stateMap.get(t.fromState)!.addTransition(t.symbol, stateMap.get(next)!
+    //     ))
+    // })
+    log("4 - Minimizing automaton ", statesToNumbers);
+    let minimized = statesToNumbers.minimize()
+    log("5 - Minimization OK, ", minimized);
+    return minimized
+  } catch {
+    throw 'Error'
+  }
 }
 
 export function intersectionAutomata(a1: Automaton, a2: Automaton): Automaton {
+  console.log("Intersection, ", a1.states.size, a2.states.size);
   return minimizeAutomaton(noam.fsm.intersection(MyAutomatonToHis(a1), MyAutomatonToHis(a2)))
 }
 
@@ -78,7 +143,7 @@ export function unionAutomata(a1: Automaton, a2: Automaton): Automaton {
 }
 
 export function complementAutomata(a1: Automaton): Automaton {
-  return minimizeAutomaton(noam.fsm.complement(MyAutomatonToHis(a1)))
+  return HisAutomaton2Mine(noam.fsm.complement(MyAutomatonToHis(minimizeAutomaton(MyAutomatonToHis(a1)))))
 }
 
 export function differenceAutomata(a1: Automaton, a2: Automaton): Automaton {

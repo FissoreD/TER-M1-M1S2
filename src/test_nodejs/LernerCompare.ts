@@ -1,39 +1,37 @@
-import { NL_star } from "../lerners/NL_star.js";
-import { L_star } from "../lerners/L_star.js";
-import { teachers } from "../Teacher.js";
-import assert from 'assert/strict';
-import { LernerBase } from "../lerners/LernerBase.js";
+import { NL_star } from "../learners/NL_star.js";
+import { L_star } from "../learners/L_star.js";
+import { teachers } from "../teacher/Teacher.js";
+import { clearFile, csvHead, printCsvCompare, printInfo, writeToFile } from "./PrintFunction.js";
 /**
  * About this file : 
  * The goal here is to compare L and NL algo in term
  * of the number of queries and equiv function that 
- * the lerner will ask to the teacher.
+ * the learner will ask to the teacher.
  * We measure in this way a particular kind of 
  * complexity of these algorithms and will try to 
  * test which one of the two algorithms will perform less
  * interactions with the teacher.
  */
 
-let compare = (a: L_star, b: NL_star) => {
-  let printInfo = (algoName: string, algo: LernerBase) => {
-    return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.states.length}`;
-  }
-  assert(a.teacher == b.teacher)
+let fileName = "randomRegex";
+clearFile(fileName)
+writeToFile(fileName, csvHead)
 
-  console.log(printInfo("L Star", a));
-  console.log(printInfo("NL Star", b));
-}
+for (let index = 0; index < teachers.length; index++) {
+  const teacher = teachers[index];
+  teacher.description = index + "";
 
-for (const teacher of teachers) {
-  let lernerL = new L_star(teacher)
-  let lernerNL = new NL_star(teacher)
+  let L = new L_star(teacher);
+  let NL = new NL_star(teacher);
 
   console.log("==============================");
-  console.log("Current regexp : ", teacher.regex);
+  console.log("Current regexp : ", teacher.regex, teacher.description);
 
-  lernerL.make_all_queries()
+  L.make_all_queries()
+  printInfo(L, "L*")
 
-  lernerNL.make_all_queries()
+  NL.make_all_queries()
+  printInfo(L, "NL*")
 
-  compare(lernerL, lernerNL)
+  writeToFile(fileName, printCsvCompare(L, NL))
 }

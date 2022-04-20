@@ -10,7 +10,7 @@
     "strict": true,
     "sourceMap": true,
     "alwaysStrict": true,
-    // "declaration": true,
+    "declaration": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleResolution": "node",

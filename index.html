@@ -10,7 +10,17 @@
     <link rel="stylesheet" href="css/htmlStyle.css">
     <link rel="stylesheet" href="css/tableHtml.css">
     <link rel="stylesheet" href="css/nextStepButton.css">
+    <link rel="stylesheet" href="css/buttonStyle.css">
+    <link rel="stylesheet" href="css/sectionHead.css">
     <link rel="shortcut icon" href="#">
+
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="http://viz-js.com/bower_components/viz.js/viz-lite.js"></script>
+    <script src="https://github.com/magjac/d3-graphviz/releases/download/v0.0.4/d3-graphviz.min.js"></script>
+
+    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.14.3/js/lib/beautify.js"></script>
+    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.14.3/js/lib/beautify-css.js"></script>
+    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.14.3/js/lib/beautify-html.js"></script>
 
     <script src="public/polyfill.min.js"></script>
     <script src="public/tex-mml-chtml.js"></script>
@@ -19,14 +29,14 @@
     <script src="public/jquery.min.js"></script>
     <script src="public/myGeneralFunction.js"></script>
 
+
     <script>
         mermaid.initialize({ startOnLoad: false });
     </script>
 </head>
 
 <body>
-    <h1> Learning languages </h1>
-    <h2> An implementation of L* and NL* algorithms </h2>
+    <h1> Learning algorithms : L* vs NL* </h1>
 
     <div class="preset">
         <div>
@@ -47,46 +57,88 @@
         <div>
             <p>Enter your regular expression</p>
             <input id="input-regex">
-            <button id="button-regex">Send teacher</button>
+            <button id="button-regex" class="button-19">Send teacher</button>
         </div>
     </div>
-    <p class="description" id="teacher_description"></p>
     <div class="bottom_page">
         <button class="bottom_button" id="next_step">Next step</button>
         <button class="bottom_button" id="go_to_end">Run algo</button>
     </div>
-    <table class="mainTable">
-        <thead>
-            <tr>
-                <td>
-                    Observation Table
-                </td>
-                <td>
-                    Automaton
-                </td>
-            </tr>
-        </thead>
-        <tr>
-            <td>
-                <div class="box">
-                    <table id="table" class="styled-table"> </table>
-                </div>
-            </td>
-            <td>
+
+    <div class="marginColumn hide" id="leftCol"><span>◀</span></div>
+    <div class="marginColumn hide" id="rightCol"><span>▶</span></div>
+
+    <div id="centerDiv">
+
+        <div>
+            <div class="headSpecial" id="descriptionHead">Teacher Description</div>
+            <div class="innerHead">
+                <span id="teacher_description"></p>
+            </div>
+        </div>
+
+        <div id="messageBox">
+            <div class="head" id="messageHead">Message</div>
+            <div class="innerHead">
                 <span id="message"></span>
+            </div>
+        </div>
+
+        <div>
+            <div class="head" id="automatonHead">Automaton</div>
+            <div class="innerHead">
                 <div class="automaton-div" id="automaton-div">
                     <div class="mermaid" id='automaton-mermaid'></div>
-                    <div id="input-automaton" class="box"></div>
+                    <!-- <img src="images/Minus.png" class="automatonLogo" alt="Minus" onclick="console.log(123)">
+                    <img src="images/Plus.png" class="automatonLogo" alt="Plus" onclick="console.log(123)"> -->
                 </div>
-            </td>
-        </tr>
-    </table>
+                <div id="graph" class="hide"></div>
+                <div id="input-automaton" class="box hide">
+                    <input type="text" name="Enter word" id="inputWord">
+                    <button id="reinitializeAutomaton">Reinitialize automaton</button>
+                    <button id="readNextChar">Read next char</button>
+                    <button id="inAutomaton">In Automaton</button>
+                    <p id="answer"></p>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="head" id="tableHead">Observation table</div>
+            <div class="box innerHead">
+                <table id="table" class="styled-table"> </table>
+            </div>
+        </div>
     </div>
 
-    <!-- <script src="public/out.js"></script>
-    <script>require(['Main']);</script> -->
 
     <script type="module" src="dist/Main.js"></script>
+
+    <script>
+        let hideShow = elt => elt.classList.toggle('up');
+        Array.from(document.getElementsByClassName('head')).forEach(e => {
+            e.setAttribute('onclick', 'this.classList.toggle("up")')
+            e.classList.toggle("up");
+        });
+
+        $('#reinitializeAutomaton')[0].setAttribute("onclick", `{
+            automaton.restart();
+            automaton.initiate_graph();
+        }`);
+        $('#readNextChar')[0].setAttribute('onclick', `{
+                console.log(12222);
+                automaton.draw_next_step($('#inputWord')[0].value[0]);
+                $('#inputWord')[0].value = $('#inputWord')[0].value.slice(1);
+            }`);
+        $('#inAutomaton')[0].setAttribute('onclick', `{
+                let aut_answer = automaton.accept_word_nfa($('#inputWord')[0].value);
+                if (aut_answer)
+                    $('#answer')[0].innerHTML = \`The word ${$('#inputWord')[0].value} is accepted\`
+                else
+                    $('#answer')[0].innerHTML = \`The word ${$('#inputWord')[0].value} is not accepted\`
+            }`);
+
+    </script>
 </body>
 
 </html>
