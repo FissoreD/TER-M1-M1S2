@@ -1,7 +1,7 @@
 \section{Finate State Automaton}
 
 \subsection{Description}
-An automaton \automaton{} is a computing device used in abstract computer science to understand a regular language \lang{} which can be seen as a set of words formed with the concatenation of zero or more letters \letter{} belonging to an alphabet, a finite set of symbols, noted \alphabet{}.
+An automaton \automaton{} is a computing device used in abstract computer science to understand a regular language \lang{} which can be seen as a set of words formed with the concatenation of zero or more letters \letter{} belonging to an alphabet, and a finite set of symbols, noted \alphabet{}.
 
 \begin{theorem}[Kleene's theorem]
   A language is called regular if it can be represented by a regular expression, a finite state automaton or a context free grammar.
@@ -59,17 +59,28 @@ Here are some examples of regular langauges and their corresponting automata are
   \label{simple_automata}
 \end{figure}
 
-To test if a word \word{} belongs to the language recognized by the the automaton, we place our cursor on the initial state, usually noted \qzero{}, which is the one with the entering arrow. Then we read the first letter \letter{} of \word{}, look for the edge labelled with \letter{} exiting from the current state and move the cursor to the new node pointed by the selected edge. We read the second letter of \word{} and repeat the previous operation until we have consumed all letters of \word{}. If at the end the cursor is in a node marked with a double circle then the word is in \lang{}.
+In \cref{simple_automata} we see that a \textit{finite} automaton is composed by a finite set of states linked by labelled arrows called \textit{transitions}.
 
-\subsection{Technical definition}
-An automaton \automaton{} is usually represented by a 5-tuple $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ where \alphabet{} is the alphabet, \states{} is the set of states composing the automaton, \transition{} is a mapping \transition{} $\coloneqq \{q_i \times \letterN{} \rightarrow q_j | (q_i, q_j) \in \statesN{} \wedge \letterN{} \in \Sigma \} $ meaning that we move from $ q_i $ to $q_j$ if we read \letter{}, \qzero{} $\in \statesN{}$ is the starting state and \qend{} is the set of accepting states in \states{}
+The set of states that are directly linked with a state \qi{} are called successor of \qi{} and noted $Succ(q_i)$, and the predecessors of \qi{}, noted $Pred(q_i)$, are those states having \qi{} has a successor. Moreover, if a state is pointed by an arrow with no predecessor, then it is an initial state and if a state is marked with a double circle then it is called an accepting state.
 
-If $\forall (q_i, \alpha, q_j) \in \transitionN{}, \nexists (q_i, \alpha, q_j') \in \transitionN{} \mid q_j \neq q_j'$ that is, if for all state $q_i \in \statesN{}$, there does not exist two different transitions exiting from \qi{} with the same label, then the automaton is said to be \textit{deterministic} and noted \textit{DFA}, on the other case the automaton is called \textit{non deterministic} and noted \textit{NFA}.
+We say that a word \word{} is accepted by \automaton{} or belongs to \langA{}, the language recognized by \automaton{}, if, from an initial state we can join an accepting state by reading each letter of \word{}.
 
-DFAs \automaton{} have important properties since it is computationally "easy" to test if a word is accepted by \automaton{}. On the other hand a NFA can be exponentially more succint in term of number of states than a DFA, but checking the membership of a word is in general a difficult task for an algorithm.
+\begin{notation}
+  An automaton \automaton{} is usually represented by a 5-tuple $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ where \alphabet{} is the alphabet, \states{} is the set of states composing the automaton, \transition{} is the set of transition of \automaton{} \qzero{} $\in \statesN{}$ is the starting state and \qend{} is the set of accepting states in \states{}. A transition \transition{} is a triple $(q_i, \alpha, q_j)$ saying that it is possible to go to the state $q_j$ from the state $q_i$ when the symbol $\alpha$ is read.
+\end{notation}
 
-\begin{exmp}[A DFA and an NFA for the same langauge]
-  Here an exemple of two minimum automata defining the language over the alphabet $\alphabetN{} = \{a, b\}$ for strings with an $a$ in the second letter from last.
+\begin{definition}[DFA and NFA]
+  If $\forall (q_i, \alpha, q_j) \in \transitionN{}, \nexists (q_i, \alpha, q_j') \in \transitionN{} \mid q_j \neq q_j'$ that is, if for every state $q_i \in \statesN{}$, there does not exist two different transitions from \qi{} with the same label, then the automaton is said to be \textit{deterministic} and noted \textit{DFA}, otherwise the automaton is called \textit{non deterministic} and noted \textit{NFA}.
+\end{definition}
+
+DFAs have important properties since it is computationally "easy" to test if a word is accepted by \automaton{}. On the other hand a NFA can be exponentially more succint in term of number of states than a DFA, but checking the acceptance of a word in an NFA is in general more difficult task.
+
+\begin{definition}[Minimal automaton]
+  An automaton \automaton{} is minimal if it is not possible to construct a smaller automaton $\automatonN{}'$ for the same language having less states than \automaton{}.
+\end{definition}
+
+\begin{exmp}[DFA vs NFA]
+  Here an exemple of two minimal automata defining the language over the alphabet $\alphabetN{} = \{a, b\}$ for strings with an $a$ in the second letter from last position (same as $L = regex((a+b)^*a(a+b))$).
   \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
@@ -114,11 +125,11 @@ DFAs \automaton{} have important properties since it is computationally "easy" t
 \end{exmp}
 
 % \begin{theorem}
-%   Every DFA has an unique minimum DFA representing the same langauge with the minimum number of states and to know if two DFAs are equivalent, we can minimize and compare them.
+%   Every DFA has an unique minimal DFA representing the same langauge with the minimal number of states and to know if two DFAs are equivalent, we can minimize and compare them.
 % \end{theorem}
 
 % \begin{theorem}
-%   An NFA has not a unique minimum representation and to compare two NFAs, in general, we must transform them in DFA and then test the equality.
+%   An NFA has not a unique minimal representation and to compare two NFAs, in general, we must transform them in DFA and then test the equality.
 % \end{theorem}
 
 % Since the goal of this paper is not to minimize automata, we are going to consider DFA and NFA as if they are always in the minimized form.

@@ -1,12 +1,14 @@
 \section{L* algorithm}
 
-The L* algorithm, described by Dana Angluin in \cite{angluinL}, is a lerning algorithm that wants to build a minimum DFA to define an unknown language \langU{}. In this algorithm we see the interaction between a \lerner{} and a \teacher{} as said in the introduction section, where communications are made thanks membership and equivalence queries.
+The L* algorithm, described by Dana Angluin in \cite{angluinL}, is a learning algorithm. Its goal is to build a \textit{minimal} DFA recognizing an unknown language \langU{} thanks to interactions between a \learner{} and a \teacher{} through membership and equivalence queries.
 
-\subsection{\textit{member} and \textit{equiv} functions}
+\begin{definition}[Type of queries]
+  A membership query is represented as a function which maps a word $w$ to \{True, False\} and an equivalence query maps an automaton \automaton{} to \{True, $w \in \Sigma^*$\}, where $w$ is a counter-exemple if \automaton{} does not recognize \langU{}.
+\end{definition}
 
-A membership query is represented as a function which maps a word $w$ to \{True, False\} and an equivalence query maps an automaton \automaton{} to \{True, $w \in \Sigma^*$\}, where $w$ is a counter-exemple if \automaton{} does not recognize \langU{}.
-
-A counter-example is a word belonging to the symmetric difference of \langU{} and the language recognized by \automaton{}. The symmetric difference between to sets $A$ and $B$ is a set $S$ containing all the elements that are in $A$ and not in $B$ or that are in $B$ and not in $A$, we can note it as : $A \Delta B \equiv (A \cap \bar{B}) \cup (\bar{A} \cap B) \equiv (A \cup B) - (A \cap B) $
+\begin{definition}[Counter-exemple]
+  A counter-example is a word belonging to the symmetric difference of \langU{} and $L(\automatonN{})$. The symmetric difference between to sets $A$ and $B$ is a set $S$ containing all the elements that are in $A$ and not in $B$ or that are in $B$ and not in $A$, we can note it as : $A \Delta B \equiv (A \cap \bar{B}) \cup (\bar{A} \cap B)$.
+\end{definition}
 
 Mathematically :\\
 let w be a word over an alphabet \alphabet{}, \automaton{} an automaton and \langU{} the language to be learnt, then
@@ -19,8 +21,52 @@ let w be a word over an alphabet \alphabet{}, \automaton{} an automaton and \lan
 \[ equiv(\automatonN{}) =
   \begin{cases}
     \text{True} & \quad \text{if } \automatonN{} \text{ recognizes } U           \\
-    \text{w}    & \quad \text{otherwise, where } w \in U \Delta L(\automatonN{})
+    w           & \quad \text{otherwise, where } w \in U \Delta L(\automatonN{})
   \end{cases}
 \]
 
-\subsection{Tools of L* algorithm}
+
+\subsection{The observation table}
+Every time an answer is received by the learner, it is important to store it somewhere to be able to increase the overall knowledge. In fact, every piece of information obtained from the teacher is immediatly added to the observation table ($O.T.$).
+
+\begin{definition}[Observation Table]
+  The observation table is the memory of the learner, composed by two non-empty sets of words, $S$ and $E$, and a dictionnary $T$.
+\end{definition}
+
+We define also $SA = S \circ \Sigma$ made by the concatenation of words of S and every symbol of \alphabet{} that are not in $S$, mathematically $\forall s \in S, \: \forall c \in \Sigma, \: SA = \{s \circ c \text{ such that } s \circ c \notin S \} $, and $S_{ext} = S \cup SA$ containing the union of $S$ and $SA$.
+\begin{exmp}
+  If $S = \{\varepsilon, a\}$ and $\Sigma = \{a, b\}$ then $S_{ext} = \{\varepsilon, a, b, aa, ab\}$.
+\end{exmp}
+
+The $O.T.$ can be seen as a matrix where rows are indexed by $S_{ext}$ and columns are indexed by $E$. The dictionnary $T$ finally stores for every cell $c_{i,j}$ if the concatenation of the $i^{th}$ word of $S_{ext}$ and the $j^{th}$ word of $E$ belongs to $U$. We split this matrix in the \upperPart{} with the rows of $S$ and the \lowerPart{} with rows of $SA$.
+
+
+$S$ (resp. $E$) has an important property, that will be discussed next, since it is \textit{prefix-closed} (resp. \textit{suffix-closed}).
+
+\begin{definition}
+  A non-empty set of words $W$ is \textit{prefix-closed} (resp. \textit{suffix-closed}) if it contains every prefix (resp. \textit{suffix}) of every word of it. And, to garantee this property $W$ should of course contain $\varepsilon$.
+\end{definition}
+
+In L* an $O.T.$ should be at every time closed and consistence.
+
+\begin{definition}[Closedness]
+  The $O.T.$ is closed if every row of the \lowerPart{} is also present in the \upperPart{}.
+\end{definition}
+
+If the table is not closed then there exists an element $s$ of $SA$ where $row(s)$ is not in the \upperPart{}. To restore the closedness of the observation table, $s$ will be moved from $SA$ to $S$. Then all word needed to respect its definition will be added to $SA$.
+
+\begin{lemma}
+  If we move an element from $SA$ to $S$ then $S$ will remain \textit{prefix-closed}.
+\end{lemma}
+
+\begin{proof}
+  Every element of $SA$ is the concatenation of an element in $S$ and a letter of $\Sigma$. We have that $Pref(w) = Pref(w' \circ a) = \{w' \circ a\} \cup Pref(w')$ and every $Pref(w')$ is already in $S$ since $S$ is \textit{prefix-closed} and every prefix of a word in $S$ is already in $S$. Therefore adding \word{} won't inpact the \textit{prefix-closedness} of $S$.
+\end{proof}
+
+\begin{definition}[Consistence]
+  The $O.T.$ is consistent if for every $s_1,s_2 \in S$ and $row(s_1) = row(s_2)$ then for every $c \in \Sigma$, $row(s_1 \circ c) = row(s_2 \circ c)$.
+\end{definition}
+
+If the table is not consistent, it means that there is two words $w_1, w_2$ in $S$ which have same rows, but for which there exists a symbol $c$ of $\Sigma$ where $row(w_1 \circ c) \neq row(w_2 \circ c)$. In thich case we search the first element $e$ of $E$ where $T(w_1 \circ c \circ e) \neq T(w_2 \circ c \circ e)$ and we add $c \circ e$ in $E$.
+
+When the learner starts to understand the language, it add the empty word $\varepsilon$ to $S$ and $E$ and asks for the appartenance of $\varepsilon \circ \varepsilon = \varepsilon$.
