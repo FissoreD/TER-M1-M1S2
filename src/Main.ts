@@ -124,6 +124,7 @@ function changeMainDivContent() {
     else e.classList.remove('up');
   })
   document.getElementById('centerDiv')!.innerHTML = historyHTML[historyPosition][0].innerHTML;
+  window.automaton = historyHTML[historyPosition][1];
 }
 
 function clearHistory() {
@@ -176,7 +177,7 @@ declare global {
     automatonDivList: [Automaton, Node][];
     historyHTML: [Node, Automaton?][];
     historyPosition: number;
-    automaton: Automaton;
+    automaton: Automaton | undefined;
   }
 }
 

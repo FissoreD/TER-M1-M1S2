@@ -87,7 +87,7 @@ export function minimizeAutomaton(automatonInput: HisAutomaton | Automaton): Aut
 
   let log = (message: string, aut: HisAutomaton | Automaton) => {
     console.log(message, automaton.states.length);
-    if ((aut instanceof Automaton ? aut.state_number() : aut.states.length) > 10000)
+    if ((aut instanceof Automaton ? aut.state_number() : aut.states.length) > 5000)
       console.error(message, automaton.states.length);
   }
 

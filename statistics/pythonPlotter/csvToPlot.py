@@ -7,6 +7,21 @@ import numpy as np
 
 folderPrefix = ["statistics/", "../"][0]
 plotFolder = "plots/"
+trendGraphic = False
+
+
+def objective(x, a, b, c, d, f):
+    return (a * x) + (b * x**2) + (c * x**3) + (d * x**4) + f
+
+
+def amortizeCurve(x, y):
+    if trendGraphic:
+        popt, _ = curve_fit(objective, x, y)
+        a, b, c, d, f = popt
+        x_line = np.arange(min(x), max(x), 1)
+        y_line = objective(x_line, a, b, c, d, f)
+        return x_line, y_line
+    return x, y
 
 
 def savePlot(plot: plt, path: str):
@@ -29,13 +44,8 @@ def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName: str):
     fig, ax = plt.subplots()
     ax.set_title(f'Comparing {comparator}')
     for i in algos:
-        def objective(x, a, b, c, d, f):
-            return (a * x) + (b * x**2) + (c * x**3) + (d * x**4) + f
         x, y = df['Description'], df[f"{i} {comparator}"]
-        popt, _ = curve_fit(objective, x, y)
-        a, b, c, d, f = popt
-        x_line = np.arange(min(x), max(x), 1)
-        y_line = objective(x_line, a, b, c, d,  f)
+        x_line, y_line = amortizeCurve(x, y)
         print(f"{i} {comparator} {fileName}")
         ax.plot(x_line, y_line, '--', label=i)
     leg = ax.legend()
