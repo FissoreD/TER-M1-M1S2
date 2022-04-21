@@ -14,13 +14,9 @@
     <link rel="stylesheet" href="css/sectionHead.css">
     <link rel="shortcut icon" href="#">
 
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="http://viz-js.com/bower_components/viz.js/viz-lite.js"></script>
-    <script src="https://github.com/magjac/d3-graphviz/releases/download/v0.0.4/d3-graphviz.min.js"></script>
-
-    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.14.3/js/lib/beautify.js"></script>
-    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.14.3/js/lib/beautify-css.js"></script>
-    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.14.3/js/lib/beautify-html.js"></script>
+    <script src="//d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+    <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
 
     <script src="public/polyfill.min.js"></script>
     <script src="public/tex-mml-chtml.js"></script>
@@ -39,25 +35,29 @@
     <h1> Learning algorithms : L* vs NL* </h1>
 
     <div class="preset">
-        <div>
+        <div class="box">
             <p>Choose the algorithm</p>
-            <label>
-                <input type="radio" name="algo" id="radio:l*" class="algo-switch" checked>
-                <span>L*</span>
-            </label>
-            <label>
-                <input type="radio" name="algo" id="radio:nl*" class="algo-switch">
-                <span>NL*</span>
-            </label>
+            <div style="align-items: baseline;">
+                <label>
+                    <input type="radio" name="algo" id="radio:l*" class="algo-switch" checked>
+                    <span>L*</span>
+                </label>
+                <label>
+                    <input type="radio" name="algo" id="radio:nl*" class="algo-switch">
+                    <span>NL*</span>
+                </label>
+            </div>
         </div>
-        <div>
+        <div class="box">
             <p>Choose your teacher : </p>
             <select name="teacher-switch" id="teacher-switch"></select>
         </div>
-        <div>
-            <p>Enter your regular expression</p>
-            <input id="input-regex">
-            <button id="button-regex" class="button-19">Send teacher</button>
+        <div class="box">
+            <p>Enter your regular expression :</p>
+            <div>
+                <input type="text" id="input-regex">
+                <button id="button-regex" class="">Enter</button>
+            </div>
         </div>
     </div>
     <div class="bottom_page">
@@ -65,52 +65,55 @@
         <button class="bottom_button" id="go_to_end">Run algo</button>
     </div>
 
-    <div class="marginColumn hide" id="leftCol"><span>◀</span></div>
-    <div class="marginColumn hide" id="rightCol"><span>▶</span></div>
+    <div class="mainContent">
+        <div class="marginColumn hide" id="leftCol"><span>◀</span></div>
+        <div class="marginColumn hide" id="rightCol"><span>▶</span></div>
 
-    <div id="centerDiv">
 
-        <div>
-            <div class="headSpecial" id="descriptionHead">Teacher Description</div>
-            <div class="innerHead">
-                <span id="teacher_description"></p>
+        <div id="centerDiv">
+
+            <div>
+                <div class="headSpecial" id="descriptionHead">Teacher Description</div>
+                <div class="innerHead">
+                    <span id="teacher_description"></p>
+                </div>
             </div>
-        </div>
 
-        <div id="messageBox">
-            <div class="head" id="messageHead">Message</div>
-            <div class="innerHead">
-                <span id="message"></span>
+            <div id="messageBox">
+                <div class="head" id="messageHead">Message</div>
+                <div class="innerHead">
+                    <span id="message"></span>
+                </div>
             </div>
-        </div>
 
-        <div>
-            <div class="head" id="automatonHead">Automaton</div>
-            <div class="innerHead">
-                <div class="automaton-div" id="automaton-div">
-                    <div class="mermaid" id='automaton-mermaid'></div>
-                    <!-- <img src="images/Minus.png" class="automatonLogo" alt="Minus" onclick="console.log(123)">
+            <div>
+                <div class="head" id="automatonHead">Automaton</div>
+                <div class="innerHead">
+                    <div class="automaton-div" id="automaton-div">
+                        <div class="mermaid hide" id='automaton-mermaid'></div>
+                        <!-- <img src="images/Minus.png" class="automatonLogo" alt="Minus" onclick="console.log(123)">
                     <img src="images/Plus.png" class="automatonLogo" alt="Plus" onclick="console.log(123)"> -->
-                </div>
-                <div id="graph" class="hide"></div>
-                <div id="input-automaton" class="box hide">
-                    <input type="text" name="Enter word" id="inputWord">
-                    <button id="reinitializeAutomaton">Reinitialize automaton</button>
-                    <button id="readNextChar">Read next char</button>
-                    <button id="inAutomaton">In Automaton</button>
-                    <p id="answer"></p>
+                    </div>
+                    <div id="graph" class=""></div>
+                    <div id="input-automaton" class="box hide">
+                        <input type="text" name="Enter word" id="inputWord">
+                        <button id="reinitializeAutomaton" onclick="reinitializeAutomaton()">Reinitialize
+                            automaton</button>
+                        <button id="readNextChar" onclick="readNextChar()">Read next char</button>
+                        <button id="inAutomaton" onclick="inAutomaton()">In Automaton</button>
+                        <p id="answer"></p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div>
-            <div class="head" id="tableHead">Observation table</div>
-            <div class="box innerHead">
-                <table id="table" class="styled-table"> </table>
+            <div>
+                <div class="head" id="tableHead">Observation table</div>
+                <div class="box innerHead">
+                    <table id="table" class="styled-table"> </table>
+                </div>
             </div>
         </div>
     </div>
-
 
     <script type="module" src="dist/Main.js"></script>
 
@@ -121,22 +124,23 @@
             e.classList.toggle("up");
         });
 
-        $('#reinitializeAutomaton')[0].setAttribute("onclick", `{
+        let reinitializeAutomaton = () => {
             automaton.restart();
             automaton.initiate_graph();
-        }`);
-        $('#readNextChar')[0].setAttribute('onclick', `{
-                console.log(12222);
-                automaton.draw_next_step($('#inputWord')[0].value[0]);
-                $('#inputWord')[0].value = $('#inputWord')[0].value.slice(1);
-            }`);
-        $('#inAutomaton')[0].setAttribute('onclick', `{
-                let aut_answer = automaton.accept_word_nfa($('#inputWord')[0].value);
-                if (aut_answer)
-                    $('#answer')[0].innerHTML = \`The word ${$('#inputWord')[0].value} is accepted\`
-                else
-                    $('#answer')[0].innerHTML = \`The word ${$('#inputWord')[0].value} is not accepted\`
-            }`);
+        }
+
+        let readNextChar = () => {
+            automaton.draw_next_step($('#inputWord')[0].value[0]);
+            $('#inputWord')[0].value = $('#inputWord')[0].value.slice(1);
+        }
+
+        let inAutomaton = () => {
+            let aut_answer = automaton.accept_word_nfa($('#inputWord')[0].value);
+            if (aut_answer)
+                $('#answer')[0].innerHTML = `The word ${$('#inputWord')[0].value} is accepted`
+            else
+                $('#answer')[0].innerHTML = `The word ${$('#inputWord')[0].value} is not accepted`
+        }
 
     </script>
 </body>

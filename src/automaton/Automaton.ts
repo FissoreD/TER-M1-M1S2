@@ -1,3 +1,5 @@
+import { historyPosition } from "../Main.js";
+
 export class State {
   isAccepting: boolean;
   isInitial: boolean;
@@ -59,6 +61,7 @@ export class Automaton implements AutomatonJson {
   alphabet: string[];
   currentStates: State[];
   states_rename: Map<string, string>;
+  continueAction = true;
 
   constructor(stateList: Set<State> | State[]) {
     stateList = new Set(stateList);
@@ -161,30 +164,41 @@ export class Automaton implements AutomatonJson {
   }
 
   initiate_graph() {
+    this.continueAction = false;
     document.getElementById('automatonHead')?.classList.remove('up');
-    let automatonHTML = $("#automaton-mermaid")[0];
-    automatonHTML.removeAttribute('data-processed')
-    automatonHTML.innerHTML = this.matrix_to_mermaid();
+    let txt = this.automatonToDot();
+    console.log(123);
 
-    // @ts-ignore
-    mermaid.init($(".mermaid"));
+    //@ts-ignore
+    d3.select("#graph").graphviz()
+      .dot(txt).zoom(false)
+      .render(() => {
+        this.continueAction = true;
+        console.log($("#graph")[0].replaceWith);
+      });
+    // let automatonHTML = $("#automaton-mermaid")[0];
+    // automatonHTML.removeAttribute('data-processed')
+    // automatonHTML.innerHTML = this.matrix_to_mermaid();
+    // // return
+    // // @ts-ignore
+    // mermaid.init($(".mermaid"));
 
-    // Mark end nodes
-    this.acceptingStates.forEach(n => {
-      let circle = this.get_current_graph_node(n) as HTMLElement;
-      circle.style.strokeWidth = "1.1";
-      circle.style.stroke = "black"
-      let smaller_circle = circle.cloneNode() as HTMLElement;
-      // @ts-ignore
-      smaller_circle.attributes['r'].value -= 4;
-      smaller_circle.style.fill = "#ECECFF"
-      circle.parentNode!.insertBefore(smaller_circle, circle.nextSibling);
-    });
+    // // Mark end nodes
+    // this.acceptingStates.forEach(n => {
+    //   let circle = this.get_current_graph_node(n) as HTMLElement;
+    //   circle.style.strokeWidth = "1.1";
+    //   circle.style.stroke = "black"
+    //   let smaller_circle = circle.cloneNode() as HTMLElement;
+    //   // @ts-ignore
+    //   smaller_circle.attributes['r'].value -= 4;
+    //   smaller_circle.style.fill = "#ECECFF"
+    //   circle.parentNode!.insertBefore(smaller_circle, circle.nextSibling);
+    // });
 
-    // Mark current node = initial state
-    this.color_node(true);
-    $(".mermaid")[0].after($(".mermaidTooltip")[0]);
-    $('svg')[0].style.height = 'auto';
+    // // Mark current node = initial state
+    // this.color_node(true);
+    // $(".mermaid")[0].after($(".mermaidTooltip")[0]);
+    // $('svg')[0].style.height = 'auto';
   }
 
   get_current_graph_node(node: State) {
@@ -262,11 +276,8 @@ export class Automaton implements AutomatonJson {
     })
 
     txt += "\n}"
-    try {
-      //@ts-ignore
-      d3.select("#graph").graphviz()
-        .renderDot(txt)
-    } catch { }
+    console.log(txt);
+
     return txt
   }
 

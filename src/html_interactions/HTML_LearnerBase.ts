@@ -60,7 +60,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
 
     var row = parent.insertRow();
     if (fst) {
-      row.style.borderTop = "2px solid #009879";
+      row.classList.add('borderTopTable');
       var cell = document.createElement('th');
       cell.setAttribute("rowspan", rowspan + "");
       cell.setAttribute("colspan", colspan + "");
@@ -78,8 +78,8 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
     this.table_header!.innerHTML = "";
   }
 
-  next_step() {
-    if (this.stopNextStep) return;
+  async next_step() {
+    if (this.stopNextStep || ((this.automaton && !this.automaton.continueAction))) return;
     document.getElementById('centerDiv')!.replaceWith(centerDivClone());
     if (this.pile_actions.length > 0) this.pile_actions.shift()!()
     else if (!this.close_action()) { }
@@ -97,9 +97,14 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
 
     document.getElementById('table')!.innerHTML = this.tableHTML.innerHTML;
     document.getElementById('teacher_description')!.innerHTML = this.learner.teacher.description;
-    // @ts-ignore
-    // MathJax.typeset();
-    addHistoryElement(this.automaton);
+    const timer = (ms: number) => new Promise(res => setTimeout(res, ms))
+    if (this.automaton && !this.automaton.continueAction)
+      while (this.automaton && !this.automaton.continueAction) {
+        let tm = timer(5);
+        await tm.then(() => { if (this.automaton!.continueAction) addHistoryElement(this.automaton) });
+      } else {
+      addHistoryElement(this.automaton)
+    }
   }
 
   close_action(): boolean {
@@ -172,8 +177,10 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
 
   abstract table_to_update_after_equiv(answer: string): void;
 
-  go_to_end() {
-    while (!this.learner.finish) this.next_step();
+  async go_to_end() {
+    while (!this.learner.finish) {
+      await this.next_step();
+    }
   }
 
   message() {
