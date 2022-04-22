@@ -58,9 +58,8 @@ h1,
 
 }
 
-.prime-row {
-    font-style: italic;
-    font-weight: bold;
+.prime-row td:first-child:before {
+    content: "*";
 }
 
 .preset {
