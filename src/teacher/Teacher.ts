@@ -80,8 +80,9 @@ export let binaryAddition = new TeacherNoAutomaton(
       return fst_term + snd_term == trd_term;
     },
     counter_examples: allStringFromAlphabet({ alphabet: '012345678', maxLength: 3 })
-  }, `  
-       * Automaton calculating addition between binary integers:
+  }, `  <pre>
+       /**
+       *  Automaton calculating addition between binary integers: 
        * exemple : 
        * 0101 + 
        * 1001 =
@@ -89,6 +90,6 @@ export let binaryAddition = new TeacherNoAutomaton(
        * is a valid exemple that can be sent to the automaton with the encoding 3516
        * 3 = 011 (the 1st col), 5 = 101 (the 2nd col), 
        * 1 = 001 (the 3rd col), 6 = 110 (the 4th col) 
-       **/ `)
+       **/</pre> `)
 
 export let teachers = [teacher_a_or_baStar, teacher_b_bStar_a__b_aOrb_star, binaryAddition, teacherA3fromLast, teacherEvenAandThreeB, teacherNotAfourthPos, teacherPairZeroAndOne, teacher_bStar_a_or_aStart_bStar]

@@ -7,7 +7,7 @@ import numpy as np
 
 folderPrefix = ["statistics/", "../"][0]
 plotFolder = "plots/"
-trendGraphic = False
+trendGraphic = True
 
 
 def objective(x, a, b, c, d, f):
@@ -49,7 +49,8 @@ def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName: str):
         print(f"{i} {comparator} {fileName}")
         ax.plot(x_line, y_line, '--', label=i)
     leg = ax.legend()
-    ax.set_xlabel("Regex")
+    ax.set_xlabel(
+        "Regex" if 'benchMark' not in fileName else 'State number in minimum DFA')
     ax.set_ylabel(comparator)
     savePlot(fig, fileName)
     # show(fig)
