@@ -167,48 +167,26 @@ export class Automaton implements AutomatonJson {
     this.continueAction = false;
     document.getElementById('automatonHead')?.classList.remove('up');
     let txt = this.automatonToDot();
-    console.log(123);
 
     //@ts-ignore
     d3.select("#graph").graphviz()
       .dot(txt).zoom(false)
       .render(() => {
         this.continueAction = true;
+        this.color_node(true);
         console.log($("#graph")[0].replaceWith);
       });
-    // let automatonHTML = $("#automaton-mermaid")[0];
-    // automatonHTML.removeAttribute('data-processed')
-    // automatonHTML.innerHTML = this.matrix_to_mermaid();
-    // // return
-    // // @ts-ignore
-    // mermaid.init($(".mermaid"));
-
-    // // Mark end nodes
-    // this.acceptingStates.forEach(n => {
-    //   let circle = this.get_current_graph_node(n) as HTMLElement;
-    //   circle.style.strokeWidth = "1.1";
-    //   circle.style.stroke = "black"
-    //   let smaller_circle = circle.cloneNode() as HTMLElement;
-    //   // @ts-ignore
-    //   smaller_circle.attributes['r'].value -= 4;
-    //   smaller_circle.style.fill = "#ECECFF"
-    //   circle.parentNode!.insertBefore(smaller_circle, circle.nextSibling);
-    // });
-
-    // // Mark current node = initial state
-    // this.color_node(true);
-    // $(".mermaid")[0].after($(".mermaidTooltip")[0]);
-    // $('svg')[0].style.height = 'auto';
   }
 
   get_current_graph_node(node: State) {
-    return Array.from($(".node")).find(e => e.id.split("-")[1] == node.name)!.firstChild!;
+    let text = Array.from($('.node title')).find(e => e.innerHTML == node.name)!;
+    return text.nextSibling?.nextSibling! as HTMLElement;
   }
 
   matrix_to_mermaid(): string {
     let mermaidTxt = "flowchart LR\n";
     mermaidTxt = mermaidTxt.concat("\ndirection LR\n")
-    // res = res.concat("\n" + this.create_entering_arrow() + "\n");
+
     let triples: { [id: string]: string[] } = {}
     for (const [name, state] of this.states) {
       for (let j = 0; j < this.alphabet.length; j++) {
@@ -223,7 +201,7 @@ export class Automaton implements AutomatonJson {
       }
     }
     mermaidTxt = mermaidTxt.concat(Object.keys(triples).map(x => this.create_triple(x, triples[x].join(","))).join("\n"));
-    // res = res.concat("\nstyle START fill:#FFFFFF, stroke:#FFFFFF;")
+
     mermaidTxt += "\n"
     mermaidTxt += "\nsubgraph InitialStates\n";
     mermaidTxt += this.initialStates.map(e => e.name).join("\n")
@@ -254,23 +232,25 @@ export class Automaton implements AutomatonJson {
         }
       }
     }
+
+    txt = txt.concat(
+      this.allStates.map(e => `${e.name} [label="${this.get_state_rename(e.name)
+        }", shape=circle]`).join("\n"));
+    txt += '\n';
+
     txt = txt.concat(Object.keys(triples).map(x => {
       let [states, transition] = [x, triples[x].join(",")]
       let split = states.split("&");
       let A = split[0], B = split[1];
-      let A_rename = this.get_state_rename(A);
-      let B_rename = this.get_state_rename(B);
-      return `${A_rename} -> ${B_rename} [label = "${transition}"]\n${A_rename} [shape=circle]`
+      return `${A} -> ${B} [label = "${transition}"]`
     }).join("\n"));
 
     this.initialStates.forEach(s => {
-      let rename = this.get_state_rename(s.name);
-      txt = txt.concat(`\nI${rename} [label="", style=invis, width=0]\nI${rename} -> ${rename}`);
+      txt = txt.concat(`\nI${s.name} [label="", style=invis, width=0]\nI${s.name} -> ${s.name}`);
     });
 
     this.acceptingStates.forEach(s => {
-      let rename = this.get_state_rename(s.name);
-      txt = txt.concat(`\n${rename} [shape=doublecircle]`)
+      txt = txt.concat(`\n${s.name} [shape=doublecircle]`)
       console.log("here");
 
     })
@@ -284,26 +264,14 @@ export class Automaton implements AutomatonJson {
 
   color_node(toFill: boolean) {
     this.currentStates.forEach(currentState => {
-      let current_circle = this.get_current_graph_node(currentState) as HTMLElement;
-      let next_circle = current_circle.nextSibling as HTMLElement;
+      let current_circle = this.get_current_graph_node(currentState);
+      console.log(current_circle);
       if (toFill) {
-        next_circle.style.textDecoration = "underline";
-        if (this.acceptingStates.includes(currentState))
-          next_circle.style.fill = '#009879';
-        else current_circle.style.fill = '#009879';
+        current_circle.classList.add('currentNode');
       } else {
-        if (this.acceptingStates.includes(currentState))
-          next_circle.removeAttribute('style');
-        else current_circle.removeAttribute('style');
+        current_circle.classList.remove('currentNode');
       }
     })
-    // let currentNode = this.get_current_graph_node(this.currentState).parentElement as HTMLElement;
-    // let spanWithText = currentNode.getElementsByClassName("nodeLabel")![0] as HTMLElement;
-    // if (toFill) {
-    //   spanWithText.style.textDecoration = "underline";
-    // } else {
-    //   spanWithText.removeAttribute('style');
-    // }
   }
 
   create_triple(states: string, transition: string): string {

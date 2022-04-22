@@ -54,9 +54,6 @@ export function MyAutomatonToHis(aut: Automaton): HisAutomaton {
     symbol: transition[0],
     toStates: transition[1].map(e => state2int(e))
   })).flat()).flat();
-  //   )) aut.transitions.map(e => ({
-  //   fromState: state2int(e.fromState), symbol: e.symbol, toStates: e.toStates.map(e => state2int(e))
-  // }))
   if (aut.initialStates.length > 1) {
     transitions.push(({
       fromState: startState,
@@ -100,26 +97,6 @@ export function minimizeAutomaton(automatonInput: HisAutomaton | Automaton): Aut
   let numToList = (elt: number | number[]) => typeof elt == 'number' ? [elt] : elt!
   try {
     let statesToNumbers = HisAutomaton2Mine(noam.fsm.convertStatesToNumbers(automaton))
-    // let automaton1 = {
-    //   acceptingStates: automaton.acceptingStates.map(e => e.toString()),
-    //   initialStates: numToList(automaton.initialState!).toString(),
-    //   transitions: automaton.transitions.map(({ fromState, symbol, toStates }) => ({ fromState: numToList(fromState).toString(), toStates: toStates.map(e => e.toString()), symbol: symbol }))
-    // }
-    // let hasInitialState = false
-    // let stateMap: Map<string, State> = new Map(), stateSet: Set<State> = new Set();
-    // for (const e of automaton.states) {
-    //   let state = new State(e.toString(), automaton1.acceptingStates.includes(e.toString()), e.toString() == automaton1.initialStates, automaton.alphabet);
-    //   stateMap.set(state.name, state);
-    //   if (!hasInitialState)
-    //     hasInitialState = e.toString() == automaton1.initialStates
-    //   stateSet.add(state);
-    // }
-
-    // automaton1.transitions.forEach(t => {
-    //   t.toStates.forEach(next =>
-    //     stateMap.get(t.fromState)!.addTransition(t.symbol, stateMap.get(next)!
-    //     ))
-    // })
     log("4 - Minimizing automaton ", statesToNumbers);
     let minimized = statesToNumbers.minimize()
     log("5 - Minimization OK, ", minimized);

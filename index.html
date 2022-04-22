@@ -14,9 +14,9 @@
     <link rel="stylesheet" href="css/sectionHead.css">
     <link rel="shortcut icon" href="#">
 
-    <script src="//d3js.org/d3.v5.min.js"></script>
-    <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
-    <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+    <script src="public/d3.v5.min.js"></script>
+    <script src="public/wasm@0.3.11.js"></script>
+    <script src="public/d3-graphviz.js"></script>
 
     <script src="public/polyfill.min.js"></script>
     <script src="public/tex-mml-chtml.js"></script>
@@ -135,6 +135,7 @@
         }
 
         let inAutomaton = () => {
+            reinitializeAutomaton();
             let aut_answer = automaton.accept_word_nfa($('#inputWord')[0].value);
             if (aut_answer)
                 $('#answer')[0].innerHTML = `The word ${$('#inputWord')[0].value} is accepted`
