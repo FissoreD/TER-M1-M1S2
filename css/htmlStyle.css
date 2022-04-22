@@ -1,12 +1,32 @@
+:root {
+    --shadow: inset -1px -1px 0 1px rgb(53 86 129 / 0%),
+        inset 0 0 5px rgb(53 86 129 / 50%),
+        inset 0px 0 35px white;
+    --marginColumnRight: 7pt;
+    --marginColumns: 2% var(--marginColumnRight);
+    --color1: #b1b1b1;
+    --color2: #2a2a2a;
+    --color3: #bfbfbf;
+    --color4: #0e0e0e;
+    --color5: #484848;
+    --color6: #556689;
+}
+
 body {
-    color: #009879;
+    color: var(--color1);
     margin-bottom: 50px;
     padding: 0;
+    background: var(--color2);
+}
+
+body * {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    font-weight: 500;
 }
 
 p {
     margin: 0;
-    padding: 5pt;
     text-align: center;
 }
 
@@ -22,13 +42,20 @@ p {
     max-width: 80%;
 }
 
+
 h1 {
     text-align: center;
     padding: 10pt;
     font-size: 36px;
-    color: #355681;
-    box-shadow: inset 0 0 0 1px rgba(53, 86, 129, 0.4), inset 0 0 5px rgba(53, 86, 129, 0.5), inset -285px 0 35px white;
-    border-radius: 0 10px 0 10px;
+}
+
+h1,
+.preset {
+    margin: var(--marginColumns);
+    box-shadow: var(--shadow);
+    border-radius: 10px;
+    background-color: #464646;
+
 }
 
 .prime-row {
@@ -37,20 +64,16 @@ h1 {
 }
 
 .preset {
-    border-radius: 5pt;
-    border: solid #2e973178 2pt;
     display: flex;
     flex-direction: row;
     align-items: center;
-    /* justify-content: center; */
-    background: #fdf274;
-    position: -webkit-sticky;
-    /* position: sticky; */
-    /* top: 0px; */
     z-index: 1;
+    padding: 4pt;
+    align-items: flex-start;
 }
 
-.preset div {
+
+/* .preset div {
     display: flex;
     justify-content: center;
     align-content: center;
@@ -60,6 +83,10 @@ h1 {
     padding: 0 0.5em;
     align-items: center;
 }
+
+.preset div>* {
+    margin: 2pt 0;
+} */
 
 .sum-calc-style {
     font-family: monospace;
@@ -71,36 +98,48 @@ select,
 input {
     border: solid 1pt black;
     border-radius: 5pt;
-    padding-left: 5pt;
+    padding: 2pt;
     max-width: 250px;
+    background-color: var(--color3);
+    color: var(--color4);
 }
 
-/* Scrollbar */
-
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px grey;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: blueviolet;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #b30000;
+input[type=text] {
+    text-align: center;
 }
 
 .box {
     display: flex;
+    flex-wrap: wrap;
     flex-direction: column;
     align-items: center;
     padding: 5pt;
+}
+
+.preset .box {
+    flex-grow: 1;
+}
+
+#button-regex {
+    align-self: flex-end;
+    margin-right: 10pt;
+    margin-top: 5pt;
+    padding: 1pt 10pt;
+    background-color: var(--color3);
+    color: var(--color4);
+}
+
+button:active,
+.head:active {
+    opacity: 0.7;
+    transition: opacity 0.1s;
+}
+
+.box>* {
+    margin: 1px 0;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
 }
 
 pre {
@@ -111,4 +150,320 @@ svg,
 #graph {
     width: 100%;
     height: 100%;
+    max-height: 300pt;
+}
+
+input[type="radio"] {
+    /* remove standard background appearance */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* create custom radiobutton appearance */
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    padding: 1px;
+    /* background-color only for content */
+    background-clip: content-box;
+    border: 2px solid #bbbbbb;
+    background-color: transparent;
+    border-radius: 50%;
+}
+
+/* appearance for checked radiobutton */
+input[type="radio"]:checked {
+    background-color: var(--color3);
+}
+
+button {
+    color: var(--color3);
+    border-radius: 10pt;
+    background: var(--color5);
+    padding: 2pt 9pt;
+    border: 0;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+.head,
+.headSpecial {
+    background-color: var(--color5);
+    border-top-left-radius: 4pt;
+    border-top-right-radius: 4pt;
+    text-align: center;
+    padding: 5pt;
+}
+
+.head {
+    cursor: pointer;
+}
+
+.head.up {
+    border-radius: 4pt;
+}
+
+/* .head:hover {
+    background-color: var(--color6);
+} */
+
+.head::after {
+    content: "▲";
+    text-align: right;
+    float: right;
+}
+
+.head.up::after {
+    content: "▼";
+}
+
+.innerHead {
+    background-color: var(--color3);
+    align-items: center;
+    color: var(--color4);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    border-bottom-left-radius: 4pt;
+    border-bottom-right-radius: 4pt;
+    padding: 5pt;
+    border: solid 1pt var(--color5);
+    border-width: 0 1pt 1pt 1pt;
+    /* max-height: 500pt; */
+    /* overflow: auto; */
+}
+
+
+.head.up+* {
+    height: 0;
+    transform: scaleY(0);
+    padding: 0;
+}
+
+
+
+.hide {
+    display: none;
+}
+
+.marginColumn span:hover {
+    cursor: pointer;
+    color: var(--color3);
+}
+
+#rightCol {
+    float: right;
+    /* text-align: left; */
+}
+
+/* #leftCol {
+    text-align: right;
+} */
+
+.marginColumn {
+    position: sticky;
+    top: 50%;
+    transform: scaleY(2.5);
+    /*position: fixed;
+    width: var(--marginColumnRight);
+    top: 50%;
+    z-index: 1; */
+}
+
+.mainContent {
+    /* display: flex; */
+    /* flex-wrap: wrap; */
+    /* align-items: flex-start; */
+    margin: var(--marginColumns);
+}
+
+#centerDiv {
+    padding: 3px;
+    /* overflow: auto; */
+    flex-grow: 1;
+    width: 96%;
+    margin: auto;
+}
+
+#centerDiv>div {
+    border-bottom: solid 5pt transparent;
+}
+
+.automatonLogo {
+    width: 15pt;
+}
+
+.automatonLogo:hover {
+    cursor: pointer;
+    zoom: 1.2;
+}
+
+.automaton-div div:empty {
+    display: none;
+}
+
+#messageBox {
+    position: sticky;
+    top: 0px;
+    z-index: 5;
+}
+
+.bottom_page {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 5;
+}
+
+.bottom_button {
+    display: inline-block;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10rem;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 0.15rem;
+    transition: all 0.3s;
+    position: relative;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+    z-index: 3;
+    color: #f0f8ff;
+    background: black;
+}
+
+.bottom_button:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border-radius: 10rem;
+    z-index: -2;
+    box-shadow: var(--shadow);
+}
+
+.bottom_button:before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background-color: black;
+    transition: all 0.8s;
+    border-radius: 10rem;
+    z-index: -1;
+    box-shadow: var(--shadow);
+}
+
+/* .bottom_button:hover {
+    color: #fff;
+} */
+
+.bottom_button:hover:before {
+    width: 100%;
+}
+
+.borderTopTable {
+    border-top: 1pt solid var(--color5);
+}
+
+/* Table */
+
+.styled-table {
+    border-collapse: collapse;
+    /* margin: 25px 0; */
+    font-size: 0.9em;
+    font-family: sans-serif;
+    /* min-width: 400px; */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    background-color: #919090;
+    display: block;
+    max-width: 100%;
+    overflow: auto;
+}
+
+.styled-table thead tr {
+    background-color: var(--color5);
+    color: var(--color3);
+    /* text-align: left; */
+}
+
+.styled-table tbody th,
+.styled-table tbody tr td:first-of-type {
+    background-color: #5e5e5e;
+    color: var(--color3);
+}
+
+.styled-table th,
+.styled-table td {
+    text-align: center;
+    padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #adadad;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid var(--color5);
+}
+
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: #009879;
+}
+
+.styled-table tbody tr th {
+    position: sticky;
+    left: 0;
+    min-width: 25pt;
+}
+
+.styled-table tbody tr td:first-of-type {
+    position: sticky;
+    left: 45pt;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 10px;
+    background-color: #2c2c2c;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: #686868;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #606060;
+    /* cursor: pointer; */
+}
+
+::-moz-selection {
+    /* Code for Firefox */
+    color: red;
+    background: yellow;
+}
+
+::selection {
+    background: #afafaf;
 }

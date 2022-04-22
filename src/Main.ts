@@ -24,8 +24,8 @@ export function initiate_global_vars() {
   automatonDiv = $("#input-automaton")[0] as HTMLDivElement;
   historyHTML.push([document.getElementById('centerDiv')!.cloneNode(true) as HTMLElement, undefined])
 
-  document.getElementById('leftCol')!.onclick = goBackward
-  document.getElementById('rightCol')!.onclick = goForeward
+  $('#leftCol span')[0]!.onclick = goBackward
+  $('#rightCol span')[0]!.onclick = goForeward
 
   document.onkeydown = (key) => {
     const LEFT = 37,

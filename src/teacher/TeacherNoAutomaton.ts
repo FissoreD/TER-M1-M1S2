@@ -17,7 +17,7 @@ export class TeacherNoAutomaton implements Teacher {
   constructor(params: {
     regex: string | myFunction<string, boolean>, counter_examples: string[], alphabet:
     string[] | string
-  }, description: string = "") {
+  }, description: undefined | string) {
 
     this.counter = 0;
     this.description = description || ((typeof params.regex == 'string') ? "Automaton with regex : " + params.regex :
