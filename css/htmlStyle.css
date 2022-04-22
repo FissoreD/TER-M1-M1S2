@@ -149,11 +149,12 @@ pre {
 svg,
 #graph {
     max-width: 100%;
+    border-radius: 10pt;
     max-height: 300pt;
 }
 
 .currentNode {
-    fill: #878787;
+    fill: #919090;
 }
 
 input[type="radio"] {
