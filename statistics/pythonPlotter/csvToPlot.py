@@ -7,7 +7,7 @@ import numpy as np
 
 folderPrefix = ["statistics/", "../"][0]
 plotFolder = "plots/"
-trendGraphic = True
+trendGraphic = False
 
 
 def objective(x, a, b, c, d, f):

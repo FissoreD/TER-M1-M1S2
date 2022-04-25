@@ -1,0 +1,2 @@
+import{L_star}from"../learners/L_star.js";import{TeacherNoAutomaton}from"../teacher/TeacherNoAutomaton.js";let teacher=new TeacherNoAutomaton({alphabet:"ab",counter_examples:["aaa","aaaaaaaaa"],regex:"aaa|aaaaaaaaa"});let L=new L_star(teacher);L.make_all_queries();console.log(L.equiv_number);teacher.counter_examples=["aaaaaaaaa","aaa"];L=new L_star(teacher);L.make_all_queries();console.log(L.equiv_number);
+//# sourceMappingURL=test_one.js.map
