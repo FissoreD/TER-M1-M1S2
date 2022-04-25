@@ -119,10 +119,10 @@ export function addHistoryElement(automaton?: Automaton) {
 function changeMainDivContent() {
   let historyHead = Array.from(historyHTML[historyPosition][0].getElementsByClassName('head'))
   let currentHead = Array.from(document.getElementsByClassName('head'))
-  historyHead.forEach((e, pos) => {
-    if (currentHead[pos].classList.contains('up')) e.classList.add('up');
-    else e.classList.remove('up');
-  })
+  // historyHead.forEach((e, pos) => {
+  //   if (currentHead[pos].classList.contains('up')) e.classList.add('up');
+  //   else e.classList.remove('up');
+  // })
   document.getElementById('centerDiv')!.innerHTML = historyHTML[historyPosition][0].innerHTML;
   window.automaton = historyHTML[historyPosition][1];
 }
