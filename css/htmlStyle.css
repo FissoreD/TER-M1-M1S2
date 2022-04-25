@@ -60,6 +60,7 @@ h1,
 
 .prime-row td:first-child:before {
     content: "*";
+    float: left;
 }
 
 .preset {

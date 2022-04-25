@@ -86,7 +86,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
     else if (!this.consistence_action()) { }
     else this.send_automaton_action()
     this.message().innerHTML =
-      `Queries = ${this.learner.member_number} - Membership = ${this.learner.equiv_number}` + (this.learner.automaton ? ` - States = ${this.learner.automaton?.state_number()} - Transitions = ${this.learner.automaton?.transition_number()}` : ``) + `<br> ${this.message().innerHTML}`
+      `Membership queries = ${this.learner.member_number} - Equivalence queries = ${this.learner.equiv_number}` + (this.learner.automaton ? ` - States = ${this.learner.automaton?.state_number()} - Transitions = ${this.learner.automaton?.transition_number()}` : ``) + `<br> ${this.message().innerHTML}`
     if (this.learner.finish) {
       this.message().innerHTML += "The Teacher has accepted the automaton";
       this.stopNextStep = true
