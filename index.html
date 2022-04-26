@@ -8,10 +8,6 @@
     <title>L* and NL* Home page</title>
 
     <link rel="stylesheet" href="css/htmlStyle.css">
-    <link rel="stylesheet" href="css/tableHtml.css">
-    <link rel="stylesheet" href="css/nextStepButton.css">
-    <link rel="stylesheet" href="css/buttonStyle.css">
-    <link rel="stylesheet" href="css/sectionHead.css">
     <link rel="shortcut icon" href="#">
 
     <script src="public/d3.v5.min.js"></script>
@@ -55,10 +51,11 @@
         <div class="box">
             <p>Enter your regular expression :</p>
             <div>
-                <input type="text" id="input-regex">
+                <input type="text" placeholder="Your expression here" id="input-regex">
                 <button id="button-regex" class="">Enter</button>
             </div>
         </div>
+        <div class="help" id="helpButton" onclick="$('.allScreen')[0].classList.remove('hide')">?</div>
     </div>
     <div class="bottom_page">
         <button class="bottom_button" id="next_step">Next step</button>
@@ -80,14 +77,14 @@
             </div>
 
             <div id="messageBox">
-                <div class="head" id="messageHead">Message</div>
+                <div class="head up" id="messageHead">Message</div>
                 <div class="innerHead">
                     <span id="message"></span>
                 </div>
             </div>
 
             <div>
-                <div class="head" id="automatonHead">Automaton</div>
+                <div class="head up" id="automatonHead">Automaton</div>
                 <div class="innerHead">
                     <div class="automaton-div" id="automaton-div">
                         <div class="mermaid hide" id='automaton-mermaid'></div>
@@ -96,7 +93,7 @@
                     </div>
                     <div id="graph" class=""></div>
                     <div id="input-automaton" class="box hide">
-                        <input type="text" name="Enter word" id="inputWord">
+                        <input type="text" name="Enter word" placeholder="Enter word for automaton" id="inputWord">
                         <button id="reinitializeAutomaton" onclick="reinitializeAutomaton()">Reinitialize
                             automaton</button>
                         <button id="readNextChar" onclick="readNextChar()">Read next char</button>
@@ -107,7 +104,7 @@
             </div>
 
             <div>
-                <div class="head" id="tableHead">Observation table</div>
+                <div class="head up" id="tableHead">Observation table</div>
                 <div class="box innerHead">
                     <table id="table" class="styled-table"> </table>
                 </div>
@@ -115,13 +112,62 @@
         </div>
     </div>
 
+
+    <div class="allScreen hide">
+        <div id="helpDiv">
+            <div class="help" onclick="$('.allScreen')[0].classList.add('hide')">X</div>
+            <div>
+                <div class="head" id="descriptionHead">Teacher Description</div>
+                <div class="innerHead">
+                    <span>
+                        This is a web page to run the L* and NL* algorithm. <br>
+                        Their goal is to Learn an unknown language from a Teacher thanks to
+                        memebership or equivalence queries.
+                    </span>
+                </div>
+            </div>
+            <div>
+                <div class="head" id="descriptionHead">Setting and launching the learner</div>
+                <div class="innerHead">
+                    <span>
+                        With this program, you can choose to run L* of NL* algorithms. <br>
+                        Some default Teacher are proposed, but you
+                        can also create your own teacher by entering a regular expression. <br>
+                        Regex encode :
+                        <ul>
+                            <li>The logic or is indicated with '+'</li>
+                            <li>Epsilon is represented by '$'</li>
+                            <li>The Kleene's star with '*'</li>
+                        </ul>
+                        Once you have chosen all the settings, you can run the either step-by-step or
+                        entirely the algorithm and you can go backword and foreward the history of the
+                        operation thanks the arrow of the side of the screen
+                        (the arrow on the key-board will also work).
+                    </span>
+                </div>
+            </div>
+            <div>
+                <div class="head" id="descriptionHead">Automata</div>
+                <div class="innerHead">
+                    <span>
+                        Automata are drawn with graphviz. You can test if a word belongs to the
+                        language of the automaton writing it in the corresponding bar and if you want you
+                        can either read the word letter by letter to see the current state of the automaton
+                        changing or directly test the appartenance of a word via the "In Automaton" button.
+                        <br>
+                        It is important to reset the automaton after having read a word if you want to test
+                        a new one.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="module" src="dist/Main.js"></script>
 
     <script>
         let hideShow = elt => elt.classList.toggle('up');
         Array.from(document.getElementsByClassName('head')).forEach(e => {
             e.setAttribute('onclick', 'this.classList.toggle("up")')
-            e.classList.toggle("up");
         });
 
         let reinitializeAutomaton = () => {
