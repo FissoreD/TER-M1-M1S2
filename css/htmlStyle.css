@@ -57,7 +57,7 @@ h1,
 
 }
 
-.prime-row td:first-child:before {
+.prime-row td:first-of-type:before {
     content: "*";
     float: left;
 }

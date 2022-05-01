@@ -13,7 +13,7 @@ export class HTML_NL_star extends HTML_LearnerBase<NL_star> {
   ) {
     let row = super.add_row_html(parent, fst, head, row_elts, colspan, rowspan);
     if (head != undefined && this.learner.prime_lines.includes(head)) {
-      row.className += "prime-row"
+      row.classList.add("prime-row")
     }
     return row;
   }
