@@ -234,6 +234,7 @@ button:hover {
 .marginColumn span:hover {
     cursor: pointer;
     color: var(--color3);
+    z-index: -1;
 }
 
 #rightCol {
