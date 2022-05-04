@@ -19,10 +19,6 @@ export class TeacherTakingAut implements Teacher {
     this.counter_examples = params.counter_examples;
   }
 
-  /*
- * @param sentence the sentence to test the appartenance
- * @returns the string "0" if the sentence is accepted else "1"
- */
   member(sentence: string): string {
     return boolToString(this.automaton!.accept_word_nfa(sentence));
   }

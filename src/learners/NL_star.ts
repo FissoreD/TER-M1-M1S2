@@ -56,8 +56,10 @@ export class NL_star extends LearnerBase {
     return;
   }
 
-  add_elt_in_E(new_elt: string): void {
-    super.add_elt_in_E(new_elt);
+  add_elt_in_E(new_elt: string, after_equiv = false): void {
+    console.log("Here 2", after_equiv);
+
+    super.add_elt_in_E(new_elt, after_equiv);
     this.check_prime_lines()
     return;
   }

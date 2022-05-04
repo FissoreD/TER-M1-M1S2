@@ -9,7 +9,15 @@ export interface Teacher {
   counter_examples?: string[];
   regex: string;
   automaton?: Automaton;
+  /**
+   * @param sentence the sentence to test the appartenance
+   * @returns the string "0" if the sentence is accepted else "1"
+   */
   member(sentence: string): string;
+  /**
+   * @param automaton
+   * @returns undifined if the automaton recognizes the teacher's language, a counter-exemple otherwise
+   */
   equiv(automaton: Automaton): string | undefined;
 }
 /** 

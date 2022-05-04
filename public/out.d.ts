@@ -28,6 +28,7 @@ declare module "automaton/Automaton" {
         alphabet: string[];
         currentStates: State[];
         states_rename: Map<string, string>;
+        continueAction: boolean;
         constructor(stateList: Set<State> | State[]);
         complete(stateList: Set<State>): void;
         set_state_rename(): void;
@@ -37,8 +38,8 @@ declare module "automaton/Automaton" {
         findTransition(state: State, symbol: string): State[];
         restart(): void;
         draw_next_step(next_char: string): void;
-        initiate_graph(): void;
-        get_current_graph_node(node: State): ChildNode;
+        initiate_graph(): any;
+        get_current_graph_node(node: State): HTMLElement;
         matrix_to_mermaid(): string;
         automatonToDot(): string;
         color_node(toFill: boolean): void;
@@ -55,8 +56,8 @@ declare module "automaton/Automaton" {
 declare module "automaton/automaton_type" {
     import { Automaton } from "automaton/Automaton";
     interface HisTransition {
-        fromState: number;
-        toStates: number[];
+        fromState: number | number[];
+        toStates: number[] | number[][];
         symbol: string;
     }
     interface HisAutomaton {
@@ -145,7 +146,6 @@ declare module "teacher/Teacher" {
     import { Automaton } from "automaton/Automaton";
     import { TeacherAutomaton } from "teacher/TeacherAutomaton";
     import { TeacherNoAutomaton } from "teacher/TeacherNoAutomaton";
-    import { TeacherTakingAut } from "teacher/TeacherTakingAut";
     export interface Teacher {
         description: string;
         alphabet: string[];
@@ -163,7 +163,7 @@ declare module "teacher/Teacher" {
     export let teacher_bStar_a_or_aStart_bStar: TeacherNoAutomaton;
     export let teacher_b_bStar_a__b_aOrb_star: TeacherAutomaton;
     export let binaryAddition: TeacherNoAutomaton;
-    export let teachers: (TeacherTakingAut | TeacherNoAutomaton)[];
+    export let teachers: (TeacherAutomaton | TeacherNoAutomaton)[];
 }
 declare module "learners/LearnerBase" {
     import { Automaton } from "automaton/Automaton";
@@ -228,14 +228,14 @@ declare module "html_interactions/HTML_LearnerBase" {
         draw_table(): void;
         add_row_html(parent: HTMLTableSectionElement, fst: string | undefined, head: string | undefined, row_elts: string[], colspan?: number, rowspan?: number): HTMLTableRowElement;
         clear_table(): void;
-        next_step(): void;
+        next_step(): Promise<void>;
         close_action(): boolean;
         consistence_action(): boolean;
         send_automaton_action(): void;
         abstract close_message(close_rep: string): string;
         abstract consistent_message(s1: string, s2: string, new_col: string): string;
         abstract table_to_update_after_equiv(answer: string): void;
-        go_to_end(): void;
+        go_to_end(): Promise<void>;
         message(): HTMLElement;
     }
 }
@@ -281,6 +281,21 @@ declare module "html_interactions/HTML_NL_star" {
         table_to_update_after_equiv(answer: string): void;
     }
 }
+declare module "teacher/TeacherUser" {
+    import { Automaton } from "automaton/Automaton";
+    import { Teacher } from "teacher/Teacher";
+    export class TeacherUser implements Teacher {
+        description: string;
+        alphabet: string[];
+        counter_examples?: string[] | undefined;
+        regex: string;
+        automaton?: Automaton | undefined;
+        constructor();
+        member(sentence: string): string;
+        equiv(automaton: Automaton): string | undefined;
+        notNullPrompt(str: string, defaultValue?: string): string;
+    }
+}
 declare module "Main" {
     import { Teacher } from "teacher/Teacher";
     import { Automaton } from "automaton/Automaton";
@@ -302,7 +317,7 @@ declare module "Main" {
             automatonDivList: [Automaton, Node][];
             historyHTML: [Node, Automaton?][];
             historyPosition: number;
-            automaton: Automaton;
+            automaton: Automaton | undefined;
         }
     }
 }

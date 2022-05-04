@@ -41,10 +41,6 @@ export class TeacherNoAutomaton implements Teacher {
     this.counter_examples = params.counter_examples;
   }
 
-  /*
-  * @param sentence the sentence to test the appartenance
-  * @returns the string "0" if the sentence is accepted else "1"
-  */
   member(sentence: string): string {
     return boolToString(this.check_function(sentence));
   }
@@ -52,5 +48,4 @@ export class TeacherNoAutomaton implements Teacher {
   equiv(automaton: Automaton): string | undefined {
     return equivalenceFunction(this, automaton);
   }
-
 }

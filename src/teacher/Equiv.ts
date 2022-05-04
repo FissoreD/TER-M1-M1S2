@@ -5,6 +5,11 @@ import { Automaton, State } from "../automaton/Automaton.js";
 import { Teacher } from "./Teacher.js";
 import { boolToString } from "../tools/Utilities.js";
 
+/**
+ * @param teacher 
+ * @param automaton 
+ * @returns undifined if the automaton recognizes the teacher's language, a counter-exemple otherwise
+ */
 export let equivalenceFunction = (teacher: Teacher, automaton: Automaton): string | undefined => {
   if (teacher.counter_examples) {
     for (const counter_example of teacher.counter_examples) {
@@ -49,20 +54,20 @@ export let equivalenceFunction = (teacher: Teacher, automaton: Automaton): strin
     let diff1 = differenceAutomata(teacher.automaton!, automMinimized);
 
     let counterEx1 = counterExemple(diff1);
-    if (counterEx1) return counterEx1;
+    // if (counterEx1) return counterEx1;
 
     let diff2 = differenceAutomata(automMinimized, teacher.automaton!);
 
     let counterEx2 = counterExemple(diff2);
-    return counterEx2;
+    // return counterEx2;
     // BREAKPOINT AFTER DIFF 
     // console.log("Counter * Exemples");
 
     // AFTER COUNTEREXEMPLE
     // console.log(`C1 = { ${counterEx1} }, C2 = { ${counterEx2} }`, automaton.state_number());
 
-    // if (counterEx1 == undefined) return counterEx2;
-    // if (counterEx2 == undefined) return counterEx1;
-    // return counterEx1 < counterEx2 ? counterEx1 : counterEx2;
+    if (counterEx1 == undefined) return counterEx2;
+    if (counterEx2 == undefined) return counterEx1;
+    return counterEx1 < counterEx2 ? counterEx1 : counterEx2;
   }
 }

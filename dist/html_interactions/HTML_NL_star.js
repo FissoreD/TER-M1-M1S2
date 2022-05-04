@@ -2,5 +2,5 @@ import{NL_star}from"../learners/NL_star.js";import{HTML_LearnerBase}from"./HTML_
     "${close_rep}" will be moved from SA to S.`}consistent_message(s1,s2,new_col){let fstChar=new_col[0],sndChar=new_col.length==1?"\u03B5":new_col.substring(1);return`The table is not consistent since :
         row(${s1?s1:"\u03B5"}) ⊑ row(${s2?s2:"\u03B5"}) where ${s1?s1:"\u03B5"}, ${s2?s2:"\u03B5"} ∈ S but row(${s1+new_col[0]}) ⋢ row(${s2+new_col[0]});
         The column "${new_col}" will be added in E since T(${s1+new_col}) ≠ T(${s2+new_col}) 
-        [Note : ${new_col} = ${fstChar} ∘ ${sndChar} and ${fstChar} ∈ Σ and ${sndChar} ∈ E]`}table_to_update_after_equiv(answer){this.learner.add_elt_in_E(answer)}}
+        [Note : ${new_col} = ${fstChar} ∘ ${sndChar} and ${fstChar} ∈ Σ and ${sndChar} ∈ E]`}table_to_update_after_equiv(answer){console.log("In this place");this.learner.add_elt_in_E(answer,true)}}
 //# sourceMappingURL=HTML_NL_star.js.map

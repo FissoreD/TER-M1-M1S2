@@ -122,14 +122,22 @@ export abstract class LearnerBase {
   * add suff to {@link E} and make queries for every elt in {@link SA} and
   * {@link S} relating to the new column suff
   */
-  add_elt_in_E(new_elt: string) {
+  add_elt_in_E(new_elt: string, after_equiv = false) {
     let suffix_list = generate_suffix_list(new_elt);
+    console.log("Here", after_equiv);
+
     for (const suffix of suffix_list) {
       if (this.E.includes(suffix)) break;
       this.SA.forEach(s => {
-        this.make_member(s, suffix)
+        if (s + suffix == new_elt && after_equiv)
+          this.update_observation_table(s, boolToString(!this.automaton!.accept_word(new_elt)))
+        else this.make_member(s, suffix)
       });
-      this.S.forEach(s => this.make_member(s, suffix));
+      this.S.forEach(s => {
+        if (s + suffix == new_elt && after_equiv)
+          this.update_observation_table(s, boolToString(!this.automaton!.accept_word(new_elt)))
+        else this.make_member(s, suffix)
+      });
       this.E.push(suffix);
     }
   }

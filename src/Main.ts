@@ -6,6 +6,7 @@ import { L_star } from "./learners/L_star.js";
 import { NL_star } from "./learners/NL_star.js";
 import * as autFunction from "./automaton/automaton_type.js";
 import { TeacherAutomaton } from "./teacher/TeacherAutomaton.js";
+import { TeacherUser } from "./teacher/TeacherUser.js";
 
 export let
   automatonDiv: HTMLDivElement,
@@ -28,13 +29,11 @@ export function initiate_global_vars() {
   $('#rightCol span')[0]!.onclick = goForeward
 
   document.onkeydown = (key) => {
-    const LEFT = 37,
-      RIGHT = 39;
-    switch (key.keyCode) {
-      case LEFT:
+    switch (key.code) {
+      case 'ArrowLeft':
         goBackward();
         break;
-      case RIGHT:
+      case 'ArrowRight':
         goForeward();
         break;
     }
@@ -97,6 +96,16 @@ export function initiate_global_vars() {
     changeTeacherOrAlgo();
   });
 
+  $('#radio-userTeacher')[0].onclick = () => {
+    $('#teacher-switch')[0].setAttribute('disabled', '');
+    currentTeacher = new TeacherUser()
+    changeTeacherOrAlgo()
+  }
+  $('#radio-pcTeacher')[0].onclick = () => {
+    $('#teacher-switch')[0].removeAttribute('disabled');
+    currentTeacher = mapTeacherValue[teacherSelector.selectedOptions[0].value];
+    changeTeacherOrAlgo()
+  }
 }
 
 function toggleArrowLeft(toDisplay: boolean) {
@@ -117,8 +126,8 @@ export function addHistoryElement(automaton?: Automaton) {
 }
 
 function changeMainDivContent() {
-  let historyHead = Array.from(historyHTML[historyPosition][0].getElementsByClassName('head'))
-  let currentHead = Array.from(document.getElementsByClassName('head'))
+  // let historyHead = Array.from(historyHTML[historyPosition][0].getElementsByClassName('head'))
+  // let currentHead = Array.from(document.getElementsByClassName('head'))
   // historyHead.forEach((e, pos) => {
   //   if (currentHead[pos].classList.contains('up')) e.classList.add('up');
   //   else e.classList.remove('up');

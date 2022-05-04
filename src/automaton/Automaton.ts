@@ -61,6 +61,10 @@ export class Automaton implements AutomatonJson {
   alphabet: string[];
   currentStates: State[];
   states_rename: Map<string, string>;
+  /**
+   * If the HTML page can continue next action after Automaton
+   * with graphviz has been loaded
+   */
   continueAction = true;
 
   constructor(stateList: Set<State> | State[]) {
@@ -163,13 +167,17 @@ export class Automaton implements AutomatonJson {
     this.color_node(true);
   }
 
+  /**
+   * Create a dot file corresponding to the current automaton and 
+   * display it in the automaton section
+   */
   initiate_graph() {
     this.continueAction = false;
     document.getElementById('automatonHead')?.classList.remove('up');
     let txt = this.automatonToDot();
 
     //@ts-ignore
-    d3.select("#graph").graphviz()
+    return d3.select("#graph").graphviz()
       .dot(txt).zoom(false)
       .render(() => {
         this.continueAction = true;
@@ -265,7 +273,6 @@ export class Automaton implements AutomatonJson {
   color_node(toFill: boolean) {
     this.currentStates.forEach(currentState => {
       let current_circle = this.get_current_graph_node(currentState);
-      console.log(current_circle);
       if (toFill) {
         current_circle.classList.add('currentNode');
       } else {
@@ -300,7 +307,7 @@ export class Automaton implements AutomatonJson {
 
 
   /**
-   * Usage of Filling table algorithm for Automaton Minimisation
+   * Usage of Filling table algorithm for Automaton Minimisation \
    * The automaton should be in DFA form else the algorithm won't work
    */
   minimize() {

@@ -81,7 +81,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   async next_step() {
     if (this.stopNextStep || ((this.automaton && !this.automaton.continueAction))) return;
     document.getElementById('centerDiv')!.replaceWith(centerDivClone());
-    if (this.pile_actions.length > 0) this.pile_actions.shift()!()
+    if (this.pile_actions.length > 0) await this.pile_actions.shift()!()
     else if (!this.close_action()) { }
     else if (!this.consistence_action()) { }
     else this.send_automaton_action()
@@ -101,7 +101,9 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
     if (this.automaton && !this.automaton.continueAction)
       while (this.automaton && !this.automaton.continueAction) {
         let tm = timer(5);
-        await tm.then(() => { if (this.automaton!.continueAction) addHistoryElement(this.automaton) });
+        await tm.then(() => { if (this.automaton!.continueAction) addHistoryElement(this.automaton) }).catch(e => {
+          console.log(e);
+        });
       } else {
       addHistoryElement(this.automaton)
     }
@@ -148,26 +150,39 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
 
     this.automaton = automaton;
     window.automaton = automaton;
-    this.pile_actions.push(() => {
+    this.pile_actions.push(async () => {
       this.message().innerHTML = "";
       automaton.initiate_graph();
       $('#input-automaton')[0].classList.remove('hide');
-      let answer = this.learner.make_equiv(automaton);
 
-
-      if (answer != undefined) {
-        this.message().innerText =
-          `The sent automaton is not valid, here is a counter-exemple ${answer}`;
-        this.pile_actions.push(() => {
-          this.message().innerHTML = "";
-          clear_automaton_HTML();
-          this.table_to_update_after_equiv(answer!)
-          this.clear_table();
-          this.draw_table();
-        })
-        return;
+      function delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
       }
-      this.learner.finish = true;
+
+      while (!automaton.continueAction) {
+        await delay(10).then(() => {
+          document.getElementById("messageHead")!.scrollIntoView();
+          if (!automaton.continueAction) return
+          let answer = this.learner.make_equiv(automaton);
+          console.log(answer);
+
+
+          if (answer != undefined) {
+            this.message().innerText =
+              `The sent automaton is not valid, here is a counter-exemple ${answer}`;
+            this.pile_actions.push(() => {
+              this.message().innerHTML = "";
+              clear_automaton_HTML();
+              this.table_to_update_after_equiv(answer!)
+              this.clear_table();
+              this.draw_table();
+            })
+            return;
+          }
+          this.learner.finish = true;
+        }
+        );
+      }
     });
   }
 
