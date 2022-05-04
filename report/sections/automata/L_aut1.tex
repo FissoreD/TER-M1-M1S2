@@ -1,0 +1,38 @@
+\begin{tikzpicture}[>=latex',line join=bevel,scale=0.5]
+  \pgfsetlinewidth{1bp}
+  %%
+  \pgfsetcolor{black}
+  % Edge: 1 -> 1
+  \draw [->] (52.683bp,42.991bp) .. controls (51.78bp,53.087bp) and (54.219bp,62.0bp)  .. (60.0bp,62.0bp) .. controls (63.704bp,62.0bp) and (66.036bp,58.342bp)  .. (67.317bp,42.991bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (60.0bp,69.5bp) node {a};
+  % Edge: 1 -> 0
+  \draw [->] (82.117bp,22.0bp) .. controls (92.296bp,22.0bp) and (104.63bp,22.0bp)  .. (125.82bp,22.0bp);
+  \draw (104.0bp,29.5bp) node {b};
+  % Edge: 0 -> 1
+  \draw [->] (128.69bp,12.134bp) .. controls (122.6bp,8.5065bp) and (115.24bp,4.8378bp)  .. (108.0bp,3.0bp) .. controls (101.24bp,1.2827bp) and (94.155bp,2.4513bp)  .. (78.473bp,9.1607bp);
+  \draw (104.0bp,10.5bp) node {a};
+  % Edge: 0 -> 0
+  \draw [->] (136.97bp,38.664bp) .. controls (135.41bp,48.625bp) and (137.75bp,58.0bp)  .. (144.0bp,58.0bp) .. controls (148.0bp,58.0bp) and (150.4bp,54.152bp)  .. (151.03bp,38.664bp);
+  \draw (144.0bp,65.5bp) node {b};
+  % Edge: I1 -> 1
+  \draw [->] (1.1664bp,22.0bp) .. controls (2.7183bp,22.0bp) and (14.889bp,22.0bp)  .. (37.856bp,22.0bp);
+  % Node: 1
+  \begin{scope}
+    \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+    \pgfsetstrokecolor{strokecol}
+    \draw (60.0bp,22.0bp) ellipse (18.0bp and 18.0bp);
+    \draw (60.0bp,22.0bp) ellipse (22.0bp and 22.0bp);
+    \draw (60.0bp,22.0bp) node {1};
+  \end{scope}
+  % Node: 0
+  \begin{scope}
+    \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+    \pgfsetstrokecolor{strokecol}
+    \draw (144.0bp,22.0bp) ellipse (18.0bp and 18.0bp);
+    \draw (144.0bp,22.0bp) node {0};
+  \end{scope}
+  %
+\end{tikzpicture}
+% End of code

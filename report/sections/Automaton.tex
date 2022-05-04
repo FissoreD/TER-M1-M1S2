@@ -23,7 +23,7 @@ Here are some examples of regular langauges and their corresponting automata are
   $L = \{a, aa, ...\}$ is the language of words represented by the regular expression $a^+$.
 \end{exmp}
 
-\begin{figure}[H]
+\begin{figure}
   \centering
   \begin{subfigure}[b]{0.45\textwidth}
     \centering
@@ -55,13 +55,13 @@ Here are some examples of regular langauges and their corresponting automata are
     \end{tikzpicture}
     \caption{Automaton of \cref{exmp:a_plus}}
   \end{subfigure}
-  \caption{First automata}
+  \caption{Some simple automata}
   \label{simple_automata}
 \end{figure}
 
 In \cref{simple_automata} we see that a \textit{finite} automaton is composed by a finite set of states linked by labelled arrows called \textit{transitions}.
 
-The set of states that are directly linked with a state \qi{} are called successor of \qi{} and noted $Succ(q_i)$, and the predecessors of \qi{}, noted $Pred(q_i)$, are those states having \qi{} has a successor. Moreover, if a state is pointed by an arrow with no predecessor, then it is an initial state and if a state is marked with a double circle then it is called an accepting state.
+The set of states that are directly linked with a state \qi{} are called successor of \qi{} and noted $Succ(q_i)$, and the predecessors of \qi{}, noted $Pred(q_i)$, are those states having \qi{} has a successor. Moreover, if a state is pointed by an arrow with no predecessor, then it is an initial state and if a state is marked with a double cdotle then it is called an accepting state.
 
 We say that a word \word{} is accepted by \automaton{} or belongs to \langA{}, the language recognized by \automaton{}, if, from an initial state we can join an accepting state by reading each letter of \word{}.
 
@@ -81,7 +81,7 @@ DFAs have important properties since it is computationally "easy" to test if a w
 
 \begin{exmp}[DFA vs NFA]
   Here an exemple of two minimal automata defining the language over the alphabet $\alphabetN{} = \{a, b\}$ for strings with an $a$ in the second letter from last position (same as $L = regex((a+b)^*a(a+b))$).
-  \begin{figure}[H]
+  \begin{figure}
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
       \centering

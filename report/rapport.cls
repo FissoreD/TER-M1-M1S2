@@ -40,15 +40,20 @@
 
 \usepackage[colorlinks, citecolor=red!60!green, linkcolor=blue!60!green, urlcolor=magenta]{hyperref}
 
-\usepackage{algorithm}
+% \usepackage{algorithm}
 \usepackage{variable}
-\usepackage{algo}
+\usepackage{float}
+% \usepackage{algo}
 \usepackage{colorationSyntaxique}
 \usepackage{mathtools}
 \usepackage{tikz}
 \usepackage{subcaption}
 \usepackage[capitalise,noabbrev,nameinlink]{cleveref}
 \usetikzlibrary{automata, positioning, arrows}
+
+
+\usepackage[linesnumbered,ruled]{algorithm2e}
+\crefname{algocf}{Algorithm}{Algorithms}
 
 % Bibliography
 \usepackage[
@@ -138,8 +143,15 @@ sorting=ynt
     \emph{Supervisor:} \\
     \StrSubstitute{\professor}{,}{\newline}% Supervisor
     \end{flushright}
-    \end{minipage}\\[9cm]
+    \end{minipage}
 }
+
+
+\begin{abstract}
+    Angluin's L* algorithm \cite{LPaper} is a famous algorithm for learning deterministic finite state automata from membership and equivalence queries.
+    Bollig et al NL* \cite{NLPaper} algorithm is a variant of this algorithm, where the automaton that is learned may be non deterministic, and therefore exponentially more succinct.
+    The goal of this TERD is to understand the theory behind these two algorithms, and if the time permits, to implement them and compare them.
+\end{abstract}
 
 % If you don't want a supervisor, uncomment the two lines below and remove the section above
 %\Large \emph{Author:}\\
@@ -148,13 +160,11 @@ sorting=ynt
 %--------------------
 %	DATE SECTION
 %--------------------
-
-{\large Spring 2021-2022}\\[2cm]
+\mbox{}
+\vfill
+{\large Spring 2021-2022}
 
 %--------------------
-
-\vfill % Fill the rest of the page with whitespace
-
 \end{center}
 }
 \makeatother

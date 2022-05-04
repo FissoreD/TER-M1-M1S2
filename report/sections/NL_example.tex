@@ -1,0 +1,176 @@
+% \subsection{L* with Exemple}
+% Let $U = regex(a + ba^*)$
+% \begin{enumerate}
+%   \item \quad
+%         \begin{center}
+%           \begin{tabular}{c || c }
+%             $T_1$         & $\varepsilon$ \\ [0.5ex]
+%             \hline\hline
+%             $\varepsilon$ & 1             \\
+%             \hline \hline
+%             a             & 1             \\
+%             b             & 0             \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             At start we have $E = \{\varepsilon\}, S = \{\varepsilon\}, SA = \{a, b\}$,
+%             The table is not closed \\
+%             $row(b) = 0 \text{ but }$ \\
+%             $\nexists s \in S \text{ such that } row(s) = 0$ \\
+%             Row b is promoted and SA in updated
+%           \end{minipage}
+%         \end{center}
+%   \item \quad
+%         \begin{center}
+%           \begin{tabular}{c || c }
+%             $T_2$         & $\varepsilon$ \\ [0.5ex]
+%             \hline\hline
+%             $\varepsilon$ & 1             \\
+%             $b$           & 0             \\
+%             \hline \hline
+%             a             & 1             \\
+%             ba            & 1             \\
+%             bb            & 0             \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             Row b is now in $S$ and $ba$ and $bb$ have been added in $SA$ to complete the table.\\
+%             Now, the table is closed and consistent an automaton will be sent.
+%           \end{minipage}
+%         \end{center}
+%   \item \quad
+%         \begin{center}
+%           \input{sections/automata/L_aut1.tex}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             This is the automaton sent. It has two states, one for the rows equal to 0 and one for
+%             the rows equal to 1. From state $1 = row(\varepsilon)$ if we read an $a$ we go rest in 1 since $row(\varepsilon \cdot a) = 1$. If we read a $b$ we go to 0 since $row(\varepsilon \cdot b) = 0$. 1 is the initial state since it is $row(\varepsilon) = 1$ and it is also an accepting state since the first bit of its row is a 1.\\
+%             A counter-exemple of this automaton after an equivalence query could be $aa$ since $aa$ is accepted by the A but not by the language of Teacher.
+%           \end{minipage}
+%         \end{center}
+%   \item  \quad
+%         \begin{center}
+%           \begin{tabular}{c || c }
+%             $T_3$         & $\varepsilon$ \\ [0.5ex]
+%             \hline\hline
+%             $\varepsilon$ & 1             \\
+%             $b$           & 0             \\
+%             $aa$          & 0             \\
+%             $a$           & 1             \\
+%             \hline \hline
+%             ba            & 1             \\
+%             bb            & 0             \\
+%             aaa           & 0             \\
+%             aab           & 0             \\
+%             ab            & 0             \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             The table is closed but not consistent :\\
+%             $row(\varepsilon) = row(a)$ but $row(\varepsilon \cdot a) \neq row(a \cdot a)$.\\
+%             We can distinguish $row(\varepsilon)$ and $row(a)$ by adding $a$ to $E$ since $T(a \cdot a \cdot \varepsilon) \neq T(\varepsilon \cdot a \cdot \varepsilon)$. \\
+%             Note : in $a \cdot a \cdot \varepsilon$, the first $a$ is taken from $S$, the second from $\Sigma$ and $\varepsilon$ from $E$.
+%           \end{minipage}
+%         \end{center}
+%   \item  \quad
+%         \begin{center}
+%           \begin{tabular}{c || c | c }
+%             $T_4$         & $\varepsilon$ & a \\ [0.5ex]
+%             \hline\hline
+%             $\varepsilon$ & 1             & 1 \\
+%             $b$           & 0             & 1 \\
+%             $aa$          & 0             & 0 \\
+%             $a$           & 1             & 0 \\
+%             \hline \hline
+%             ba            & 1             & 0 \\
+%             bb            & 0             & 0 \\
+%             aaa           & 0             & 0 \\
+%             aab           & 0             & 0 \\
+%             ab            & 0             & 0 \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             The table is now closed and consistent.
+%             It is easy to check the closedness (every line in the lower part are also in the upper part), and the consistence (there are no two similar rows in the upper part).
+%           \end{minipage}
+%         \end{center}
+%   \item \quad
+%         \begin{center}
+%           \input{sections/automata/L_aut2.tex}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             The automaton sent is still not valid : \\
+%             a counter-exemple could be $baba$ since $baba$ is accepted \\
+%             by the Teacher but not by the automaton.\\
+%             The counter-example and all of its prefixes will be added to $S$.
+%           \end{minipage}
+%         \end{center}
+%   \item \quad
+%         \begin{center}
+%           \begin{tabular}{c || c | c }
+%             $T_5$         & $\varepsilon$ & a \\ [0.5ex]
+%             \hline\hline
+%             $\varepsilon$ & 1             & 1 \\
+%             $b$           & 0             & 1 \\
+%             $aa$          & 0             & 0 \\
+%             $a$           & 1             & 0 \\
+%             $baba$        & 1             & 0 \\
+%             $bab$         & 0             & 1 \\
+%             $ba$          & 1             & 0 \\
+%             \hline \hline
+%             ba            & 1             & 0 \\
+%             bb            & 0             & 0 \\
+%             aaa           & 0             & 0 \\
+%             aab           & 0             & 0 \\
+%             ab            & 0             & 0 \\
+%             $babaa$       & 0             & 0 \\
+%             $babab$       & 0             & 1 \\
+%             $babb$        & 0             & 0 \\
+%             $baa$         & 0             & 0 \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             The table is closed but not consistent :\\
+%             $row(a) = row(baba)$ but $row(a \cdot b) \neq row(baba \cdot b)$.\\
+%             We can distinguish them by adding $ba$ to $E$ since $T(a \cdot b \cdot a) \neq T(baba \cdot b \cdot a)$. \\
+%             Note : in $a \cdot b \cdot a$, the first $a$ is taken from $S$, the $b$ from $\Sigma$ and the second $a$ from $E$.
+%           \end{minipage}
+%         \end{center}
+%   \item \quad
+%         \begin{center}
+%           \begin{tabular}{c || c | c | c }
+%             $T_6$         & $\varepsilon$ & a & ba \\ [0.5ex]
+%             \hline\hline
+%             $\varepsilon$ & 1             & 1 & 1  \\
+%             $b$           & 0             & 1 & 0  \\
+%             $aa$          & 0             & 0 & 0  \\
+%             $a$           & 1             & 0 & 0  \\
+%             $baba$        & 1             & 0 & 1  \\
+%             $bab$         & 0             & 1 & 0  \\
+%             $ba$          & 1             & 0 & 1  \\
+%             \hline \hline
+%             ba            & 1             & 0 & 0  \\
+%             bb            & 0             & 0 & 0  \\
+%             aaa           & 0             & 0 & 0  \\
+%             aab           & 0             & 0 & 0  \\
+%             ab            & 0             & 0 & 0  \\
+%             $babaa$       & 0             & 0 & 0  \\
+%             $babav$       & 0             & 1 & 0  \\
+%             $babb$        & 0             & 0 & 0  \\
+%             $baa$         & 0             & 0 & 0  \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             The table is closed and consistent.\\
+%             An automaton will be sent.
+%           \end{minipage}
+%         \end{center}
+%   \item \quad
+%         \begin{center}
+%           \input{sections/automata/L_aut3.tex}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             $L(A) = U \rightarrow$ the Teacher accepts the automaton.
+%           \end{minipage}
+%         \end{center}
+% \end{enumerate}

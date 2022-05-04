@@ -1,6 +1,6 @@
-\section{L* algorithm}
+\section{Learnig with L* }
 
-The L* algorithm, described by Dana Angluin in \cite{angluinL}, is a learning algorithm. Its goal is to build a \textit{minimal} DFA recognizing an unknown language \langU{} thanks to interactions between a \learner{} and a \teacher{} through membership and equivalence queries.
+The L* algorithm, described by Dana Angluin in \cite{LPaper}, is a learning algorithm. Its goal is to build a \textit{minimal} DFA recognizing an unknown language \langU{} thanks to interactions between a \learner{} and a \teacher{} through membership and equivalence queries.
 
 \begin{definition}[Type of queries]
   A membership query is represented as a function which maps a word $w$ to \{True, False\} and an equivalence query maps an automaton \automaton{} to \{True, $w \in \Sigma^*$\}, where $w$ is a counter-exemple if \automaton{} does not recognize \langU{}.
@@ -26,14 +26,14 @@ let w be a word over an alphabet \alphabet{}, \automaton{} an automaton and \lan
 \]
 
 
-\subsection{The observation table}
+\subsection{The observation table (O.T.)}
 Every time an answer is received by the learner, it is important to store it somewhere to be able to increase the overall knowledge. In fact, every piece of information obtained from the teacher is immediatly added to the observation table ($O.T.$).
 
 \begin{definition}[Observation Table]
   The observation table is the memory of the learner, composed by two non-empty sets of words, $S$ and $E$, and a dictionnary $T$.
 \end{definition}
 
-We define also $SA = S \circ \Sigma$ made by the concatenation of words of S and every symbol of \alphabet{} that are not in $S$, mathematically $\forall s \in S, \: \forall c \in \Sigma, \: SA = \{s \circ c \text{ such that } s \circ c \notin S \} $, and $S_{ext} = S \cup SA$ containing the union of $S$ and $SA$.
+We define also $SA = S \cdot \Sigma$ made by the concatenation of words of S and every symbol of \alphabet{} that are not in $S$, mathematically $\forall s \in S, \: \forall c \in \Sigma, \: SA = \{s \cdot c \text{ such that } s \cdot c \notin S \} $, and $S_{ext} = S \cup SA$ containing the union of $S$ and $SA$.
 \begin{exmp}
   If $S = \{\varepsilon, a\}$ and $\Sigma = \{a, b\}$ then $S_{ext} = \{\varepsilon, a, b, aa, ab\}$.
 \end{exmp}
@@ -53,20 +53,115 @@ In L* an $O.T.$ should be at every time closed and consistence.
   The $O.T.$ is closed if every row of the \lowerPart{} is also present in the \upperPart{}.
 \end{definition}
 
-If the table is not closed then there exists an element $s$ of $SA$ where $row(s)$ is not in the \upperPart{}. To restore the closedness of the observation table, $s$ will be moved from $SA$ to $S$. Then all word needed to respect its definition will be added to $SA$.
+If the table is not closed then there exists an element $s$ of $SA$ where $row(s)$ is not in the \upperPart{}. To restore the closedness of the observation table, $s$ will be promoted to $S$ and $\forall x \in \Sigma \text{ if } s \cdot x \notin S \text{ then } s \cdot x \text{ is added to } SA$.
 
 \begin{lemma}
+  \label{lemmaPromoteLinePrefixClosedness}
   If we move an element from $SA$ to $S$ then $S$ will remain \textit{prefix-closed}.
 \end{lemma}
 
 \begin{proof}
-  Every element of $SA$ is the concatenation of an element in $S$ and a letter of $\Sigma$. We have that $Pref(w) = Pref(w' \circ a) = \{w' \circ a\} \cup Pref(w')$ and every $Pref(w')$ is already in $S$ since $S$ is \textit{prefix-closed} and every prefix of a word in $S$ is already in $S$. Therefore adding \word{} won't inpact the \textit{prefix-closedness} of $S$.
+  Every element of $SA$ is the concatenation of an element in $S$ and a letter of $\Sigma$. We have that $Pref(w) = Pref(w' \cdot a) = \{w' \cdot a\} \cup Pref(w')$ and every $Pref(w')$ is already in $S$ since $S$ is \textit{prefix-closed}. Therefore adding \word{} won't inpact the \textit{prefix-closedness} of $S$.
 \end{proof}
 
 \begin{definition}[Consistence]
-  The $O.T.$ is consistent if for every $s_1,s_2 \in S$ and $row(s_1) = row(s_2)$ then for every $c \in \Sigma$, $row(s_1 \circ c) = row(s_2 \circ c)$.
+  The $O.T.$ is consistent if for every $s_1,s_2 \in S$ and $row(s_1) = row(s_2)$, in this case $s_1,s_2$ are colled similar rows, then for every $x \in \Sigma$, $row(s_1 \cdot x) = row(s_2 \cdot x)$.
 \end{definition}
 
-If the table is not consistent, it means that there is two words $w_1, w_2$ in $S$ which have same rows, but for which there exists a symbol $c$ of $\Sigma$ where $row(w_1 \circ c) \neq row(w_2 \circ c)$. In thich case we search the first element $e$ of $E$ where $T(w_1 \circ c \circ e) \neq T(w_2 \circ c \circ e)$ and we add $c \circ e$ in $E$.
+If the table is not consistent, we have $row(w_1) = row(w_2)$ and $row(w_1 \cdot x) \neq row(w_2 \cdot x)$ for some $x \in \Sigma \text{ and some }w_1, w_2 \in S$. We can restore the consistence by making $w_1$ and $w_2$ no more similar: we find an $e \in E$ such that $T(w_1 \cdot x \cdot e) \neq T(w_2 \cdot x \cdot e)$ and we add $x \cdot e$ in $E$. In this way, the new bit of $row(w_1)$ is different from the new bit of $row(w_2)$ therefore the two rows are no more similar.
 
-When the learner starts to understand the language, it add the empty word $\varepsilon$ to $S$ and $E$ and asks for the appartenance of $\varepsilon \circ \varepsilon = \varepsilon$.
+\begin{lemma}
+  If we move an element of the type $x \cdot e$ where $x \in Sigma \text{ and } e \in E$ then $E$ remains \textit{suffix-closed}.
+\end{lemma}
+
+The proof is analogue to the proof of \cref{lemmaPromoteLinePrefixClosedness}.
+
+\subsection{Automaton creation from the O.T.}
+
+When the observation table is closed and consistent, the Learner can send to Teacher a conjecture of the language the it has understood so far.
+
+The conjecture is made on the form of an automaton where :
+\begin{itemize}
+  \item $Q = \{row(s), \forall s \in S\}$;
+  \item $\delta = \{(row(s), x, row(s \cdot x)), \forall s \in S, x \in \Sigma\}$;
+  \item $q_0 = row(\varepsilon)$;
+  \item $F = \{row(s) | s \in S \text{ and } T(s) = 1 \}$.
+\end{itemize}
+
+\begin{lemma}
+  The automaton created is deterministic.
+\end{lemma}
+
+\begin{proof}
+  We know that for every row $s_1 \in S$ and for every $x \in \Sigma$, $s_1 \cdot x \in S_{ext}$. Moreover, since the table is consistent, for every $s_2 \in S$ where $row(s_1)$ and $row(s_2)$ are similar, we have that $row(s_1 \cdot x) = row(s_2 \cdot x)$. Therefore there exists only one successor for every state $q \in Q$ and every letter $x \in \Sigma$.
+\end{proof}
+
+\begin{lemma}
+  The automaton created is minimum.
+\end{lemma}
+
+\begin{proof}
+  We can proove this lemma by contradiction. Let suppose that $A$ is not minimun and, therefore, that it is possible to merge some states $q_i, q_j$ to minimize it.
+  By construction, $q_i$ and $q_j$ are linked to two different rows $r_1, r_2$ of the observation table.
+  Let $e \in E$ be a column which is accepted by only one between $r_1, r_2$.
+  Then it means that $e$ is accepted by only one of the residual languages recognized by $q_i$ and $q_j$ and therefore we cannot merge them.
+  We have prooved that it is not possible to merge any couple of state $q_i, q_j \in Q$ and so the automaton is minimum.
+\end{proof}
+
+\subsection{The algorithm}
+
+\begin{algorithm}[H]
+  \caption{Angluil L* algorithm}
+  \label{L_star_algo}
+  \KwIn{$\Sigma$}
+  \KwOut{$A \text{ such that } L(A) = U$}
+  $S \gets \{\varepsilon\}, E \gets \{\varepsilon\}, T \gets \text{new Dict()}$\;
+  \While{$True$}{
+    \If{$(S,E,T) \text{ is not complete}$}{
+      $complete(S,E,T) \text{ with membership queries}$\;
+    }
+    \uIf{$(S, E, T) \text{ is not closed}$}{
+      $rowToPromote \gets \{x \in SA \text{ such that } row(x) \notin upperRows(T)\}$\;
+      $S \gets S \cup \{rowToPromote\}$\;
+    }
+    \uElseIf{$(S,E,T) \text{ is not consistent}$}{
+      $\text{Fix } s_1, s_2 \in S, x \in \Sigma, e \in E \text{ such that } row(s_1) = row(s_2) \text{ and } T(s_1 \cdot x \cdot e) \neq T(s_2 \cdot x \cdot e)$\;
+      $\text{add } x \cdot e \text{ to E and complete T with membership queries}$\;
+    }
+    \Else{
+      $A \gets createAutomaton(S, E, T)$\;
+      $teacherAnswer \gets equiv(A)$\;
+      \uIf{$\text{teacherAnswer is a counter exemple t}$}{
+        \For{$p \in Pref(t)$}{
+          $\text{add p to S and add row t to (S, E, T) with membership queries }$\;
+        }
+      }
+      \Else{
+        \Return A \tcp*{The Teacher accepted the automaton}
+      }
+    }
+  }
+\end{algorithm}
+
+\subsection{L* analysis}
+\subsubsection{Correcteness}
+The goal of the algorithm is to find an automaton recognizing the language of the teacher. The solution found by the Learner is correct since it has been accepted by the Teacher.
+\subsubsection{Terminaison}
+The algorithm terminates only if the Teacher answer $Yes$ to a \textit{equivalence query} of the Learner.
+
+We know, by definition, that the language $U$ known by the teacher is regular. It means that the number $n$ of its residuals is finite implying that the number of states of the minimum DFA recognizing it and the number of different rows in the $O.T$ is finite (and equal to $n$).
+
+If in a certain moment we have $n' < n$ different rows and the table is closed and consistent, the Learner make its conjecture and sends it to the Teacher. This conjecture cannot be the good one, and the counter-example provided will have an associated row similar to a row in $S$ but which makes the $O.T.$ no more consistent. The Learner repeats the algorithm, and every time the table is not consistent, the $n'$ will increase of one. When $n' = n$ the conjecture will have $n$ states, the same of the minimum DFA, and therefore since a minimum DFA is unique, the teacher will answer $Yes$ to the last conjecture allowing the algorithm to stop.
+
+\subsubsection{Time complexity}
+Let suppose that the \cref{L_star_algo} takes constant time to check if the table is consistent and closed and to create an automaton from the $O.T$ and pose $A$ the minimum DFA recognizing $U$.
+
+The time complexity should be measured on the number of cells of the $O.T$.
+
+In the wrost case, the number of columns $n$ (that is the cardinal of $E$) equals the number of states $A$, since at most we should have to make the table consistent $n-1$ times.
+
+The size of $S$ is another key factor for the time complexity. Its size really depends on the length $m$ of the counter-exemple provided by the Teacher. At least $S$ has $n$ rows, one per number of column, but considering the length of $m$, and knowing that all prefix of $m$ will be added to $S$, then $|S|$ will have $O(n \times m)$ rows.
+
+The size of $SA$ is at most $O(|\Sigma|)$ times the length $|S|$ since for every word in $|S|$ we can potentially have $|\Sigma|$ successors to add in $SA$.
+
+In conclusion we have $O(n)$ columns and $O(|\Sigma| \times n \times m)$ rows, asking an overall complexity of $O(n \times |\Sigma| \times n \times m) = O(|\Sigma| \times n^2 \times m) = O(n^2 \times m)$ since $|\Sigma|$ is constant. The time complexity is so polynomial on the size of the automaton and the larger counter-exemple given by the teacher.
