@@ -34,8 +34,6 @@ export class HTML_NL_star extends HTML_LearnerBase<NL_star> {
   }
 
   table_to_update_after_equiv(answer: string): void {
-    console.log("In this place");
-
     this.learner.add_elt_in_E(answer!, true);
   }
 }

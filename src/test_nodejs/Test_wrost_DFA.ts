@@ -3,6 +3,7 @@ import { clearFile, csvHead, printCsvCompare, writeToFile } from "./PrintFunctio
 import { L_star } from "../learners/L_star.js";
 import { NL_star } from "../learners/NL_star.js";
 import { TeacherNoAutomaton } from "../teacher/TeacherNoAutomaton.js";
+import { myLog } from "../tools/Utilities.js";
 
 /**
  * About this file : 
@@ -55,16 +56,16 @@ for (let index = 0; index < regexList.length; index++) {
   let L = new L_star(teacher)
   let NL = new NL_star(teacher)
 
-  console.log("==============================");
-  console.log("Current regexp : ", regex);
+  myLog("==============================");
+  myLog("Current regexp : ", regex);
 
-  console.log("In L*");
+  myLog("In L*");
 
   L.make_all_queries();
-  console.log(printInfo(L, "L*"));
-  console.log("In NL*");
+  myLog(printInfo(L, "L*"));
+  myLog("In NL*");
   NL.make_all_queries();
-  console.log(printInfo(NL, "NL*"));
+  myLog(printInfo(NL, "NL*"));
 
   if (toWrite) writeToFile(fileName, printCsvCompare(L, NL))
 }

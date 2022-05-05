@@ -1,4 +1,4 @@
-import { historyPosition } from "../Main.js";
+import { myLog } from "../tools/Utilities.js";
 
 export class State {
   isAccepting: boolean;
@@ -182,8 +182,14 @@ export class Automaton implements AutomatonJson {
       .render(() => {
         this.continueAction = true;
         this.color_node(true);
-        console.log($("#graph")[0].replaceWith);
+        myLog($("#graph")[0].replaceWith);
       });
+  }
+
+  restart_graph() {
+    this.color_node(false)
+    this.restart()
+    this.color_node(true)
   }
 
   get_current_graph_node(node: State) {
@@ -219,7 +225,7 @@ export class Automaton implements AutomatonJson {
     mermaidTxt += "\n"
     // Callback for tooltip on mouse over
     mermaidTxt = mermaidTxt.concat(Array.from(this.states).map(([name, _]) => `click ${name} undnamefinedCallback "${name}";`).join("\n"))
-    console.log(mermaidTxt);
+    myLog(mermaidTxt);
 
     this.automatonToDot()
     return mermaidTxt;
@@ -259,12 +265,12 @@ export class Automaton implements AutomatonJson {
 
     this.acceptingStates.forEach(s => {
       txt = txt.concat(`\n${s.name} [shape=doublecircle]`)
-      console.log("here");
+      myLog("here");
 
     })
 
     txt += "\n}"
-    console.log(txt);
+    myLog(txt);
 
     return txt
   }

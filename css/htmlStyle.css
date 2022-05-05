@@ -234,7 +234,6 @@ button:hover {
 .marginColumn span:hover {
     cursor: pointer;
     color: var(--color3);
-    z-index: -1;
 }
 
 #rightCol {
@@ -250,6 +249,7 @@ button:hover {
     position: sticky;
     top: 50%;
     transform: scaleY(2.5);
+    z-index: -1;
     /*position: fixed;
     width: var(--marginColumnRight);
     top: 50%;

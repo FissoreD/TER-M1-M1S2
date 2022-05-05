@@ -1,3 +1,4 @@
+import { myLog } from "../tools/Utilities.js";
 import { Automaton, State } from "../automaton/Automaton.js";
 
 
@@ -9,9 +10,9 @@ state2.addTransition('a', state3)
 
 let a: Automaton = new Automaton(new Set([state1, state2, state3]))
 
-console.log(a.matrix_to_mermaid());
+myLog(a.matrix_to_mermaid());
 
-console.log("-".repeat(70));
+myLog("-".repeat(70));
 
-console.log(a.minimize().matrix_to_mermaid());
-console.log();
+myLog(a.minimize().matrix_to_mermaid());
+myLog();

@@ -2,6 +2,11 @@ import { NL_star } from "../learners/NL_star.js";
 import { L_star } from "../learners/L_star.js";
 import { teachers } from "../teacher/Teacher.js";
 import { clearFile, csvHead, printCsvCompare, printInfo, writeToFile } from "./PrintFunction.js";
+import { myLog } from "../tools/Utilities.js";
+import { TeacherTakingAut } from "../teacher/TeacherTakingAut.js";
+import { readFileSync } from "fs";
+import { Automaton } from "../automaton/Automaton.js";
+
 /**
  * About this file : 
  * The goal here is to compare L and NL algo in term
@@ -13,12 +18,15 @@ import { clearFile, csvHead, printCsvCompare, printInfo, writeToFile } from "./P
  * interactions with the teacher.
  */
 
-let fileName = "randomRegex";
-clearFile(fileName)
-writeToFile(fileName, csvHead)
+let fileName = "randomRegex", writeToFileB = false,
+  teachers1 = [...teachers, new TeacherTakingAut({ automaton: Automaton.strToAutomaton(readFileSync('./statistics/benchMark/2-0.1/A6.ba').toString()), regex: '2-0.1/A6.ba' })];
 
-for (let index = 0; index < teachers.length; index++) {
-  const teacher = teachers[index];
+if (writeToFileB) {
+  clearFile(fileName)
+  writeToFile(fileName, csvHead)
+}
+for (let index = 0; index < teachers1.length; index++) {
+  const teacher = teachers1[index];
   teacher.description = index + "";
 
   let L = new L_star(teacher);
@@ -28,10 +36,11 @@ for (let index = 0; index < teachers.length; index++) {
   console.log("Current regexp : ", teacher.regex, teacher.description);
 
   L.make_all_queries()
-  printInfo(L, "L*")
+  console.log(printInfo(L, "L*"))
 
   NL.make_all_queries()
-  printInfo(L, "NL*")
+  console.log(printInfo(NL, "NL*"))
 
-  writeToFile(fileName, printCsvCompare(L, NL))
+  if (writeToFileB)
+    writeToFile(fileName, printCsvCompare(L, NL))
 }

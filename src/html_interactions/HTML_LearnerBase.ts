@@ -1,7 +1,8 @@
 import { Automaton } from "../automaton/Automaton.js";
 import { LearnerBase } from "../learners/LearnerBase.js";
-import { addHistoryElement, automatonDiv, centerDivClone, clear_automaton_HTML, historyHTML } from "../Main.js";
-import { myFunction } from "../tools/Utilities.js";
+import { addHistoryElement, automatonDiv, centerDivClone, clear_automaton_HTML } from "../Main.js";
+import { myFunction, myLog } from "../tools/Utilities.js";
+
 
 export abstract class HTML_LearnerBase<T extends LearnerBase> {
   learner: T;
@@ -102,7 +103,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
       while (this.automaton && !this.automaton.continueAction) {
         let tm = timer(5);
         await tm.then(() => { if (this.automaton!.continueAction) addHistoryElement(this.automaton) }).catch(e => {
-          console.log(e);
+          myLog(e);
         });
       } else {
       addHistoryElement(this.automaton)
@@ -164,7 +165,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
           document.getElementById("messageHead")!.scrollIntoView();
           if (!automaton.continueAction) return
           let answer = this.learner.make_equiv(automaton);
-          console.log(answer);
+          myLog(answer);
 
 
           if (answer != undefined) {

@@ -1,6 +1,7 @@
 import { minimizeAutomaton } from "../automaton/automaton_type.js";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "fs";
 import { Automaton, State } from "../automaton/Automaton.js";
+import { myLog } from "../tools/Utilities.js";
 
 /**
  * The goal of this file is to create random 
@@ -41,7 +42,7 @@ const reachableFromState = (s: State) => {
 
 for (let stateNumber = minStateNumber; stateNumber < maxStateNumber; stateNumber += 10) {
   if (folders.size == 0) break;
-  console.log("Iteration =", stateNumber, "Folder to fill :", folders.size);
+  myLog("Iteration =", stateNumber, "Folder to fill :", folders.size);
 
   for (let counter = 0; counter < iterationNumber; counter++) {
     if (folders.size == 0) break;
@@ -80,6 +81,6 @@ for (let stateNumber = minStateNumber; stateNumber < maxStateNumber; stateNumber
     }
 
     writeFileSync(path + folderName + "/" + dirElementNb + ".ba", minimized.toString());
-    console.log("State Number =", stateNumber, "Counter =", counter, "StateNb =", folderName);
+    myLog("State Number =", stateNumber, "Counter =", counter, "StateNb =", folderName);
   }
 }

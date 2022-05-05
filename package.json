@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "lerningalgorithm",
+  "name": "learningalgorithm",
   "version": "1.0.0",
   "main": "./dist/Main.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "build-typecheck": "npm run typecheck && npm run build",
     "lstar": "node ./dist/test_nodejs/L_star_test.js",
     "nlstar": "node ./dist/test_nodejs/NL_star_test.js",
-    "compare": "node ./dist/test_nodejs/LernerCompare.js",
+    "compare": "node ./dist/test_nodejs/LearnerCompare.js",
     "wrostDFA": "node dist/test_nodejs/Test_wrost_DFA.js",
     "wrostRFSA": "node dist/test_nodejs/Test_wrost_RFSA.js",
     "benchmark": "node ./dist/test_nodejs/CompareBenchMark.js",

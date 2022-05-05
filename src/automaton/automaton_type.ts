@@ -1,6 +1,7 @@
 import { Automaton, AutomatonJson, State } from "../automaton/Automaton.js";
 // @ts-ignore
 import { noam } from '../../public/noam.js';
+import { myLog } from "../tools/Utilities.js";
 
 interface HisTransition {
   fromState: number | number[],
@@ -83,7 +84,7 @@ export function minimizeAutomaton(automatonInput: HisAutomaton | Automaton): Aut
     MyAutomatonToHis(automatonInput) : automatonInput
 
   let log = (message: string, aut: HisAutomaton | Automaton) => {
-    console.log(message, automaton.states.length);
+    myLog(message, automaton.states.length);
     if ((aut instanceof Automaton ? aut.state_number() : aut.states.length) > 5000)
       console.error(message, automaton.states.length);
   }
@@ -107,7 +108,7 @@ export function minimizeAutomaton(automatonInput: HisAutomaton | Automaton): Aut
 }
 
 export function intersectionAutomata(a1: Automaton, a2: Automaton): Automaton {
-  console.log("Intersection, ", a1.states.size, a2.states.size);
+  myLog("Intersection, ", a1.states.size, a2.states.size);
   return minimizeAutomaton(noam.fsm.intersection(MyAutomatonToHis(a1), MyAutomatonToHis(a2)))
 }
 

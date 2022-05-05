@@ -18,7 +18,46 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-define("automaton/Automaton", ["require", "exports"], function (require, exports) {
+define("tools/Utilities", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.myLog = exports.allStringFromAlphabet = exports.boolToString = exports.count_str_occurrences = exports.generate_suffix_list = exports.generate_prefix_list = exports.same_vector = void 0;
+    function same_vector(v1, v2) {
+        return v1.map((elt, pos) => elt == v2[pos]).every(e => e);
+    }
+    exports.same_vector = same_vector;
+    const generate_prefix_list = (str) => Array(str.length + 1).fill(0).map((_, i) => str.substring(0, i)).reverse();
+    exports.generate_prefix_list = generate_prefix_list;
+    const generate_suffix_list = (str) => Array(str.length + 1).fill("").map((_, i) => str.substring(i, str.length + 1));
+    exports.generate_suffix_list = generate_suffix_list;
+    const count_str_occurrences = (str, obj) => Array.from(str).filter(f => f == obj).length;
+    exports.count_str_occurrences = count_str_occurrences;
+    function boolToString(bool) {
+        return bool ? "1" : "0";
+    }
+    exports.boolToString = boolToString;
+    function allStringFromAlphabet(params) {
+        let res = [""];
+        let alphabet = Array.from(params.alphabet).sort();
+        let level = [""];
+        while (res[res.length - 1].length < params.maxLength) {
+            let res1 = [];
+            level.forEach(e => alphabet.forEach(a => {
+                res.push(e + a);
+                res1.push(e + a);
+            }));
+            level = res1;
+        }
+        return res;
+    }
+    exports.allStringFromAlphabet = allStringFromAlphabet;
+    let myLog = (a, ...optionalParam) => {
+        if (true)
+            console.log(a, optionalParam);
+    };
+    exports.myLog = myLog;
+});
+define("automaton/Automaton", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Automaton = exports.State = void 0;
@@ -155,7 +194,7 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
                 .render(() => {
                 this.continueAction = true;
                 this.color_node(true);
-                console.log($("#graph")[0].replaceWith);
+                (0, Utilities_js_1.myLog)($("#graph")[0].replaceWith);
             });
         }
         get_current_graph_node(node) {
@@ -188,7 +227,7 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
             mermaidTxt = mermaidTxt.concat(this.acceptingStates.map(e => `style ${e.name} fill:#FFFF00, stroke:#FF00FF;\n`).join(""));
             mermaidTxt += "\n";
             mermaidTxt = mermaidTxt.concat(Array.from(this.states).map(([name, _]) => `click ${name} undnamefinedCallback "${name}";`).join("\n"));
-            console.log(mermaidTxt);
+            (0, Utilities_js_1.myLog)(mermaidTxt);
             this.automatonToDot();
             return mermaidTxt;
         }
@@ -221,10 +260,10 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
             });
             this.acceptingStates.forEach(s => {
                 txt = txt.concat(`\n${s.name} [shape=doublecircle]`);
-                console.log("here");
+                (0, Utilities_js_1.myLog)("here");
             });
             txt += "\n}";
-            console.log(txt);
+            (0, Utilities_js_1.myLog)(txt);
             return txt;
         }
         color_node(toFill) {
@@ -391,7 +430,7 @@ define("automaton/Automaton", ["require", "exports"], function (require, exports
     }
     exports.Automaton = Automaton;
 });
-define("automaton/automaton_type", ["require", "exports", "automaton/Automaton", "../../public/noam.js"], function (require, exports, Automaton_js_1, noam_js_1) {
+define("automaton/automaton_type", ["require", "exports", "automaton/Automaton", "../../public/noam.js", "tools/Utilities"], function (require, exports, Automaton_js_1, noam_js_1, Utilities_js_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.differenceAutomata = exports.complementAutomata = exports.unionAutomata = exports.intersectionAutomata = exports.minimizeAutomaton = exports.regexToAutomaton = exports.MyAutomatonToHis = exports.HisAutomaton2Mine = void 0;
@@ -450,7 +489,7 @@ define("automaton/automaton_type", ["require", "exports", "automaton/Automaton",
         let automaton = automatonInput instanceof Automaton_js_1.Automaton ?
             MyAutomatonToHis(automatonInput) : automatonInput;
         let log = (message, aut) => {
-            console.log(message, automaton.states.length);
+            (0, Utilities_js_2.myLog)(message, automaton.states.length);
             if ((aut instanceof Automaton_js_1.Automaton ? aut.state_number() : aut.states.length) > 5000)
                 console.error(message, automaton.states.length);
         };
@@ -473,7 +512,7 @@ define("automaton/automaton_type", ["require", "exports", "automaton/Automaton",
     }
     exports.minimizeAutomaton = minimizeAutomaton;
     function intersectionAutomata(a1, a2) {
-        console.log("Intersection, ", a1.states.size, a2.states.size);
+        (0, Utilities_js_2.myLog)("Intersection, ", a1.states.size, a2.states.size);
         return minimizeAutomaton(noam_js_1.noam.fsm.intersection(MyAutomatonToHis(a1), MyAutomatonToHis(a2)));
     }
     exports.intersectionAutomata = intersectionAutomata;
@@ -495,41 +534,7 @@ define("automaton/automaton_type", ["require", "exports", "automaton/Automaton",
     }
     exports.differenceAutomata = differenceAutomata;
 });
-define("tools/Utilities", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.allStringFromAlphabet = exports.boolToString = exports.count_str_occurrences = exports.generate_suffix_list = exports.generate_prefix_list = exports.same_vector = void 0;
-    function same_vector(v1, v2) {
-        return v1.map((elt, pos) => elt == v2[pos]).every(e => e);
-    }
-    exports.same_vector = same_vector;
-    const generate_prefix_list = (str) => Array(str.length + 1).fill(0).map((_, i) => str.substring(0, i)).reverse();
-    exports.generate_prefix_list = generate_prefix_list;
-    const generate_suffix_list = (str) => Array(str.length + 1).fill("").map((_, i) => str.substring(i, str.length + 1));
-    exports.generate_suffix_list = generate_suffix_list;
-    const count_str_occurrences = (str, obj) => Array.from(str).filter(f => f == obj).length;
-    exports.count_str_occurrences = count_str_occurrences;
-    function boolToString(bool) {
-        return bool ? "1" : "0";
-    }
-    exports.boolToString = boolToString;
-    function allStringFromAlphabet(params) {
-        let res = [""];
-        let alphabet = Array.from(params.alphabet).sort();
-        let level = [""];
-        while (res[res.length - 1].length < params.maxLength) {
-            let res1 = [];
-            level.forEach(e => alphabet.forEach(a => {
-                res.push(e + a);
-                res1.push(e + a);
-            }));
-            level = res1;
-        }
-        return res;
-    }
-    exports.allStringFromAlphabet = allStringFromAlphabet;
-});
-define("teacher/Equiv", ["require", "exports", "automaton/automaton_type", "automaton/automaton_type", "automaton/automaton_type", "tools/Utilities"], function (require, exports, automaton_type_js_1, automaton_type_js_2, automaton_type_js_3, Utilities_js_1) {
+define("teacher/Equiv", ["require", "exports", "automaton/automaton_type", "automaton/automaton_type", "automaton/automaton_type", "tools/Utilities"], function (require, exports, automaton_type_js_1, automaton_type_js_2, automaton_type_js_3, Utilities_js_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.equivalenceFunction = void 0;
@@ -537,7 +542,7 @@ define("teacher/Equiv", ["require", "exports", "automaton/automaton_type", "auto
         if (teacher.counter_examples) {
             for (const counter_example of teacher.counter_examples) {
                 if (teacher.member(counter_example) !=
-                    (0, Utilities_js_1.boolToString)(automaton.accept_word_nfa(counter_example)))
+                    (0, Utilities_js_3.boolToString)(automaton.accept_word_nfa(counter_example)))
                     return counter_example;
             }
         }
@@ -588,7 +593,7 @@ define("teacher/Equiv", ["require", "exports", "automaton/automaton_type", "auto
     };
     exports.equivalenceFunction = equivalenceFunction;
 });
-define("teacher/TeacherTakingAut", ["require", "exports", "tools/Utilities", "teacher/Equiv", "automaton/automaton_type"], function (require, exports, Utilities_js_2, Equiv_js_1, automaton_type_js_4) {
+define("teacher/TeacherTakingAut", ["require", "exports", "tools/Utilities", "teacher/Equiv", "automaton/automaton_type"], function (require, exports, Utilities_js_4, Equiv_js_1, automaton_type_js_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TeacherTakingAut = void 0;
@@ -601,7 +606,7 @@ define("teacher/TeacherTakingAut", ["require", "exports", "tools/Utilities", "te
             this.counter_examples = params.counter_examples;
         }
         member(sentence) {
-            return (0, Utilities_js_2.boolToString)(this.automaton.accept_word_nfa(sentence));
+            return (0, Utilities_js_4.boolToString)(this.automaton.accept_word_nfa(sentence));
         }
         equiv(automaton) {
             return (0, Equiv_js_1.equivalenceFunction)(this, automaton);
@@ -621,7 +626,7 @@ define("teacher/TeacherAutomaton", ["require", "exports", "automaton/automaton_t
     }
     exports.TeacherAutomaton = TeacherAutomaton;
 });
-define("teacher/TeacherNoAutomaton", ["require", "exports", "tools/Utilities", "teacher/Equiv"], function (require, exports, Utilities_js_3, Equiv_js_2) {
+define("teacher/TeacherNoAutomaton", ["require", "exports", "tools/Utilities", "teacher/Equiv"], function (require, exports, Utilities_js_5, Equiv_js_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TeacherNoAutomaton = void 0;
@@ -640,7 +645,7 @@ define("teacher/TeacherNoAutomaton", ["require", "exports", "tools/Utilities", "
             this.counter_examples = params.counter_examples;
         }
         member(sentence) {
-            return (0, Utilities_js_3.boolToString)(this.check_function(sentence));
+            return (0, Utilities_js_5.boolToString)(this.check_function(sentence));
         }
         equiv(automaton) {
             return (0, Equiv_js_2.equivalenceFunction)(this, automaton);
@@ -649,7 +654,7 @@ define("teacher/TeacherNoAutomaton", ["require", "exports", "tools/Utilities", "
     exports.TeacherNoAutomaton = TeacherNoAutomaton;
     TeacherNoAutomaton.counter = 0;
 });
-define("teacher/Teacher", ["require", "exports", "teacher/TeacherAutomaton", "teacher/TeacherNoAutomaton", "tools/Utilities"], function (require, exports, TeacherAutomaton_js_1, TeacherNoAutomaton_js_1, Utilities_js_4) {
+define("teacher/Teacher", ["require", "exports", "teacher/TeacherAutomaton", "teacher/TeacherNoAutomaton", "tools/Utilities"], function (require, exports, TeacherAutomaton_js_1, TeacherNoAutomaton_js_1, Utilities_js_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.teachers = exports.binaryAddition = exports.teacher_b_bStar_a__b_aOrb_star = exports.teacher_bStar_a_or_aStart_bStar = exports.teacherNotAfourthPos = exports.teacherEvenAandThreeB = exports.teacherA3fromLast = exports.teacherPairZeroAndOne = exports.teacher_a_or_baStar = void 0;
@@ -673,7 +678,7 @@ define("teacher/Teacher", ["require", "exports", "teacher/TeacherAutomaton", "te
             let trd_term = parseInt(sentenceAr.map(e => e[2]).join(''), 2);
             return fst_term + snd_term == trd_term;
         },
-        counter_examples: (0, Utilities_js_4.allStringFromAlphabet)({ alphabet: '012345678', maxLength: 3 })
+        counter_examples: (0, Utilities_js_6.allStringFromAlphabet)({ alphabet: '012345678', maxLength: 3 })
     }, `  <pre>
        /**
        *  Automaton calculating addition between binary integers: 
@@ -687,7 +692,7 @@ define("teacher/Teacher", ["require", "exports", "teacher/TeacherAutomaton", "te
        **/</pre> `);
     exports.teachers = [exports.teacher_a_or_baStar, exports.teacher_b_bStar_a__b_aOrb_star, exports.binaryAddition, exports.teacherA3fromLast, exports.teacherEvenAandThreeB, exports.teacherNotAfourthPos, exports.teacherPairZeroAndOne, exports.teacher_bStar_a_or_aStart_bStar];
 });
-define("learners/LearnerBase", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_5) {
+define("learners/LearnerBase", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LearnerBase = void 0;
@@ -740,7 +745,7 @@ define("learners/LearnerBase", ["require", "exports", "tools/Utilities"], functi
         }
         add_elt_in_S(new_elt, after_member = false) {
             let added_list = [];
-            let prefix_list = (0, Utilities_js_5.generate_prefix_list)(new_elt);
+            let prefix_list = (0, Utilities_js_7.generate_prefix_list)(new_elt);
             for (const prefix of prefix_list) {
                 if (this.S.includes(prefix))
                     return;
@@ -772,22 +777,30 @@ define("learners/LearnerBase", ["require", "exports", "tools/Utilities"], functi
             }
             return;
         }
-        add_elt_in_E(new_elt) {
-            let suffix_list = (0, Utilities_js_5.generate_suffix_list)(new_elt);
+        add_elt_in_E(new_elt, after_equiv = false) {
+            let suffix_list = (0, Utilities_js_7.generate_suffix_list)(new_elt);
             for (const suffix of suffix_list) {
                 if (this.E.includes(suffix))
                     break;
                 this.SA.forEach(s => {
-                    this.make_member(s, suffix);
+                    if (s + suffix == new_elt && after_equiv)
+                        this.update_observation_table(s, (0, Utilities_js_7.boolToString)(!this.automaton.accept_word(new_elt)));
+                    else
+                        this.make_member(s, suffix);
                 });
-                this.S.forEach(s => this.make_member(s, suffix));
+                this.S.forEach(s => {
+                    if (s + suffix == new_elt && after_equiv)
+                        this.update_observation_table(s, (0, Utilities_js_7.boolToString)(!this.automaton.accept_word(new_elt)));
+                    else
+                        this.make_member(s, suffix);
+                });
                 this.E.push(suffix);
             }
         }
         add_row(row_name, after_member = false) {
             this.E.forEach(e => {
                 if (after_member && e == "")
-                    this.observation_table[row_name] = (0, Utilities_js_5.boolToString)(!this.automaton.accept_word_nfa(row_name));
+                    this.observation_table[row_name] = (0, Utilities_js_7.boolToString)(!this.automaton.accept_word_nfa(row_name));
                 else
                     this.make_member(row_name, e);
             });
@@ -892,7 +905,7 @@ define("learners/L_star", ["require", "exports", "automaton/Automaton", "learner
     }
     exports.L_star = L_star;
 });
-define("html_interactions/HTML_LearnerBase", ["require", "exports", "Main"], function (require, exports, Main_js_1) {
+define("html_interactions/HTML_LearnerBase", ["require", "exports", "Main", "tools/Utilities"], function (require, exports, Main_js_1, Utilities_js_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HTML_LearnerBase = void 0;
@@ -952,7 +965,7 @@ define("html_interactions/HTML_LearnerBase", ["require", "exports", "Main"], fun
                 return;
             document.getElementById('centerDiv').replaceWith((0, Main_js_1.centerDivClone)());
             if (this.pile_actions.length > 0)
-                this.pile_actions.shift()();
+                await this.pile_actions.shift()();
             else if (!this.close_action()) { }
             else if (!this.consistence_action()) { }
             else
@@ -974,7 +987,7 @@ define("html_interactions/HTML_LearnerBase", ["require", "exports", "Main"], fun
                     let tm = timer(5);
                     await tm.then(() => { if (this.automaton.continueAction)
                         (0, Main_js_1.addHistoryElement)(this.automaton); }).catch(e => {
-                        console.log(e);
+                        (0, Utilities_js_8.myLog)(e);
                     });
                 }
             else {
@@ -1028,7 +1041,11 @@ define("html_interactions/HTML_LearnerBase", ["require", "exports", "Main"], fun
                 }
                 while (!automaton.continueAction) {
                     await delay(10).then(() => {
+                        document.getElementById("messageHead").scrollIntoView();
+                        if (!automaton.continueAction)
+                            return;
                         let answer = this.learner.make_equiv(automaton);
+                        (0, Utilities_js_8.myLog)(answer);
                         if (answer != undefined) {
                             this.message().innerText =
                                 `The sent automaton is not valid, here is a counter-exemple ${answer}`;
@@ -1120,8 +1137,8 @@ define("learners/NL_star", ["require", "exports", "automaton/Automaton", "learne
             this.check_prime_lines();
             return;
         }
-        add_elt_in_E(new_elt) {
-            super.add_elt_in_E(new_elt);
+        add_elt_in_E(new_elt, after_equiv = false) {
+            super.add_elt_in_E(new_elt, after_equiv);
             this.check_prime_lines();
             return;
         }
@@ -1226,12 +1243,12 @@ define("html_interactions/HTML_NL_star", ["require", "exports", "learners/NL_sta
         [Note : ${new_col} = ${fstChar} ∘ ${sndChar} and ${fstChar} ∈ Σ and ${sndChar} ∈ E]`;
         }
         table_to_update_after_equiv(answer) {
-            this.learner.add_elt_in_E(answer);
+            this.learner.add_elt_in_E(answer, true);
         }
     }
     exports.HTML_NL_star = HTML_NL_star;
 });
-define("teacher/TeacherUser", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_6) {
+define("teacher/TeacherUser", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TeacherUser = void 0;
@@ -1242,9 +1259,9 @@ define("teacher/TeacherUser", ["require", "exports", "tools/Utilities"], functio
             this.regex = "";
         }
         member(sentence) {
-            return (0, Utilities_js_6.boolToString)(confirm(`Does ${sentence.length > 0 ? sentence : 'ε'} belongs to your language ?`));
+            return (0, Utilities_js_9.boolToString)(confirm(`Does ${sentence.length > 0 ? sentence : 'ε'} belongs to your language ?`));
         }
-        equiv(automaton) {
+        equiv(_automaton) {
             let isValid = confirm(`Does the displayed automaton recognize your language ?`);
             return isValid ? undefined : this.notNullPrompt("Enter a counter-exemple");
         }
@@ -1258,7 +1275,7 @@ define("teacher/TeacherUser", ["require", "exports", "tools/Utilities"], functio
     }
     exports.TeacherUser = TeacherUser;
 });
-define("Main", ["require", "exports", "teacher/Teacher", "html_interactions/HTML_L_star", "html_interactions/HTML_NL_star", "automaton/Automaton", "learners/L_star", "learners/NL_star", "automaton/automaton_type", "teacher/TeacherAutomaton", "teacher/TeacherUser"], function (require, exports, Teacher_js_1, HTML_L_star_js_1, HTML_NL_star_js_1, Automaton_js_4, L_star_js_2, NL_star_js_2, autFunction, TeacherAutomaton_js_2, TeacherUser_js_1) {
+define("Main", ["require", "exports", "teacher/Teacher", "html_interactions/HTML_L_star", "html_interactions/HTML_NL_star", "automaton/Automaton", "learners/L_star", "learners/NL_star", "automaton/automaton_type", "teacher/TeacherAutomaton", "teacher/TeacherUser", "tools/Utilities"], function (require, exports, Teacher_js_1, HTML_L_star_js_1, HTML_NL_star_js_1, Automaton_js_4, L_star_js_2, NL_star_js_2, autFunction, TeacherAutomaton_js_2, TeacherUser_js_1, Utilities_js_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.clear_automaton_HTML = exports.clear_table = exports.goBackward = exports.goForeward = exports.addHistoryElement = exports.initiate_global_vars = exports.centerDivClone = exports.backupCenterDiv = exports.historyPosition = exports.historyHTML = exports.automatonDivList = exports.automatonHTML = exports.automatonDiv = void 0;
@@ -1291,7 +1308,7 @@ define("Main", ["require", "exports", "teacher/Teacher", "html_interactions/HTML
                 new HTML_L_star_js_1.HTML_L_star(currentTeacher) :
                 new HTML_NL_star_js_1.HTML_NL_star(currentTeacher);
             $("#teacher_description")[0].innerHTML = current_automaton.learner.teacher.description;
-            console.log("The description is ", current_automaton.learner.teacher.description);
+            (0, Utilities_js_10.myLog)("The description is ", current_automaton.learner.teacher.description);
             clearHistory();
         };
         let createRadioTeacher = (teacher) => {
@@ -1356,8 +1373,6 @@ define("Main", ["require", "exports", "teacher/Teacher", "html_interactions/HTML
     }
     exports.addHistoryElement = addHistoryElement;
     function changeMainDivContent() {
-        let historyHead = Array.from(exports.historyHTML[exports.historyPosition][0].getElementsByClassName('head'));
-        let currentHead = Array.from(document.getElementsByClassName('head'));
         document.getElementById('centerDiv').innerHTML = exports.historyHTML[exports.historyPosition][0].innerHTML;
         window.automaton = exports.historyHTML[exports.historyPosition][1];
     }
@@ -1464,7 +1479,7 @@ define("html_interactions/listeners", ["require", "exports"], function (require,
     }
     exports.set_text = set_text;
 });
-define("learners/Observation_table", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_7) {
+define("learners/Observation_table", ["require", "exports", "tools/Utilities"], function (require, exports, Utilities_js_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Observation_table = void 0;
@@ -1493,12 +1508,12 @@ define("learners/Observation_table", ["require", "exports", "tools/Utilities"], 
             const r1 = this.get_row(row1);
             const r2 = this.get_row(row2);
             return r1 != undefined && r2 != undefined &&
-                (0, Utilities_js_7.same_vector)(r1, r2);
+                (0, Utilities_js_11.same_vector)(r1, r2);
         }
     }
     exports.Observation_table = Observation_table;
 });
-define("test_nodejs/Automaton_minimize_test", ["require", "exports", "automaton/Automaton"], function (require, exports, Automaton_js_5) {
+define("test_nodejs/Automaton_minimize_test", ["require", "exports", "tools/Utilities", "automaton/Automaton"], function (require, exports, Utilities_js_12, Automaton_js_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let state1 = new Automaton_js_5.State("0", false, true, ['a', 'b']);
@@ -1507,10 +1522,10 @@ define("test_nodejs/Automaton_minimize_test", ["require", "exports", "automaton/
     state1.addTransition('a', state2);
     state2.addTransition('a', state3);
     let a = new Automaton_js_5.Automaton(new Set([state1, state2, state3]));
-    console.log(a.matrix_to_mermaid());
-    console.log("-".repeat(70));
-    console.log(a.minimize().matrix_to_mermaid());
-    console.log();
+    (0, Utilities_js_12.myLog)(a.matrix_to_mermaid());
+    (0, Utilities_js_12.myLog)("-".repeat(70));
+    (0, Utilities_js_12.myLog)(a.minimize().matrix_to_mermaid());
+    (0, Utilities_js_12.myLog)();
 });
 define("test_nodejs/PrintFunction", ["require", "exports", "assert", "fs"], function (require, exports, assert_1, fs_1) {
     "use strict";
@@ -1534,11 +1549,11 @@ define("test_nodejs/PrintFunction", ["require", "exports", "assert", "fs"], func
     };
     exports.writeToFile = writeToFile;
 });
-define("test_nodejs/CompareBenchMark", ["require", "exports", "fs", "test_nodejs/PrintFunction", "teacher/TeacherTakingAut", "learners/L_star", "learners/NL_star", "automaton/Automaton"], function (require, exports, fs_2, PrintFunction_js_1, TeacherTakingAut_js_2, L_star_js_3, NL_star_js_3, Automaton_js_6) {
+define("test_nodejs/CompareBenchMark", ["require", "exports", "fs", "test_nodejs/PrintFunction", "teacher/TeacherTakingAut", "learners/L_star", "learners/NL_star", "automaton/Automaton", "tools/Utilities"], function (require, exports, fs_2, PrintFunction_js_1, TeacherTakingAut_js_2, L_star_js_3, NL_star_js_3, Automaton_js_6, Utilities_js_13) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let benchMark = true;
-    let path = ("./statistics/" + (benchMark ? "benchMark/" : "automata/")), fileName = benchMark ? "benchMark" : "randomAutomata", files = (0, fs_2.readdirSync)(path), automata = [], toWrite = true;
+    let path = ("./statistics/" + (benchMark ? "benchMark/" : "automata/")), fileName = benchMark ? "benchMark" : "randomAutomata", files = (0, fs_2.readdirSync)(path), automata = [], minStateNb = 100, maxStateNb = 200, toWrite = true;
     let l = [
         '1.5-0.1/A13.ba', '1.5-0.1/A17.ba', '1.5-0.1/A19.ba', '1.5-0.1/A2.ba', '1.5-0.1/A37.ba', '1.5-0.1/A42.ba',
         '1.5-0.1/A44.ba', '1.5-0.1/A58.ba', '1.5-0.1/A7.ba', '1.5-0.1/A82.ba', '1.5-0.1/A85.ba', '1.5-0.1/A93.ba',
@@ -1559,35 +1574,33 @@ define("test_nodejs/CompareBenchMark", ["require", "exports", "fs", "test_nodejs
         '1.5-0.8/A88.ba', '1.5-0.8/B54.ba', '1.5-0.9/A40.ba',
         '1.5-0.9/B16.ba', '1.5-1/B86.ba'
     ];
-    let minStateNb = 102;
     for (const underFolder of files) {
-        console.log(underFolder);
-        if (!l.includes(underFolder))
+        (0, Utilities_js_13.myLog)(underFolder);
+        if (!underFolder.startsWith("2-"))
             continue;
         let newPath = path + underFolder + "/";
         let files = (0, fs_2.readdirSync)(newPath);
         for (const file of files) {
-            if (!l.includes(underFolder + "/" + file))
-                continue;
             if (!file.endsWith('.ba'))
                 continue;
-            console.log("=".repeat(90));
+            (0, Utilities_js_13.myLog)("=".repeat(90));
             console.error("Creating automaton of file", underFolder + "/" + file);
-            console.log("Creating automaton of file", underFolder + "/" + file);
+            (0, Utilities_js_13.myLog)("Creating automaton of file", underFolder + "/" + file);
             let content = (0, fs_2.readFileSync)(newPath + file).toString();
             let automaton = Automaton_js_6.Automaton.strToAutomaton(content);
             let teacher = new TeacherTakingAut_js_2.TeacherTakingAut({ automaton: automaton, regex: underFolder + "/" + file });
-            if (teacher.automaton.state_number() < minStateNb)
+            if (teacher.automaton.state_number() > minStateNb
+                || teacher.automaton.state_number() < maxStateNb)
                 continue;
             automata.push([teacher, underFolder + "/" + file]);
             teacher.description = teacher.automaton.state_number() + "";
         }
     }
-    console.log(automata.map(e => e[1]));
-    console.log("=".repeat(90));
-    console.log("Automata created the ordered list of states is :");
+    (0, Utilities_js_13.myLog)(automata.map(e => e[1]));
+    (0, Utilities_js_13.myLog)("=".repeat(90));
+    (0, Utilities_js_13.myLog)("Automata created the ordered list of states is :");
     automata.sort((a, b) => a[0].automaton.state_number() - b[0].automaton.state_number());
-    automata.forEach(a => console.log(a[0].automaton.state_number()));
+    automata.forEach(a => (0, Utilities_js_13.myLog)(a[0].automaton.state_number()));
     if (toWrite) {
         (0, PrintFunction_js_1.clearFile)(fileName);
         (0, PrintFunction_js_1.writeToFile)(fileName, PrintFunction_js_1.csvHead);
@@ -1595,22 +1608,22 @@ define("test_nodejs/CompareBenchMark", ["require", "exports", "fs", "test_nodejs
     for (let index = 0; index < automata.length; index++) {
         const [teacher, file] = automata[index];
         let L = new L_star_js_3.L_star(teacher), NL = new NL_star_js_3.NL_star(teacher);
-        console.log("=".repeat(90));
+        (0, Utilities_js_13.myLog)("=".repeat(90));
         console.error(file, "Current benchmark :", index, "/", automata.length, "With state number", teacher.automaton.state_number());
-        console.log(file, "Current benchmark :", index, "/", automata.length, "With state number", teacher.automaton.state_number());
+        (0, Utilities_js_13.myLog)(file, "Current benchmark :", index, "/", automata.length, "With state number", teacher.automaton.state_number());
         console.error("In L*");
         L.make_all_queries();
-        console.log((0, PrintFunction_js_1.printInfo)(L, "L*"));
-        console.log("-".repeat(80));
+        (0, Utilities_js_13.myLog)((0, PrintFunction_js_1.printInfo)(L, "L*"));
+        (0, Utilities_js_13.myLog)("-".repeat(80));
         console.error("In NL*");
         NL.make_all_queries();
-        console.log((0, PrintFunction_js_1.printInfo)(NL, "NL*"));
-        console.log((0, PrintFunction_js_1.printCsvCompare)(L, NL));
+        (0, Utilities_js_13.myLog)((0, PrintFunction_js_1.printInfo)(NL, "NL*"));
+        (0, Utilities_js_13.myLog)((0, PrintFunction_js_1.printCsvCompare)(L, NL));
         if (toWrite)
             (0, PrintFunction_js_1.writeToFile)(fileName, (0, PrintFunction_js_1.printCsvCompare)(L, NL));
     }
 });
-define("test_nodejs/GenerateAutomaton", ["require", "exports", "fs", "automaton/Automaton"], function (require, exports, fs_3, Automaton_js_7) {
+define("test_nodejs/GenerateAutomaton", ["require", "exports", "fs", "automaton/Automaton", "tools/Utilities"], function (require, exports, fs_3, Automaton_js_7, Utilities_js_14) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let path = "./statistics/automata/", iterationNumber = 5000, minStateNumber = 10, maxStateNumber = 350, maxFilePerFolder = 40, maxAutomatonStates = 200, folders = new Set(new Array(maxAutomatonStates).fill(1).map((_, pos) => pos + 1));
@@ -1636,7 +1649,7 @@ define("test_nodejs/GenerateAutomaton", ["require", "exports", "fs", "automaton/
     for (let stateNumber = minStateNumber; stateNumber < maxStateNumber; stateNumber += 10) {
         if (folders.size == 0)
             break;
-        console.log("Iteration =", stateNumber, "Folder to fill :", folders.size);
+        (0, Utilities_js_14.myLog)("Iteration =", stateNumber, "Folder to fill :", folders.size);
         for (let counter = 0; counter < iterationNumber; counter++) {
             if (folders.size == 0)
                 break;
@@ -1665,11 +1678,11 @@ define("test_nodejs/GenerateAutomaton", ["require", "exports", "fs", "automaton/
                 continue;
             }
             (0, fs_3.writeFileSync)(path + folderName + "/" + dirElementNb + ".ba", minimized.toString());
-            console.log("State Number =", stateNumber, "Counter =", counter, "StateNb =", folderName);
+            (0, Utilities_js_14.myLog)("State Number =", stateNumber, "Counter =", counter, "StateNb =", folderName);
         }
     }
 });
-define("test_nodejs/LernerCompare", ["require", "exports", "learners/NL_star", "learners/L_star", "teacher/Teacher", "test_nodejs/PrintFunction"], function (require, exports, NL_star_js_4, L_star_js_4, Teacher_js_2, PrintFunction_js_2) {
+define("test_nodejs/LernerCompare", ["require", "exports", "learners/NL_star", "learners/L_star", "teacher/Teacher", "test_nodejs/PrintFunction", "tools/Utilities"], function (require, exports, NL_star_js_4, L_star_js_4, Teacher_js_2, PrintFunction_js_2, Utilities_js_15) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let fileName = "randomRegex";
@@ -1680,8 +1693,8 @@ define("test_nodejs/LernerCompare", ["require", "exports", "learners/NL_star", "
         teacher.description = index + "";
         let L = new L_star_js_4.L_star(teacher);
         let NL = new NL_star_js_4.NL_star(teacher);
-        console.log("==============================");
-        console.log("Current regexp : ", teacher.regex, teacher.description);
+        (0, Utilities_js_15.myLog)("==============================");
+        (0, Utilities_js_15.myLog)("Current regexp : ", teacher.regex, teacher.description);
         L.make_all_queries();
         (0, PrintFunction_js_2.printInfo)(L, "L*");
         NL.make_all_queries();
@@ -1689,7 +1702,7 @@ define("test_nodejs/LernerCompare", ["require", "exports", "learners/NL_star", "
         (0, PrintFunction_js_2.writeToFile)(fileName, (0, PrintFunction_js_2.printCsvCompare)(L, NL));
     }
 });
-define("test_nodejs/Test_wrost_DFA", ["require", "exports", "test_nodejs/PrintFunction", "learners/L_star", "learners/NL_star", "teacher/TeacherNoAutomaton"], function (require, exports, PrintFunction_js_3, L_star_js_5, NL_star_js_5, TeacherNoAutomaton_js_2) {
+define("test_nodejs/Test_wrost_DFA", ["require", "exports", "test_nodejs/PrintFunction", "learners/L_star", "learners/NL_star", "teacher/TeacherNoAutomaton", "tools/Utilities"], function (require, exports, PrintFunction_js_3, L_star_js_5, NL_star_js_5, TeacherNoAutomaton_js_2, Utilities_js_16) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let toWrite = false;
@@ -1725,19 +1738,19 @@ define("test_nodejs/Test_wrost_DFA", ["require", "exports", "test_nodejs/PrintFu
         let teacher = teacher1;
         let L = new L_star_js_5.L_star(teacher);
         let NL = new NL_star_js_5.NL_star(teacher);
-        console.log("==============================");
-        console.log("Current regexp : ", regex);
-        console.log("In L*");
+        (0, Utilities_js_16.myLog)("==============================");
+        (0, Utilities_js_16.myLog)("Current regexp : ", regex);
+        (0, Utilities_js_16.myLog)("In L*");
         L.make_all_queries();
-        console.log(printInfo(L, "L*"));
-        console.log("In NL*");
+        (0, Utilities_js_16.myLog)(printInfo(L, "L*"));
+        (0, Utilities_js_16.myLog)("In NL*");
         NL.make_all_queries();
-        console.log(printInfo(NL, "NL*"));
+        (0, Utilities_js_16.myLog)(printInfo(NL, "NL*"));
         if (toWrite)
             (0, PrintFunction_js_3.writeToFile)(fileName, (0, PrintFunction_js_3.printCsvCompare)(L, NL));
     }
 });
-define("test_nodejs/Test_wrost_RFSA", ["require", "exports", "test_nodejs/PrintFunction", "learners/L_star", "learners/NL_star", "teacher/TeacherTakingAut", "automaton/Automaton", "automaton/automaton_type", "tools/Utilities"], function (require, exports, PrintFunction_js_4, L_star_js_6, NL_star_js_6, TeacherTakingAut_js_3, Automaton_js_8, automaton_type_js_6, Utilities_js_8) {
+define("test_nodejs/Test_wrost_RFSA", ["require", "exports", "test_nodejs/PrintFunction", "learners/L_star", "learners/NL_star", "teacher/TeacherTakingAut", "automaton/Automaton", "automaton/automaton_type", "tools/Utilities"], function (require, exports, PrintFunction_js_4, L_star_js_6, NL_star_js_6, TeacherTakingAut_js_3, Automaton_js_8, automaton_type_js_6, Utilities_js_17) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let toWrite = false;
@@ -1747,10 +1760,10 @@ define("test_nodejs/Test_wrost_RFSA", ["require", "exports", "test_nodejs/PrintF
         (0, PrintFunction_js_4.writeToFile)(fileName, PrintFunction_js_4.csvHead);
     }
     let automatonList = [];
-    let counter_examples = (0, Utilities_js_8.allStringFromAlphabet)({ alphabet: "ab", maxLength: 14 });
+    let counter_examples = (0, Utilities_js_17.allStringFromAlphabet)({ alphabet: "ab", maxLength: 14 });
     const N = 2, maxN = 11;
     for (let n = N; n < maxN; n++) {
-        console.log("Creating test with", n, "power");
+        (0, Utilities_js_17.myLog)("Creating test with", n, "power");
         let states = new Array(n).fill(0).map((_, i) => new Automaton_js_8.State(i + "", i == 0, i < n / 2, ['a', 'b']));
         for (let i = 0; i < n - 1; i++)
             states[i].addTransition('a', states[i + 1]);
@@ -1773,14 +1786,14 @@ define("test_nodejs/Test_wrost_RFSA", ["require", "exports", "test_nodejs/PrintF
         });
         let L = new L_star_js_6.L_star(teacher);
         let NL = new NL_star_js_6.NL_star(teacher);
-        console.log("=".repeat(100));
-        console.log("Current n : ", N + i);
-        console.log("In L*");
+        (0, Utilities_js_17.myLog)("=".repeat(100));
+        (0, Utilities_js_17.myLog)("Current n : ", N + i);
+        (0, Utilities_js_17.myLog)("In L*");
         L.make_all_queries();
-        console.log(printInfo(L, "L*"));
-        console.log("In NL*");
+        (0, Utilities_js_17.myLog)(printInfo(L, "L*"));
+        (0, Utilities_js_17.myLog)("In NL*");
         NL.make_all_queries();
-        console.log(printInfo(NL, "NL*"));
+        (0, Utilities_js_17.myLog)(printInfo(NL, "NL*"));
         if (toWrite)
             (0, PrintFunction_js_4.writeToFile)(fileName, (0, PrintFunction_js_4.printCsvCompare)(L, NL));
     }

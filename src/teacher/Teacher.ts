@@ -2,6 +2,7 @@ import { Automaton, State } from "../automaton/Automaton.js";
 import { TeacherAutomaton } from "./TeacherAutomaton.js";
 import { TeacherNoAutomaton } from "./TeacherNoAutomaton.js";
 import { allStringFromAlphabet } from "../tools/Utilities.js";
+import { TeacherTakingAut } from "./TeacherTakingAut.js";
 
 export interface Teacher {
   description: string;

@@ -7,6 +7,7 @@ import { NL_star } from "./learners/NL_star.js";
 import * as autFunction from "./automaton/automaton_type.js";
 import { TeacherAutomaton } from "./teacher/TeacherAutomaton.js";
 import { TeacherUser } from "./teacher/TeacherUser.js";
+import { myLog } from "./tools/Utilities.js";
 
 export let
   automatonDiv: HTMLDivElement,
@@ -54,7 +55,7 @@ export function initiate_global_vars() {
       new HTML_L_star(currentTeacher) :
       new HTML_NL_star(currentTeacher);
     $("#teacher_description")[0].innerHTML = current_automaton.learner.teacher.description;
-    console.log("The description is ", current_automaton.learner.teacher.description);
+    myLog("The description is ", current_automaton.learner.teacher.description);
 
     clearHistory();
   }

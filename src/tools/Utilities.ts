@@ -1,5 +1,3 @@
-import { Automaton, State } from "../automaton/Automaton.js";
-
 export type myFunction<S, T> = { (data: S): T; };
 
 export function same_vector(v1: any[], v2: any[]): boolean {
@@ -40,4 +38,8 @@ export function allStringFromAlphabet(params: { alphabet: string[] | string, max
     level = res1
   }
   return res;
+}
+
+export let myLog = (a?: any, ...optionalParam: any[]) => {
+  if (false) console.log(a, ...optionalParam);
 }

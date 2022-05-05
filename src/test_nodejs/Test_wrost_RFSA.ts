@@ -5,7 +5,7 @@ import { NL_star } from "../learners/NL_star.js";
 import { TeacherTakingAut } from "../teacher/TeacherTakingAut.js";
 import { Automaton, State } from "../automaton/Automaton.js";
 import { minimizeAutomaton, MyAutomatonToHis } from "../automaton/automaton_type.js";
-import { allStringFromAlphabet } from "../tools/Utilities.js";
+import { allStringFromAlphabet, myLog } from "../tools/Utilities.js";
 
 /**
  * About this file : 
@@ -30,7 +30,7 @@ let automatonList: Automaton[] = []
 let counter_examples = allStringFromAlphabet({ alphabet: "ab", maxLength: 14 })
 const N = 2, maxN = 11;
 for (let n = N; n < maxN; n++) {
-  console.log("Creating test with", n, "power");
+  myLog("Creating test with", n, "power");
 
   let states: State[] = new Array(n).fill(0).map((_, i) => new State(i + "", i == 0, i < n / 2, ['a', 'b']));
 
@@ -60,16 +60,16 @@ for (let i = 0; i < automatonList.length; i++) {
   let L = new L_star(teacher)
   let NL = new NL_star(teacher)
 
-  console.log("=".repeat(100));
-  console.log("Current n : ", N + i);
+  myLog("=".repeat(100));
+  myLog("Current n : ", N + i);
 
-  console.log("In L*");
+  myLog("In L*");
   L.make_all_queries();
-  console.log(printInfo(L, "L*"));
+  myLog(printInfo(L, "L*"));
 
-  console.log("In NL*");
+  myLog("In NL*");
   NL.make_all_queries();
-  console.log(printInfo(NL, "NL*"));
+  myLog(printInfo(NL, "NL*"));
 
   if (toWrite) writeToFile(fileName, printCsvCompare(L, NL))
 }

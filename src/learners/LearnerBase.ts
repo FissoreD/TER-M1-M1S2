@@ -124,8 +124,6 @@ export abstract class LearnerBase {
   */
   add_elt_in_E(new_elt: string, after_equiv = false) {
     let suffix_list = generate_suffix_list(new_elt);
-    console.log("Here", after_equiv);
-
     for (const suffix of suffix_list) {
       if (this.E.includes(suffix)) break;
       this.SA.forEach(s => {
@@ -186,7 +184,6 @@ export abstract class LearnerBase {
         this.finish = true;
       }
     }
-    // console.log(`Member number : ${this.member_number}, Equiv number  = ${this.equiv_number}`);
   }
 
   make_all_queries() {

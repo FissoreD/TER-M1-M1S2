@@ -1,3 +1,18 @@
+declare module "tools/Utilities" {
+    export type myFunction<S, T> = {
+        (data: S): T;
+    };
+    export function same_vector(v1: any[], v2: any[]): boolean;
+    export const generate_prefix_list: (str: string) => string[];
+    export const generate_suffix_list: (str: string) => string[];
+    export const count_str_occurrences: (str: string, obj: string) => number;
+    export function boolToString(bool: boolean): string;
+    export function allStringFromAlphabet(params: {
+        alphabet: string[] | string;
+        maxLength: number;
+    }): string[];
+    export let myLog: (a?: any, ...optionalParam: any[]) => void;
+}
 declare module "automaton/Automaton" {
     export class State {
         isAccepting: boolean;
@@ -75,20 +90,6 @@ declare module "automaton/automaton_type" {
     export function unionAutomata(a1: Automaton, a2: Automaton): Automaton;
     export function complementAutomata(a1: Automaton): Automaton;
     export function differenceAutomata(a1: Automaton, a2: Automaton): Automaton;
-}
-declare module "tools/Utilities" {
-    export type myFunction<S, T> = {
-        (data: S): T;
-    };
-    export function same_vector(v1: any[], v2: any[]): boolean;
-    export const generate_prefix_list: (str: string) => string[];
-    export const generate_suffix_list: (str: string) => string[];
-    export const count_str_occurrences: (str: string, obj: string) => number;
-    export function boolToString(bool: boolean): string;
-    export function allStringFromAlphabet(params: {
-        alphabet: string[] | string;
-        maxLength: number;
-    }): string[];
 }
 declare module "teacher/Equiv" {
     import { Automaton } from "automaton/Automaton";
@@ -187,7 +188,7 @@ declare module "learners/LearnerBase" {
         make_member(pref: string, suff: string): void;
         make_equiv(a: Automaton): string | undefined;
         add_elt_in_S(new_elt: string, after_member?: boolean): void;
-        add_elt_in_E(new_elt: string): void;
+        add_elt_in_E(new_elt: string, after_equiv?: boolean): void;
         add_row(row_name: string, after_member?: boolean): void;
         move_from_SA_to_S(elt: string): void;
         make_next_query(): void;
@@ -262,7 +263,7 @@ declare module "learners/NL_star" {
         is_covered(row1: string, row2: string): boolean;
         check_prime_lines(): void;
         add_elt_in_S(new_elt: string): void;
-        add_elt_in_E(new_elt: string): void;
+        add_elt_in_E(new_elt: string, after_equiv?: boolean): void;
         is_close(): string | undefined;
         is_consistent(): string[] | undefined;
         make_automaton(): Automaton;
@@ -292,7 +293,7 @@ declare module "teacher/TeacherUser" {
         automaton?: Automaton | undefined;
         constructor();
         member(sentence: string): string;
-        equiv(automaton: Automaton): string | undefined;
+        equiv(_automaton: Automaton): string | undefined;
         notNullPrompt(str: string, defaultValue?: string): string;
     }
 }
