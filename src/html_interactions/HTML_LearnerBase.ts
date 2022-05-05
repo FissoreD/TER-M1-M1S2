@@ -25,6 +25,8 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   }
 
   draw_table() {
+    document.getElementById('tableHead')?.classList.remove('up');
+
     this.add_row_html(this.table_header!, "Table" + this.table_counter++, undefined, this.learner.E, 2);
 
     /**
@@ -45,8 +47,6 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
       this.add_row_html(this.table_body!, fst, s, row, 1, fst ? this.learner.SA.length : 1);
       fst = undefined;
     }
-
-    document.getElementById('tableHead')?.classList.remove('up');
   }
 
   add_row_html(
@@ -82,6 +82,8 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   async next_step() {
     if (this.stopNextStep || ((this.automaton && !this.automaton.continueAction))) return;
     document.getElementById('centerDiv')!.replaceWith(centerDivClone());
+    document.getElementById('tableHead')?.classList.remove('up');
+
     if (this.pile_actions.length > 0) await this.pile_actions.shift()!()
     else if (!this.close_action()) { }
     else if (!this.consistence_action()) { }
