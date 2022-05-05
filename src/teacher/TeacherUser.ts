@@ -10,7 +10,7 @@ export class TeacherUser implements Teacher {
   automaton?: Automaton | undefined;
 
   constructor() {
-    this.alphabet = Array.from(this.notNullPrompt("Enter your alphabet", "01"));
+    this.alphabet = Array.from(this.notNullPrompt("Enter your alphabet", "01", false));
     this.description = "The teacher is the User and alphabet is [" + this.alphabet.join(',') + ']'
     this.regex = "";
   }
@@ -23,10 +23,18 @@ export class TeacherUser implements Teacher {
     return isValid ? undefined : this.notNullPrompt("Enter a counter-exemple")
   }
 
-  notNullPrompt(str: string, defaultValue?: string) {
+  notNullPrompt(str: string, defaultValue?: string, canExit = true) {
     let alp: string | null = prompt(str, defaultValue);
-    while (alp == null) {
-      alp = prompt("You can't send empty string. Redo :", defaultValue);
+    if (alp == null) {
+      while (true) {
+        if (canExit) {
+          let answer = confirm("Do you want to exit teacher mode ?")
+          if (answer && canExit) return ""
+          alp = prompt(str, defaultValue)
+        } else {
+          alp = prompt("You can't skip this phase !\n" + str, defaultValue)
+        }
+      }
     }
     return alp;
   }

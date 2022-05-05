@@ -181,6 +181,8 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
             return;
           }
           this.learner.finish = true;
+          ($("#next_step")[0] as HTMLButtonElement).classList.add('hide');
+          ($("#go_to_end")[0] as HTMLButtonElement).classList.add('hide');
         }
         );
       }

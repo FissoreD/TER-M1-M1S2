@@ -50,6 +50,8 @@ export function initiate_global_vars() {
     newRegexSendButton = $("#button-regex")![0];
 
   let changeTeacherOrAlgo = () => {
+    ($("#next_step")[0] as HTMLButtonElement).classList.remove('hide');
+    ($("#go_to_end")[0] as HTMLButtonElement).classList.remove('hide');
     document.getElementById('centerDiv')!.replaceWith(centerDivClone());
     current_automaton = algoSelector[0].checked ?
       new HTML_L_star(currentTeacher) :
@@ -81,6 +83,7 @@ export function initiate_global_vars() {
 
   ($("#next_step")[0] as HTMLButtonElement).addEventListener("click", () => current_automaton.next_step());
   ($("#go_to_end")[0] as HTMLButtonElement).addEventListener("click", () => current_automaton.go_to_end());
+  ($("#restart_algo")[0] as HTMLButtonElement).addEventListener("click", () => changeTeacherOrAlgo());
 
   newRegexSendButton.addEventListener("click", () => {
     let regexAlreadyExists = Array.from($("#teacher-switch option")).find(e => (e as HTMLOptionElement).text == newRegex.value);
