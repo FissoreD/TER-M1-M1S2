@@ -108,14 +108,21 @@ export class Automaton implements AutomatonJson {
   }
 
   next_step(next_char: string) {
+    if (next_char == undefined) return
     let newCurrentState: State[] = []
     this.currentStates.forEach(cs => {
-      let nextStates = cs.outTransitions.get(next_char)!;
-      nextStates.forEach(nextState => {
-        if (!newCurrentState.includes(nextState)) {
-          newCurrentState.push(nextState)
-        }
-      })
+      let nextStates = cs.outTransitions.get(next_char);
+      if (nextStates) {
+        nextStates.forEach(nextState => {
+          if (!newCurrentState.includes(nextState)) {
+            newCurrentState.push(nextState)
+          }
+        })
+      } else {
+        alert("The letter you entered in not in the alphabet !\n The automaton has been reinitialized");
+        this.restart_graph()
+        return
+      }
     })
     this.currentStates = newCurrentState;
   }
@@ -138,6 +145,10 @@ export class Automaton implements AutomatonJson {
     for (let index = 0; index < word.length && nextStates.size > 0; index++) {
       let nextStates2: Set<State> = new Set();
       const symbol = word[index];
+      if (!this.alphabet.includes(symbol)) {
+        alert("The word you entered contains a letter which is not in the alphabet !\nThe automaton has been reinitialized");
+        return false
+      }
       for (const state of nextStates) {
         for (const nextState of this.findTransition(state, symbol)) {
           nextStates2.add(nextState)
@@ -155,6 +166,7 @@ export class Automaton implements AutomatonJson {
     return state!.outTransitions.get(symbol)!
   }
 
+  /** Automaton current state is restored to initial state */
   restart() {
     this.currentStates = this.initialStates;
   }
