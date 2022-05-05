@@ -5,6 +5,7 @@ import { L_star } from "../learners/L_star.js";
 import { NL_star } from "../learners/NL_star.js";
 import { Teacher } from "../teacher/Teacher.js";
 import { Automaton } from "../automaton/Automaton.js";
+import { myLog } from "../tools/Utilities.js";
 
 let benchMark = true;
 
@@ -12,6 +13,8 @@ let path = ("./statistics/" + (benchMark ? "benchMark/" : "automata/")),
   fileName = benchMark ? "benchMark" : "randomAutomata",
   files = readdirSync(path),
   automata: [Teacher, string][] = [],
+  minStateNb = 40,
+  maxStateNb = 100,
   toWrite = true;
 
 let l = [
@@ -35,35 +38,39 @@ let l = [
   '1.5-0.9/B16.ba', '1.5-1/B86.ba'
 ];
 
-let minStateNb = 102;
-
 for (const underFolder of files) {
-  console.log(underFolder);
-  if (!l.includes(underFolder)) continue;
+  myLog(underFolder);
+  // if (!l.includes(underFolder)) continue;
   // if (Number.parseInt(underFolder) < 0 || Number.parseInt(underFolder) > 24) continue;
-  // if (!underFolder.startsWith("1.5-0.1")) break
+  if (!underFolder.startsWith("aut30")) continue
+
   let newPath = path + underFolder + "/";
   let files = readdirSync(newPath);
   for (const file of files) {
-    if (!l.includes(underFolder + "/" + file)) continue
+    // if (!l.includes(underFolder + "/" + file)) continue
     if (!file.endsWith('.ba')) continue
-    console.log("=".repeat(90))
+    myLog("=".repeat(90))
     console.error("Creating automaton of file", underFolder + "/" + file);
-    console.log("Creating automaton of file", underFolder + "/" + file);
+    myLog("Creating automaton of file", underFolder + "/" + file);
     let content = readFileSync(newPath + file).toString();
     let automaton = Automaton.strToAutomaton(content);
     let teacher = new TeacherTakingAut({ automaton: automaton, regex: underFolder + "/" + file })
-    if (teacher.automaton.state_number() < minStateNb) continue
-    automata.push([teacher, underFolder + "/" + file]);
-    teacher.description = teacher.automaton.state_number() + ""
+    myLog("State number is", "-".repeat(50), teacher.automaton.state_number())
+    if (
+      teacher.automaton.state_number() > minStateNb
+      && teacher.automaton.state_number() < maxStateNb
+    ) {
+      automata.push([teacher, underFolder + "/" + file]);
+      teacher.description = teacher.automaton.state_number() + ""
+    }
   }
 }
-console.log(automata.map(e => e[1]));
+myLog(automata.map(e => e[1]));
 
-console.log("=".repeat(90))
-console.log("Automata created the ordered list of states is :");
+myLog("=".repeat(90))
+myLog("Automata created the ordered list of states is :");
 automata.sort((a, b) => a[0].automaton!.state_number() - b[0].automaton!.state_number())
-automata.forEach(a => console.log(a[0].automaton!.state_number()));
+automata.forEach(a => myLog(a[0].automaton!.state_number()));
 
 
 
@@ -79,20 +86,22 @@ for (let index = 0; index < automata.length; index++) {
   let L = new L_star(teacher),
     NL = new NL_star(teacher);
 
-  console.log("=".repeat(90))
+  myLog("=".repeat(90))
   console.error(file, "Current benchmark :", index, "/", automata.length, "With state number", teacher.automaton!.state_number());
-  console.log(file, "Current benchmark :", index, "/", automata.length, "With state number", teacher.automaton!.state_number());
+  myLog(file, "Current benchmark :", index, "/", automata.length, "With state number", teacher.automaton!.state_number());
 
-  console.error("In L*");
 
   L.make_all_queries();
-  console.log(printInfo(L, "L*"));
-  console.log("-".repeat(80));
+
+  console.error("In L*");
+  myLog(printInfo(L, "L*"));
+  myLog("-".repeat(80));
+
   console.error("In NL*");
   NL.make_all_queries();
-  console.log(printInfo(NL, "NL*"));
+  myLog(printInfo(NL, "NL*"));
 
-  console.log(printCsvCompare(L, NL));
+  myLog(printCsvCompare(L, NL));
 
   if (toWrite) writeToFile(fileName, printCsvCompare(L, NL))
 }

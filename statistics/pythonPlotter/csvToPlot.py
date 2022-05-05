@@ -43,11 +43,12 @@ def allCsvNameInDirectory():
 def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName: str):
     fig, ax = plt.subplots()
     ax.set_title(f'Comparing {comparator}')
-    for i in algos:
+    colors = ['m', 'g']
+    for i, j in zip(algos, colors):
         x, y = df['Description'], df[f"{i} {comparator}"]
         x_line, y_line = amortizeCurve(x, y)
         print(f"{i} {comparator} {fileName}")
-        ax.plot(x_line, y_line, '--', label=i)
+        ax.plot(x_line, y_line, linestyle='--', color=j, label=i)
     leg = ax.legend()
     ax.set_xlabel(
         "Regex" if 'benchMark' not in fileName else 'State number in minimum DFA')
