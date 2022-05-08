@@ -13,6 +13,8 @@ export abstract class LearnerBase {
   teacher: Teacher;
   member_number: number;
   equiv_number: number;
+  closedness_counter: number;
+  consistence_counter: number;
   finish = false;
   automaton: undefined | Automaton;
 
@@ -21,6 +23,8 @@ export abstract class LearnerBase {
     this.teacher = teacher;
     this.member_number = 0;
     this.equiv_number = 0;
+    this.closedness_counter = 0;
+    this.consistence_counter = 0;
     this.E = [""];
     this.S = [""];
     this.SA = Array.from(this.alphabet);
@@ -190,6 +194,14 @@ export abstract class LearnerBase {
     while (!this.finish) {
       this.make_next_query();
     }
+  }
+
+  get_member_number() {
+    return this.member_number;
+  }
+
+  get_equiv_number() {
+    return this.equiv_number;
   }
 
   /**

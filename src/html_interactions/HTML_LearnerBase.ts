@@ -105,7 +105,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
       while (this.automaton && !this.automaton.continueAction) {
         let tm = timer(5);
         await tm.then(() => { if (this.automaton!.continueAction) addHistoryElement(this.automaton) }).catch(e => {
-          myLog(e);
+          myLog({ a: [e] });
         });
       } else {
       addHistoryElement(this.automaton)
@@ -163,30 +163,32 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
       }
 
       while (!automaton.continueAction) {
-        await delay(10).then(() => {
+        await delay(10).then(async () => {
           document.getElementById("messageHead")!.scrollIntoView();
           if (!automaton.continueAction) return
-          let answer = this.learner.make_equiv(automaton);
-          myLog(answer);
+          await delay(10).then(() => {
+            let answer = this.learner.make_equiv(automaton);
+            myLog({ a: [answer] });
 
 
-          if (answer != undefined) {
-            this.message().innerText =
-              `The sent automaton is not valid, here is a counter-exemple ${answer}`;
-            this.pile_actions.push(() => {
-              this.message().innerHTML = "";
-              clear_automaton_HTML();
-              this.table_to_update_after_equiv(answer!)
-              this.clear_table();
-              this.draw_table();
-            })
-            return;
+            if (answer != undefined) {
+              this.message().innerText =
+                `The sent automaton is not valid, here is a counter-exemple ${answer}`;
+              this.pile_actions.push(() => {
+                this.message().innerHTML = "";
+                clear_automaton_HTML();
+                this.table_to_update_after_equiv(answer!)
+                this.clear_table();
+                this.draw_table();
+              })
+              return;
+            }
+            this.learner.finish = true;
+            ($("#next_step")[0] as HTMLButtonElement).classList.add('hide');
+            ($("#go_to_end")[0] as HTMLButtonElement).classList.add('hide');
           }
-          this.learner.finish = true;
-          ($("#next_step")[0] as HTMLButtonElement).classList.add('hide');
-          ($("#go_to_end")[0] as HTMLButtonElement).classList.add('hide');
-        }
-        );
+          );
+        });
       }
     });
   }

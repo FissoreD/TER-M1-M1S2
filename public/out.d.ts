@@ -11,7 +11,10 @@ declare module "tools/Utilities" {
         alphabet: string[] | string;
         maxLength: number;
     }): string[];
-    export let myLog: (a?: any, ...optionalParam: any[]) => void;
+    export let myLog: ({ a, toLog }: {
+        a: any[];
+        toLog?: boolean | undefined;
+    }) => void;
 }
 declare module "automaton/Automaton" {
     export class State {
@@ -54,6 +57,7 @@ declare module "automaton/Automaton" {
         restart(): void;
         draw_next_step(next_char: string): void;
         initiate_graph(): any;
+        restart_graph(): void;
         get_current_graph_node(node: State): HTMLElement;
         matrix_to_mermaid(): string;
         automatonToDot(): string;
@@ -147,6 +151,7 @@ declare module "teacher/Teacher" {
     import { Automaton } from "automaton/Automaton";
     import { TeacherAutomaton } from "teacher/TeacherAutomaton";
     import { TeacherNoAutomaton } from "teacher/TeacherNoAutomaton";
+    import { TeacherTakingAut } from "teacher/TeacherTakingAut";
     export interface Teacher {
         description: string;
         alphabet: string[];
@@ -164,7 +169,7 @@ declare module "teacher/Teacher" {
     export let teacher_bStar_a_or_aStart_bStar: TeacherNoAutomaton;
     export let teacher_b_bStar_a__b_aOrb_star: TeacherAutomaton;
     export let binaryAddition: TeacherNoAutomaton;
-    export let teachers: (TeacherAutomaton | TeacherNoAutomaton)[];
+    export let teachers: (TeacherTakingAut | TeacherNoAutomaton)[];
 }
 declare module "learners/LearnerBase" {
     import { Automaton } from "automaton/Automaton";
@@ -181,6 +186,8 @@ declare module "learners/LearnerBase" {
         teacher: Teacher;
         member_number: number;
         equiv_number: number;
+        closedness_counter: number;
+        consistence_counter: number;
         finish: boolean;
         automaton: undefined | Automaton;
         constructor(teacher: Teacher);
@@ -294,7 +301,7 @@ declare module "teacher/TeacherUser" {
         constructor();
         member(sentence: string): string;
         equiv(_automaton: Automaton): string | undefined;
-        notNullPrompt(str: string, defaultValue?: string): string;
+        notNullPrompt(str: string, defaultValue?: string, canExit?: boolean): string;
     }
 }
 declare module "Main" {
@@ -365,6 +372,6 @@ declare module "test_nodejs/PrintFunction" {
 }
 declare module "test_nodejs/CompareBenchMark" { }
 declare module "test_nodejs/GenerateAutomaton" { }
-declare module "test_nodejs/LernerCompare" { }
+declare module "test_nodejs/LearnerCompare" { }
 declare module "test_nodejs/Test_wrost_DFA" { }
 declare module "test_nodejs/Test_wrost_RFSA" { }

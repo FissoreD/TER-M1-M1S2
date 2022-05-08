@@ -56,16 +56,16 @@ for (let index = 0; index < regexList.length; index++) {
   let L = new L_star(teacher)
   let NL = new NL_star(teacher)
 
-  myLog("==============================");
-  myLog("Current regexp : ", regex);
+  myLog({ a: ["=============================="] });
+  myLog({ a: ["Current regexp : ", regex] });
 
-  myLog("In L*");
+  myLog({ a: ["In L*"] });
 
   L.make_all_queries();
-  myLog(printInfo(L, "L*"));
-  myLog("In NL*");
+  myLog({ a: [printInfo(L, "L*")] });
+  myLog({ a: ["In NL*"] });
   NL.make_all_queries();
-  myLog(printInfo(NL, "NL*"));
+  myLog({ a: [printInfo(NL, "NL*")] });
 
   if (toWrite) writeToFile(fileName, printCsvCompare(L, NL))
 }

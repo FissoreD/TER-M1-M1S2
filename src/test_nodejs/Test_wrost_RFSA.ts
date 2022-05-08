@@ -30,7 +30,7 @@ let automatonList: Automaton[] = []
 let counter_examples = allStringFromAlphabet({ alphabet: "ab", maxLength: 14 })
 const N = 2, maxN = 11;
 for (let n = N; n < maxN; n++) {
-  myLog("Creating test with", n, "power");
+  myLog({ a: ["Creating test with", n, "power"] });
 
   let states: State[] = new Array(n).fill(0).map((_, i) => new State(i + "", i == 0, i < n / 2, ['a', 'b']));
 
@@ -60,16 +60,16 @@ for (let i = 0; i < automatonList.length; i++) {
   let L = new L_star(teacher)
   let NL = new NL_star(teacher)
 
-  myLog("=".repeat(100));
-  myLog("Current n : ", N + i);
+  myLog({ a: ["=".repeat(100)] });
+  myLog({ a: ["Current n : ", N + i] });
 
-  myLog("In L*");
+  myLog({ a: ["In L*"] });
   L.make_all_queries();
-  myLog(printInfo(L, "L*"));
+  myLog({ a: [printInfo(L, "L*")] });
 
-  myLog("In NL*");
+  myLog({ a: ["In NL*"] });
   NL.make_all_queries();
-  myLog(printInfo(NL, "NL*"));
+  myLog({ a: [printInfo(NL, "NL*")] });
 
   if (toWrite) writeToFile(fileName, printCsvCompare(L, NL))
 }

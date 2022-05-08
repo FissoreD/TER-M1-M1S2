@@ -40,6 +40,6 @@ export function allStringFromAlphabet(params: { alphabet: string[] | string, max
   return res;
 }
 
-export let myLog = (a?: any, ...optionalParam: any[]) => {
-  if (false) console.log(a, ...optionalParam);
+export let myLog = ({ a, toLog = false }: { a: any[], toLog?: boolean }) => {
+  if (toLog) console.log(...a);
 }

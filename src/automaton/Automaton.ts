@@ -194,7 +194,6 @@ export class Automaton implements AutomatonJson {
       .render(() => {
         this.continueAction = true;
         this.color_node(true);
-        myLog($("#graph")[0].replaceWith);
       });
   }
 
@@ -237,7 +236,7 @@ export class Automaton implements AutomatonJson {
     mermaidTxt += "\n"
     // Callback for tooltip on mouse over
     mermaidTxt = mermaidTxt.concat(Array.from(this.states).map(([name, _]) => `click ${name} undnamefinedCallback "${name}";`).join("\n"))
-    myLog(mermaidTxt);
+    myLog({ a: [mermaidTxt] });
 
     this.automatonToDot()
     return mermaidTxt;
@@ -277,12 +276,12 @@ export class Automaton implements AutomatonJson {
 
     this.acceptingStates.forEach(s => {
       txt = txt.concat(`\n${s.name} [shape=doublecircle]`)
-      myLog("here");
+      myLog({ a: ["here"] });
 
     })
 
     txt += "\n}"
-    myLog(txt);
+    console.log(txt);
 
     return txt
   }

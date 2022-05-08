@@ -10,9 +10,9 @@ state2.addTransition('a', state3)
 
 let a: Automaton = new Automaton(new Set([state1, state2, state3]))
 
-myLog(a.matrix_to_mermaid());
+myLog({ a: [a.matrix_to_mermaid()] });
 
-myLog("-".repeat(70));
+myLog({ a: ["-".repeat(70)] });
 
-myLog(a.minimize().matrix_to_mermaid());
-myLog();
+myLog({ a: [a.minimize().matrix_to_mermaid()] });
+myLog({ a: [] });

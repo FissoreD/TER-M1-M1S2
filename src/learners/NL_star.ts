@@ -67,7 +67,9 @@ export class NL_star extends LearnerBase {
    * `s` is not in {@link S}
    */
   is_close(): string | undefined {
-    return this.SA.find(t => !this.S.some(s => this.same_row(s, t)) && this.prime_lines.includes(t));
+    let res = this.SA.find(t => !this.S.some(s => this.same_row(s, t)) && this.prime_lines.includes(t));
+    this.closedness_counter += res == undefined ? 0 : 1
+    return res
   }
 
   /**
@@ -85,8 +87,9 @@ export class NL_star extends LearnerBase {
           let value_s2_p = this.observation_table[s2 + a]
           if (!this.is_covered(value_s1_p, value_s2_p)) {
             for (let i = 0; i < this.E.length; i++) {
-              if (this.observation_table[s1 + a][i] <
+              if (this.observation_table[s1 + a][i] >
                 this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i])) {
+                this.consistence_counter++;
                 return [s1, s2, a + this.E[i]]
               }
             }
@@ -94,16 +97,16 @@ export class NL_star extends LearnerBase {
         }
         return;
       }
+    }
 
-      for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
-        for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
-          let s1 = this.S[s1_ind];
-          let s2 = this.S[s2_ind];
-          let test1 = testCovering(s1, s2);
-          if (test1) return test1;
-          let test2 = testCovering(s2, s1);
-          if (test2) return test1;
-        }
+    for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
+      for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
+        let s1 = this.S[s1_ind];
+        let s2 = this.S[s2_ind];
+        let test1 = testCovering(s1, s2);
+        if (test1) return test1;
+        let test2 = testCovering(s2, s1);
+        if (test2) return test2;
       }
     }
     return;

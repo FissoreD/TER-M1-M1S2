@@ -57,7 +57,7 @@ export function initiate_global_vars() {
       new HTML_L_star(currentTeacher) :
       new HTML_NL_star(currentTeacher);
     $("#teacher_description")[0].innerHTML = current_automaton.learner.teacher.description;
-    myLog("The description is ", current_automaton.learner.teacher.description);
+    myLog({ a: ["The description is ", current_automaton.learner.teacher.description] });
 
     clearHistory();
   }

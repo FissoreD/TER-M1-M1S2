@@ -39,7 +39,9 @@ export class L_star extends LearnerBase {
    * @returns the first t in SA st it does not exist s in S st row(s) == row (t)
    */
   is_close(): string | undefined {
-    return this.SA.find(t => !this.S.some(s => this.same_row(s, t)));
+    let res = this.SA.find(t => !this.S.some(s => this.same_row(s, t)));
+    this.closedness_counter += res == undefined ? 0 : 1;
+    return res;
   }
 
   /**
@@ -56,8 +58,10 @@ export class L_star extends LearnerBase {
           for (const a of this.alphabet) {
             for (let i = 0; i < this.E.length; i++) {
               if (this.observation_table[s1 + a][i] !=
-                this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i]))
+                this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i])) {
+                this.consistence_counter++;
                 return [s1, s2, a + this.E[i]]
+              }
             }
           }
         }
