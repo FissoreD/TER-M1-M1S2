@@ -1,0 +1,31 @@
+\section{My implementation of the L* and NL*}
+During this semester, I've implemeted the two algorithms to better understand them and at the end to be able to compare their performances.
+
+
+\subsection{About the HTML implementation}
+
+I've decided to use TypeScript as programming language to be able to easily display the execution of these algorithms thanks to a dedicated HTML page.
+
+The page is available at \url{https://fissored.github.io/TER-M1-S2/} and allows to choose both to run the \textit{L*} and the \textit{NL*} algorithms. Some preload Theachers have been upload to let the uses test immediatly them but it is also possible to enter a choosen regular expression to build the Teacher and pass it to the Learner.
+
+The regular expression should be encoded with the following grammar :
+\[ R = symbol \; | \; R + R \; | \; RR \; | \;R^* \; | \;(R) \]
+where symbol can be every alpha-numeric character. The empty string $\varepsilon$ is encoded with the $\$$ symbol.
+
+\begin{example}
+  \[(a + b)+\$+ab^*+(ab)^*\] indicates the language containg $\{\varepsilon,a, b,  ab, abb, abbb\dots, ab, abab, ababab\dots\}$.
+\end{example}
+
+Once the Teacher created, the user can run step by step or the entire algorithm and every phase of the execution will be displayed. The \textit{Message} section contains information about the \textit{closedness} and the \textit{consistence} of the $O.T$. Once these two properties are satisfied, the automaton corresponding to the conjecture is displayed (thanks the \textit{d3-graphviz.js} library).
+
+You can see test word membership with the buttons next to the automaton.
+
+If a counter-exemple is provided then it is written in the \textit{Message} section otherwise the automaton has been approved and the algorithm can stop.
+
+The history of the operations made by the \textit{Learner} is saved in memory and can be re-taken with the arrows on the side of the screen.
+
+\subsection{Script for testing}
+
+\subsection{About the Teacher}
+
+\subsection{The noam library}

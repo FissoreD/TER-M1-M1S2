@@ -35,6 +35,9 @@
 \usepackage{url} 
 \usepackage{xstring}
 \usepackage{etoolbox}
+% \usepackage{syntax}
+\usepackage{bm}
+
 
 \usetikzlibrary{positioning} 
 
@@ -74,7 +77,7 @@ sorting=ynt
 
 
 \theoremstyle{definition}
-\newtheorem{exmp}{Example}
+\newtheorem{example}{Example}
 \newtheorem{theorem}{Theorem}
 \newtheorem{definition}{Definition}[section]
 \newtheorem{notation}{Notation}

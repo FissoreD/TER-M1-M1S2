@@ -4,123 +4,137 @@ The NL* algorithm, described by Benedikt Boolig \textit{et al.} in \cite{NLPaper
 
 \subsection{Resudial final state automaton (RFSA)}
 
+We have seen in \cref{section:L} that the L* algorithm is able to create a minimum DFA recognizing a regular language where each state is associated to a particular row of the $O.T$.
+
+\begin{theorem}
+  Every regular language \textit{L} has a finite number of residuals.
+\end{theorem}
+
+A residual of \textit{L} is a new language $L'$ where $L = \{u \cdot v, \text{ for some } w \in \Sigma^* \text{ and for } \forall v \in L\}$ or more commonly $u^{-1} L = L' \text{ for some } u \text{ over } \Sigma^*$.
+
+\begin{example}
+  \label{example:residual}
+  $L = (aa)^*$, which is the set of word over the alphabet $\{a\}$, has two residuals $L_1 = (aa)*$ and $L_2 = a(aa)*$ where ${\varepsilon}^{-1} L = L_1$ and $a^{-1}L = L_2$. We can see that these two residuals are the only one which can be derived from \textit{L} since if we continue to try to calculate $(aa)^{-1}L$ we obtain $L_1$ and if we try to calculate $(aaa)^{-1}L$ we obtain $L_2$. We can therefore understand that for every word $w_e$ from the set of words of even length $E$, we have $w_e^{-1}L = L_1$ and for every word $w_o$ from the set of words of odd length $EO$, we have $w_o^{-1}L = L_2$.
+\end{example}
+
+\begin{definition}
+  \label{def:monoid}
+  The set of word $W$ over an alphabet $\Sigma$ is called syntactic monoid if for every $w \in W$, $w^{-1}L$ give the same residual.
+\end{definition}
+
+\begin{theorem}
+  A DFA is minimum if and only if every one of its states recognizes one of the residual of a language \textit{L}.
+\end{theorem}
+
+\begin{proof}
+  $\rightarrow$ Let \automaton{} be a minimum DFA, $q_I$ the initial state of \automaton{}, $q_i$ a state of \automaton{} and $L(\automatonN{}, q_i)$ the language recognized by \automaton{} where $q_i$ is the initial state. For every $q_i$ of \automaton{}, $L(\automatonN{}, q_i)$ is a residual $L'$ of \textit{L}. In fact the syntactic monoid $M$ containg the words $w$ such that $w^{-1}L = L'$ is the set of the runs of the automaton starting from $q_I$ leading to $q_i$. \\
+  $\leftarrow$ Given the set of residuals $\{L_1, L_2, \dots, L_n\}$ of \textit{L} and an alphabet $\Sigma$. By \cref{def:monoid}, for every $L_i$ there exists an associated monoid $M_i$ such that $w^{-1}L_i = L$ for all $w \in M_i$. We can construct the minimal DFA $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ where :
+  \begin{itemize}
+    \item $Q = \bigcup_{i=1}^{n}L_i$
+    \item $\delta = \{(q_i, x, q_j) \text{ for every } q_i, q_j \in Q \text{ and } x \in \Sigma \text{ if } x^{-1}L_i = L_j\}$
+    \item $q_I$ is the state associated to the $i^{th}$ residual having
+    \item $F = \{q_i \in Q \text{ such that } \varepsilon \in L_i\}$
+  \end{itemize}
+  The created automaton is minimum since for any state $q_i, q_j, L(q_i) \neq L(q_j)$.
+\end{proof}
+
+Starting from these definitions, we can see that in the \textit{O.T.} of the L* algorithm every row is associated to a state of a mDFA and therefore to a residual.
+
+\begin{definition}
+  An $RFSA$ is a \textit{non-deterministic} automaton where every state represents a residual of \textit{L}.
+\end{definition}
+
+\begin{definition}
+  A residual $L_i$ is \textit{composed} if it exists a subset of the residual $R'$ not including $L_i$ such that $L_i = \bigcup_{L \in R'}L$, if a residual is not composed, it is said to be \textit{prime}.
+\end{definition}
+
+\begin{definition}
+  A $RFSA$ is called \textit{canonical} if every state represents a \textit{prime} residual.
+\end{definition}
+
+A canonical $RFSA$ $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ can be constructed as follow :
+\begin{itemize}
+  \item $Q = $ the set of prime residual of L
+  \item $\delta = \{(q_i, x, q_j) \text{ for every } q_i, q_j \in Q \text{ and } x \in \Sigma \text{ if } L(q_i) \subseteq x^{-1}L(q_j)\}$
+  \item $q_I$ is the set of states whose associated residual is a subset of the language \textit{L} recognized by \automaton{}
+  \item $F = \{q_i | q_i \in Q \text{ such that } \varepsilon \in L(q_i)\}$
+\end{itemize}
+
+A canonical $RFSA$ \automaton{} may have potentially less states than the number of states of a $mDFA$ since \textit{composed} residuals are not present in  \automaton{}. It has been prooved in  \cite{RFSA} that the size of a canonical $RFSA$ may vary from the size of a minimum $NFA$ to the size of a $mDFA$ and so, depending to the language, it may occures that a canonical $RFSA$ may be exponentially smaller than a $mDFA$.
+
+\subsection{Closedness and Consistence in NL*}
+
+NL* owns the prefix-closed $S$ set of word, the suffix-closed set of words $E$ and the observation table $O.T$ which are defined exactly as in the L* algorithm. But there are some differencies on the definition of the closedness and consistence.
+
+As said in the previous section, every row of the $O.T$ reprents a residual of the language, and since NL* goal is to construct a canonical $RFSA$, it is important to introduce the notion of row covering.
+
+\begin{definition}[Row covering]
+  \label{def:row-covering}
+  A row $r_1$ of the \textit{O.T.} is covered ($\sqsubseteq$) by a row $r_2$ if every bit of $r_1$ is less or equal of the corresponding bit in $r_2$.
+\end{definition}
+
+\begin{definition}[Row union]
+  The union ($\sqcup$) of two rows $r_1, r_2$ gives a new row $r_3$ where each bit $b_i$ is obtained by the max of the $i^{th}$ bit of $r_1$ and the $i^th$ bit of $r_2$
+\end{definition}
+
+\begin{definition}[Composed and Prime Rows]
+  A row $r$ of the \textit{O.T.} is composed if it exists a subset of rows $R'$ not including $r$ such that $r = \bigsqcup_{r_i \in R'}r_i$
+\end{definition}
+
+\begin{definition}[Closedness]
+  The \textit{O.T.} is closed if every prime row of every prime line of the lower part of the table is already present in the upper part.
+\end{definition}
+
+To restore the closedness of the observation table, $s$ will be promoted to $S$ and $\forall x \in \Sigma \text{ if } s \cdot x \notin SA \text{ then } s \cdot x \text{ is added to } SA$.
+
+\begin{definition}[Consistence]
+  The \textit{O.T.} is consistent if for every $s_1,s_2 \in S$ and $row(s_1) \sqsubseteq row(s_2)$, in this case $s_1,s_2$ are colled RFSA-similar, then for every $x \in \Sigma$, $row(s_1 \cdot x) = row(s_2 \cdot x)$.
+\end{definition}
+
+If the table is not consistent, we have $row(w_1) \sqsubseteq row(w_2)$ and $row(w_1 \cdot x) \not\sqsubseteq row(w_2 \cdot x) \text{ for some } x \in \Sigma \text{ and some }w_1, w_2 \in S$. We can restore the consistence by making $w_1$ and $w_2$ no more RFSA-similar: we find an $e \in E$ such that $T(w_1 \cdot x \cdot e) \sqsupset T(w_2 \cdot x \cdot e)$ and we add $x \cdot e$ in $E$.
+
+\subsection{NL* : Automaton creation}
+
+When the observation table is closed and consistent, the Learner can send to Teacher a conjecture of the language the it has understood so far.
+
+The conjecture is made as following :
+\begin{itemize}
+  \item $Q = \{row(s), \forall s \in S \text{ and } row(s) \text{ is  prime} \}$;
+  \item $\delta(row(s), x) = row(s'), \forall s \in S, x \in \Sigma, s' \in S_{ext} \text{ where } row(s) \text{ is Prime and } row(s') \sqsubseteq row(s \cdot x)\}$;
+  \item $q_I = row(s), \forall s \in S \text{ such that } row(s) \text{ is Prime and } row(s) \sqsubseteq row(\varepsilon) $;
+  \item $F = \{row(s) | s \in S \text{ and } T(s) = 1 \}$.
+\end{itemize}
+
+After the sending of the conjecture, if the Teacher answers \textit{Yes} the algorithm stops, otherwise a counter-exemple $c$ is provided. $c$ is added to the $E$ set and if needed $E$ is completed to reamins suffix-closed.
+
+\begin{lemma}
+  Let $q_I$ be the initial states and $s $ a word in $S_{ext}$ then $\delta(q_I, s) \sqsubseteq row(s)$.
+\end{lemma}
+
+The proof is really similar to the proof of \cref{lemma:L_trans_from_QI} considering that now we do not use the equality relation between states, but the coverning ($\sqsubseteq$) relaction defined in \cref{def:row-covering}.
 
 
-% In L* an $O.T.$ should be at every time closed and consistence.
+The word acceptance of \textit{NL*} can be proveed similarly to \cref{lemma:L_acceptance}. We can also note that :
+\begin{itemize}
+  \item the automaton created is no necessarily deterministic, since the transition function allow multiple successor from any state taking any letter over $\Sigma$;
+  \item the automaton may have multiple initial states, all states whose row is covered by $row(\varepsilon)$, and that it is also possible that $row(\varepsilon)$ is not in $Q_I$ if it is a composed row;
+  \item the automaton created is the canonical $RFSA$ since the represented states are only those whose corresponding line is a prime line.
+\end{itemize}
 
-% \begin{definition}[Closedness]
-%   The $O.T.$ is closed if every row of the \lowerPart{} is also present in the \upperPart{}.
-% \end{definition}
 
-% If the table is not closed then there exists an element $s$ of $SA$ where $row(s)$ is not in the \upperPart{}. To restore the closedness of the observation table, $s$ will be promoted to $S$ and $\forall x \in \Sigma \text{ if } s \cdot x \notin S \text{ then } s \cdot x \text{ is added to } SA$.
+\subsection{NL* analysis}
+\subsubsection{Correcteness}
+As for the L* algorithm, NL* is correct since the solution must be approved by the Teacher and by hypothesis the Teacher makes no mistakes.
 
-% \begin{lemma}
-%   \label{}
-%   If we move an element from $SA$ to $S$ then $S$ will remain \textit{prefix-closed}.
-% \end{lemma}
+\subsubsection{Terminaison}
+As for the L* algorithm, NL* terminates beacause the number of residual of the language is finite and if the conjecture is not accepted, the counter-exemple, will permit the Learner to find a new residual until all \textit{prime} residuals are found.
 
-% \begin{proof}
-%   Every element of $SA$ is the concatenation of an element in $S$ and a letter of $\Sigma$. We have that $Pref(w) = Pref(w' \cdot a) = \{w' \cdot a\} \cup Pref(w')$ and every $Pref(w')$ is already in $S$ since $S$ is \textit{prefix-closed}. Therefore adding \word{} won't inpact the \textit{prefix-closedness} of $S$.
-% \end{proof}
+A little precision of why NL* add the counter-exemple $c$ in $E$ and not in $S$. In general, the given counter-exemple belongs to a residual that is not correctly represented by the sent automaton. However, $c$ may belongs to a residual which is composed and therefore the algorithm will not gain enough information to find improve the \textit{O.T.} since composed rows are not considered for the closedness and consistence check. The intuition of why adding $c$ into $E$ is good to make NL* terminate is because in this way we add a bit to each row of the $O.T$ and in this way we are able to distinguish rows having $s$ as suffix.
 
-% \begin{definition}[Consistence]
-%   The $O.T.$ is consistent if for every $s_1,s_2 \in S$ and $row(s_1) = row(s_2)$, in this case $s_1,s_2$ are colled similar rows, then for every $x \in \Sigma$, $row(s_1 \cdot x) = row(s_2 \cdot x)$.
-% \end{definition}
 
-% If the table is not consistent, we have $row(w_1) = row(w_2)$ and $row(w_1 \cdot x) \neq row(w_2 \cdot x)$ for some $x \in \Sigma \text{ and some }w_1, w_2 \in S$. We can restore the consistence by making $w_1$ and $w_2$ no more similar: we find an $e \in E$ such that $T(w_1 \cdot x \cdot e) \neq T(w_2 \cdot x \cdot e)$ and we add $x \cdot e$ in $E$. In this way, the new bit of $row(w_1)$ is different from the new bit of $row(w_2)$ therefore the two rows are no more similar.
+\subsubsection{Time complexity}
+Similarly to L* the time complexity can be computed as the number of cells of the \textit{O.T.} supposing that all other operation of the algorithm runs in a constant time.
 
-% \begin{lemma}
-%   If we move an element of the type $x \cdot e$ where $x \in Sigma \text{ and } e \in E$ then $E$ remains \textit{suffix-closed}.
-% \end{lemma}
+In the wrost case the language of the Teacher has not composed residual and so the automaton created by NL* will have exactly the same number of state of the corresponding minimum DFA. That's why the time complexity is $O(n^2 \times m)$.
 
-% The proof is analogue to the proof of \cref{lemmaPromoteLinePrefixClosedness}.
-
-% \subsection{Automaton creation from the O.T.}
-
-% When the observation table is closed and consistent, the Learner can send to Teacher a conjecture of the language the it has understood so far.
-
-% The conjecture is made on the form of an automaton where :
-% \begin{itemize}
-%   \item $Q = \{row(s), \forall s \in S\}$;
-%   \item $\delta = \{(row(s), x, row(s \cdot x)), \forall s \in S, x \in \Sigma\}$;
-%   \item $q_0 = row(\varepsilon)$;
-%   \item $F = \{row(s) | s \in S \text{ and } T(s) = 1 \}$.
-% \end{itemize}
-
-% \begin{lemma}
-%   The automaton created is deterministic.
-% \end{lemma}
-
-% \begin{proof}
-%   We know that for every row $s_1 \in S$ and for every $x \in \Sigma$, $s_1 \cdot x \in S_{ext}$. Moreover, since the table is consistent, for every $s_2 \in S$ where $row(s_1)$ and $row(s_2)$ are similar, we have that $row(s_1 \cdot x) = row(s_2 \cdot x)$. Therefore there exists only one successor for every state $q \in Q$ and every letter $x \in \Sigma$.
-% \end{proof}
-
-% \begin{lemma}
-%   The automaton created is minimum.
-% \end{lemma}
-
-% \begin{proof}
-%   We can proove this lemma by contradiction. Let suppose that $A$ is not minimun and, therefore, that it is possible to merge some states $q_i, q_j$ to minimize it.
-%   By construction, $q_i$ and $q_j$ are linked to two different rows $r_1, r_2$ of the observation table.
-%   Let $e \in E$ be a column which is accepted by only one between $r_1, r_2$.
-%   Then it means that $e$ is accepted by only one of the residual languages recognized by $q_i$ and $q_j$ and therefore we cannot merge them.
-%   We have prooved that it is not possible to merge any couple of state $q_i, q_j \in Q$ and so the automaton is minimum.
-% \end{proof}
-
-% \subsection{The algorithm}
-
-% \begin{algorithm}[H]
-%   \caption{Angluil L* algorithm}
-%   \label{NL_star_algo}
-%   \KwIn{$\Sigma$}
-%   \KwOut{$A \text{ such that } L(A) = U$}
-%   $S \gets \{\varepsilon\}, E \gets \{\varepsilon\}, T \gets \text{new Dict()}$\;
-%   \While{$True$}{
-%     \If{$(S,E,T) \text{ is not complete}$}{
-%       $complete(S,E,T) \text{ with membership queries}$\;
-%     }
-%     \uIf{$(S, E, T) \text{ is not closed}$}{
-%       $rowToPromote \gets \{x \in SA \text{ such that } row(x) \notin upperRows(T)\}$\;
-%       $S \gets S \cup \{rowToPromote\}$\;
-%     }
-%     \uElseIf{$(S,E,T) \text{ is not consistent}$}{
-%       $\text{Fix } s_1, s_2 \in S, x \in \Sigma, e \in E \text{ such that } row(s_1) = row(s_2) \text{ and } T(s_1 \cdot x \cdot e) \neq T(s_2 \cdot x \cdot e)$\;
-%       $\text{add } x \cdot e \text{ to E and complete T with membership queries}$\;
-%     }
-%     \Else{
-%       $A \gets createAutomaton(S, E, T)$\;
-%       $teacherAnswer \gets equiv(A)$\;
-%       \uIf{$\text{teacherAnswer is a counter exemple t}$}{
-%         \For{$p \in Pref(t)$}{
-%           $\text{add p to S and add row t to (S, E, T) with membership queries }$\;
-%         }
-%       }
-%       \Else{
-%         \Return A \tcp*{The Teacher accepted the automaton}
-%       }
-%     }
-%   }
-% \end{algorithm}
-
-% \subsection{L* analysis}
-% \subsubsection{Correcteness}
-% The goal of the algorithm is to find an automaton recognizing the language of the teacher. The solution found by the Learner is correct since it has been accepted by the Teacher.
-% \subsubsection{Terminaison}
-% The algorithm terminates only if the Teacher answer $Yes$ to a \textit{equivalence query} of the Learner.
-
-% We know, by definition, that the language $U$ known by the teacher is regular. It means that the number $n$ of its residuals is finite implying that the number of states of the minimum DFA recognizing it and the number of different rows in the $O.T$ is finite (and equal to $n$).
-
-% If in a certain moment we have $n' < n$ different rows and the table is closed and consistent, the Learner make its conjecture and sends it to the Teacher. This conjecture cannot be the good one, and the counter-example provided will have an associated row similar to a row in $S$ but which makes the $O.T.$ no more consistent. The Learner repeats the algorithm, and every time the table is not consistent, the $n'$ will increase of one. When $n' = n$ the conjecture will have $n$ states, the same of the minimum DFA, and therefore since a minimum DFA is unique, the teacher will answer $Yes$ to the last conjecture allowing the algorithm to stop.
-
-% \subsubsection{Time complexity}
-% Let suppose that the \cref{L_star_algo} takes constant time to check if the table is consistent and closed and to create an automaton from the $O.T$ and pose $A$ the minimum DFA recognizing $U$.
-
-% The time complexity should be measured on the number of cells of the $O.T$.
-
-% In the wrost case, the number of columns $n$ (that is the cardinal of $E$) equals the number of states $A$, since at most we should have to make the table consistent $n-1$ times.
-
-% The size of $S$ is another key factor for the time complexity. Its size really depends on the length $m$ of the counter-exemple provided by the Teacher. At least $S$ has $n$ rows, one per number of column, but considering the length of $m$, and knowing that all prefix of $m$ will be added to $S$, then $|S|$ will have $O(n \times m)$ rows.
-
-% The size of $SA$ is at most $O(|\Sigma|)$ times the length $|S|$ since for every word in $|S|$ we can potentially have $|\Sigma|$ successors to add in $SA$.
-
-% In conclusion we have $O(n)$ columns and $O(|\Sigma| \times n \times m)$ rows, asking an overall complexity of $O(n \times |\Sigma| \times n \times m) = O(|\Sigma| \times n^2 \times m) = O(n^2 \times m)$ since $|\Sigma|$ is constant. The time complexity is so polynomial on the size of the automaton and the larger counter-exemple given by the teacher.
+However this complexity can be reduce in practice, expecially if the language $U$ has a lot of composed residual since in this case the automaton should need less information to construct its $RFSA$.

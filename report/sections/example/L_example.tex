@@ -1,0 +1,211 @@
+\subsection{L* Execution}
+\begin{enumerate}
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{l||l}
+            $T_1$         & $\varepsilon$ \\
+            \hline\hline
+            $\varepsilon$ & 1             \\
+            \hline\hline
+            a             & 1             \\
+            b             & 0             \\
+          \end{tabular}
+        \end{minipage} \quad
+        \begin{minipage}{0.6\textwidth}
+          The table is not closed, since in SA, the lower part of the table, there is $b$ where $row(b) = 0$ which is not presente in S. $b$ will be promoted.
+        \end{minipage}
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{l||l}
+            $T_2$         & $\varepsilon$ \\
+            \hline\hline
+            $\varepsilon$ & 1             \\
+            b             & 0             \\
+            \hline\hline
+            a             & 1             \\
+            ba            & 0             \\
+            bb            & 1             \\
+          \end{tabular}
+        \end{minipage}\quad
+        \begin{minipage}{0.6\textwidth}
+          The table is closed ($\forall x \in SA, \exists s \in S | row(x) = row(s)$) and consistent (there are no two similar rows in $S$), the learner can so send its conjecture.
+        \end{minipage}
+
+  \item \begin{minipage}{0.3\textwidth}
+          \input{sections/automata/L_aut1.tex}
+        \end{minipage}\quad
+        \begin{minipage}{0.6\textwidth}
+          This is the automaton sent.
+          The states are $0$ and $1$ since there are two distinct rows in the upper part of the table, $1$ is the initial state since $row(\varepsilon) = 0$ and it is also accepting since $T(\varepsilon) = 1$.\\
+          Transitions are made as follow : \\
+          \begin{itemize}
+            \item $\delta(1, a) = \delta(row(\varepsilon), a) = row(\varepsilon \cdot a) = 1$.
+            \item $\delta(1, b) = \delta(row(\varepsilon), b) = row(\varepsilon \cdot b) =  0$.
+            \item $\delta(0, a) = \delta(row(b), a) = row(b \cdot a) =  0$.
+            \item $\delta(0, b) = \delta(row(b), b) = row(b \cdot b) = 1$.
+          \end{itemize}
+          However, the automaton is not valid, since the word \textit{ab} is not recognized by \automaton{}, bu \textit{ab} is accepted by the Teacher.
+        \end{minipage}
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{l||l}
+            $T_3$         & $\varepsilon$ \\
+            \hline\hline
+            $\varepsilon$ & 1             \\
+            b             & 0             \\
+            ab            & 1             \\
+            a             & 1             \\
+            \hline\hline
+            ba            & 0             \\
+            bb            & 1             \\
+            aba           & 1             \\
+            abb           & 1             \\
+            aa            & 1             \\
+          \end{tabular}
+        \end{minipage} \quad
+        \begin{minipage}{0.5\textwidth}
+          \textit{ab} has been promoted in the upper part with with \textit{a} since \textit{a} was the only prefix not present in $S$.\\
+          \textit{aba, abb, aa} has been added into $SA$ beacause all word of the style $s \cdot a$ where $s \in S$ and $a \in \Sigma$ must appear in $T$.\\
+          This table is not consistent : $row(\varepsilon) = row(ab)$ but taking $b \in \Sigma$ gives $row(\varepsilon \cdot b) \neq row(ab \cdot b)$. Column $b$ is going to be added beacause $T(\varepsilon \cdot b \cdot \varepsilon) \neq row(ab \cdot b \cdot \varepsilon)$ (in the two cases the $\varepsilon$ before the closing parethesis is taken from $E$).
+        \end{minipage}
+
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{l||l|l}
+            $T_4$         & $\varepsilon$ & b \\
+            \hline\hline
+            $\varepsilon$ & 1             & 0 \\
+            b             & 0             & 1 \\
+            ab            & 1             & 1 \\
+            a             & 1             & 1 \\
+            \hline\hline
+            ba            & 0             & 0 \\
+            bb            & 1             & 1 \\
+            aba           & 1             & 1 \\
+            abb           & 1             & 1 \\
+            aa            & 1             & 1 \\
+          \end{tabular}
+        \end{minipage} \quad
+        \begin{minipage}{0.5\textwidth}
+          Now table is not closed : $row(ba)$ is not present in the upper part of the table, so it will be promoted.
+        \end{minipage}
+
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{l||l|l}
+            $T_5$         & $\varepsilon$ & b \\
+            \hline\hline
+            $\varepsilon$ & 1             & 0 \\
+            b             & 0             & 1 \\
+            ab            & 1             & 1 \\
+            a             & 1             & 1 \\
+            ba            & 0             & 0 \\
+            \hline\hline
+            bb            & 1             & 1 \\
+            aba           & 1             & 1 \\
+            abb           & 1             & 1 \\
+            aa            & 1             & 1 \\
+            baa           & 0             & 0 \\
+            bab           & 0             & 0 \\
+          \end{tabular}
+        \end{minipage} \quad
+        \begin{minipage}{0.5\textwidth}
+          The table is now closed and consistent.
+        \end{minipage}
+  \item \begin{minipage}{0.3\textwidth}
+          \input{sections/automata/L_aut2.tex}
+        \end{minipage}\quad
+        \begin{minipage}{0.6\textwidth}
+          This automaton recognized perfectly the language proposed by the Teacher, so the algorithm can stop.
+        \end{minipage}
+\end{enumerate}
+% \begin{enumerate}
+%   \item \quad
+%         \begin{center}
+%           \begin{tabular}{l||l}
+%             $T_1$         & $\varepsilon$ \\ \hline\hline
+%             $\varepsilon$ & 0             \\
+%             \hline \hline
+%             a             & 0             \\
+%             b             & 0             \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             The table is closed and consistent.\\
+%             An automaton will be sent.
+%           \end{minipage}
+%         \end{center}
+%   \item \quad
+%         \begin{center}
+%           \input{sections/automata/L_aut1.tex}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             This is the automaton sent. It has one state since there is only one line in the upper part. From state $0 = row(\varepsilon)$ if we read an $a$ we go to state $0$ since $row(\varepsilon \cdot a) = 0$. If we read a $b$ we go to $0$ since $row(\varepsilon \cdot b) = 0$. $0$ is the initial state since $row(\varepsilon) = 0$.\\
+%             There is no accepting state, because there is no row having a $1$ in the $\varepsilon$ column.\\
+%             A counter-exemple of this automaton after an equivalence query could be $aa$ since $aa$ is accepted by the Teacher but not by the conjecture.
+%           \end{minipage}
+%         \end{center}
+%   \item  \quad
+%         \begin{center}
+%           \begin{tabular}{c || c }
+%             $T_2$         & $\varepsilon$ \\ \hline\hline
+%             $\varepsilon$ & 0             \\
+%             aa            & 1             \\
+%             a             & 0             \\
+%             \hline\hline
+%             b             & 0             \\
+%             aaa           & 1             \\
+%             aab           & 1             \\
+%             ab            & 1             \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             The table is closed but not consistent :\\
+%             $row(\varepsilon) = row(a)$ but $row(\varepsilon \cdot a) \neq row(a \cdot a)$.\\
+%             We can distinguish $row(\varepsilon)$ and $row(a)$ by adding $a$ to $E$ since $T(a \cdot a \cdot \varepsilon) \neq T(\varepsilon \cdot a \cdot \varepsilon)$. \\
+%             Note : in $a \cdot a \cdot \varepsilon$, the first $a$ is taken from $S$, the second from $\Sigma$ and $\varepsilon$ from $E$.
+%           \end{minipage}
+%         \end{center}
+%   \item  \quad
+%         \begin{center}
+%           \begin{tabular}{c || c | c }
+%             $T_3$         & $\varepsilon$ & a \\ \hline\hline
+%             $\varepsilon$ & 0             & 0 \\
+%             aa            & 1             & 1 \\
+%             a             & 0             & 1 \\
+%             \hline\hline
+%             b             & 0             & 0 \\
+%             aaa           & 1             & 1 \\
+%             aab           & 1             & 0 \\
+%             ab            & 1             & 0 \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             The table is not closed since $row(aab) = 10$ is not present in the upper part of the table.\\
+%             $aab$ is going to be promoted and $aaba$ and $aabb$ are going to be add into $SA$.
+%           \end{minipage}
+%         \end{center}
+%   \item \quad
+%         \begin{center}
+%           \begin{tabular}{l||l|l}
+%             $T_4$         & $\varepsilon$ & a \\ \hline\hline
+%             $\varepsilon$ & 0             & 0 \\
+%             aa            & 1             & 1 \\
+%             a             & 0             & 1 \\
+%             aab           & 1             & 0 \\ \hline\hline
+%             b             & 0             & 0 \\
+%             aaa           & 1             & 1 \\
+%             ab            & 1             & 0 \\
+%             aaba          & 0             & 1 \\
+%             aabb          & 0             & 0 \\
+%           \end{tabular}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             The table is closed and consistent.\\
+%             An automaton will be sent.
+%           \end{minipage}
+%         \end{center}
+%   \item \quad
+%         \begin{center}
+%           \input{sections/automata/L_aut2.tex}
+%           \quad
+%           \begin{minipage}{0.5\textwidth}
+%             $L(A) = U \rightarrow$ the Teacher accepts the automaton.
+%           \end{minipage}
+%         \end{center}
+% \end{enumerate}

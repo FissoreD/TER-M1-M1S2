@@ -1,0 +1,34 @@
+\section{L* algorithm implementation}
+
+\begin{algorithm}[H]
+  \caption{Angluil L* algorithm}
+  \label{L_star_algo}
+  \KwIn{$\Sigma$}
+  \KwOut{$A \text{ such that } L(A) = U$}
+  $S \gets \{\varepsilon\}, E \gets \{\varepsilon\}, T \gets \text{new Dict()}$\;
+  \While{$True$}{
+    \If{$(S,E,T) \text{ is not complete}$}{
+      $complete(S,E,T) \text{ with membership queries}$\;
+    }
+    \uIf{$(S, E, T) \text{ is not closed}$}{
+      $rowToPromote \gets \{x \in SA \text{ such that } row(x) \notin upperRows(T)\}$\;
+      $S \gets S \cup \{rowToPromote\}$\;
+    }
+    \uElseIf{$(S,E,T) \text{ is not consistent}$}{
+      $\text{Find } s_1, s_2 \in S, x \in \Sigma, e \in E \text{ such that } row(s_1) = row(s_2) \text{ and } T(s_1 \cdot x \cdot e) \neq T(s_2 \cdot x \cdot e)$\;
+      $\text{add } x \cdot e \text{ to E and complete T with membership queries}$\;
+    }
+    \Else{
+      $A \gets createAutomaton(S, E, T)$\;
+      $teacherAnswer \gets equiv(A)$\;
+      \uIf{$\text{teacherAnswer is a counter exemple t}$}{
+        \For{$p \in Pref(t)$}{
+          $\text{add p to S and complete this row with membership queries }$\;
+        }
+      }
+      \Else{
+        \Return A \tcp*{The Teacher accepted the automaton}
+      }
+    }
+  }
+\end{algorithm}
