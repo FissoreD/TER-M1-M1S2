@@ -1,11 +1,11 @@
-Regex,Length alphabet,Description,L Membership queries,NL Membership queries,L Equivalence queries,NL Equivalence queries,L State nb in A,NL State nb in A,L Transition nb in A,NL Transition nb in A
-(a|b)*a,2,0,5,5,1,1,2,2,4,6
-(a|b)*a(a|b),2,1,14,15,2,2,4,3,8,11
-(a|b)*a(a|b)(a|b),2,2,35,24,2,2,8,4,16,16
-(a|b)*a(a|b)(a|b)(a|b),2,3,84,35,2,2,16,5,32,21
-(a|b)*a(a|b)(a|b)(a|b)(a|b),2,4,197,55,2,2,32,6,64,26
-(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b),2,5,454,79,2,2,64,7,128,31
-(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,6,1031,107,2,2,128,8,256,36
-(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,7,2312,139,2,2,256,9,512,41
-(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,8,5129,175,2,2,512,10,1024,46
-(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b),2,9,11274,215,2,2,1024,11,2048,51
+Regex,Length alphabet,Description,L Membership queries,NL Membership queries,L Equivalence queries,NL Equivalence queries,L State nb in A,NL State nb in A,L Transition nb in A,NL Transition nb in A,L Closedness,NL Closedness,L Consistence,NL Consistence
+(a|b)*a, 2, 0, 5,5, 1,1, 2,2, 4,6, 1,1, 0,0
+(a|b)*a(a|b), 2, 1, 13,14, 2,2, 4,3, 8,11, 1,2, 1,0
+(a|b)*a(a|b)(a|b), 2, 2, 34,23, 2,2, 8,4, 16,16, 4,3, 2,0
+(a|b)*a(a|b)(a|b)(a|b), 2, 3, 83,34, 2,2, 16,5, 32,21, 11,4, 3,0
+(a|b)*a(a|b)(a|b)(a|b)(a|b), 2, 4, 196,54, 2,2, 32,6, 64,26, 25,5, 4,0
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b), 2, 5, 453,78, 2,2, 64,7, 128,31, 55,6, 5,0
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b), 2, 6, 1030,106, 2,2, 128,8, 256,36, 117,7, 6,0
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b), 2, 7, 2311,138, 2,2, 256,9, 512,41, 243,8, 7,0
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b), 2, 8, 5128,174, 2,2, 512,10, 1024,46, 497,9, 8,0
+(a|b)*a(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b)(a|b), 2, 9, 11273,214, 2,2, 1024,11, 2048,51, 1007,10, 9,0

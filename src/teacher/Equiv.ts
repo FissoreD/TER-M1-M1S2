@@ -1,4 +1,4 @@
-import { differenceAutomata } from "../automaton/automaton_type.js";
+import { differenceAutomata, intersectionAutomata, unionAutomata } from "../automaton/automaton_type.js";
 import { MyAutomatonToHis } from "../automaton/automaton_type.js";
 import { minimizeAutomaton } from "../automaton/automaton_type.js";
 import { Automaton, State } from "../automaton/Automaton.js";
@@ -6,9 +6,11 @@ import { Teacher } from "./Teacher.js";
 import { boolToString } from "../tools/Utilities.js";
 
 /**
+ * let A = teacher.automaton, B = automaton
+ * res = (A union B) / (A inter B)
  * @param teacher 
  * @param automaton 
- * @returns undifined if the automaton recognizes the teacher's language, a counter-exemple otherwise
+ * @returns undifined if res = empty else the shortes word in res
  */
 export let equivalenceFunction = (teacher: Teacher, automaton: Automaton): string | undefined => {
   if (teacher.counter_examples) {

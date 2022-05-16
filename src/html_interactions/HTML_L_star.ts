@@ -21,8 +21,4 @@ export class HTML_L_star extends HTML_LearnerBase<L_star> {
         The column "${new_col}" will be added in E since T(${s1 + new_col}) ≠ T(${s2 + new_col}) 
         [Note : ${new_col} = ${fstChar} ∘ ${sndChar} and ${fstChar} ∈ Σ and ${sndChar} ∈ E]`
   }
-
-  table_to_update_after_equiv(answer: string) {
-    this.learner.add_elt_in_S(answer!, true);
-  }
 }

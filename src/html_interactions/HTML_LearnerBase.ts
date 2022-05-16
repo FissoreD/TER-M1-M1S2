@@ -177,7 +177,7 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
               this.pile_actions.push(() => {
                 this.message().innerHTML = "";
                 clear_automaton_HTML();
-                this.table_to_update_after_equiv(answer!)
+                this.learner.table_to_update_after_equiv(answer!, true)
                 this.clear_table();
                 this.draw_table();
               })
@@ -196,8 +196,6 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   abstract close_message(close_rep: string): string;
 
   abstract consistent_message(s1: string, s2: string, new_col: string): string;
-
-  abstract table_to_update_after_equiv(answer: string): void;
 
   async go_to_end() {
     while (!this.learner.finish) {

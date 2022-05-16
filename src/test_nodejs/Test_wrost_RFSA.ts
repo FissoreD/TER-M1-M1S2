@@ -18,7 +18,7 @@ import { allStringFromAlphabet, myLog } from "../tools/Utilities.js";
  * interactions with the teacher.
  */
 
-let toWrite = false
+let toWrite = true
 
 let fileName = "wrostRFSA";
 if (toWrite) {

@@ -3,6 +3,7 @@
 The NL* algorithm, described by Benedikt Boolig \textit{et al.} in \cite{NLPaper}, is an algorithm based on L* whose goal is to learn an unknown language $U$ building potentially smaller automata then those built by L*. To achieve this goal, NL* outputs a particular class of non deterministic automata which are called \textit{Residual final state automata (RFSA)} which can have less states then the equivalent minimun DFA.
 
 \subsection{Resudial final state automaton (RFSA)}
+\label{sec:RFSA}
 
 We have seen in \cref{section:L} that the L* algorithm is able to create a minimum DFA recognizing a regular language where each state is associated to a particular row of the $O.T$.
 
@@ -31,7 +32,7 @@ A residual of \textit{L} is a new language $L'$ where $L = \{u \cdot v, \text{ f
   $\leftarrow$ Given the set of residuals $\{L_1, L_2, \dots, L_n\}$ of \textit{L} and an alphabet $\Sigma$. By \cref{def:monoid}, for every $L_i$ there exists an associated monoid $M_i$ such that $w^{-1}L_i = L$ for all $w \in M_i$. We can construct the minimal DFA $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ where :
   \begin{itemize}
     \item $Q = \bigcup_{i=1}^{n}L_i$
-    \item $\delta = \{(q_i, x, q_j) \text{ for every } q_i, q_j \in Q \text{ and } x \in \Sigma \text{ if } x^{-1}L_i = L_j\}$
+    \item $\delta = \{(q_i, x) = q_j \text{ for every } q_i, q_j \in Q \text{ and } x \in \Sigma \text{ if } x^{-1}L(q_i) = L(q_j)\}$
     \item $q_I$ is the state associated to the $i^{th}$ residual having
     \item $F = \{q_i \in Q \text{ such that } \varepsilon \in L_i\}$
   \end{itemize}
@@ -55,7 +56,7 @@ Starting from these definitions, we can see that in the \textit{O.T.} of the L* 
 A canonical $RFSA$ $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ can be constructed as follow :
 \begin{itemize}
   \item $Q = $ the set of prime residual of L
-  \item $\delta = \{(q_i, x, q_j) \text{ for every } q_i, q_j \in Q \text{ and } x \in \Sigma \text{ if } L(q_i) \subseteq x^{-1}L(q_j)\}$
+  \item $\delta = \{(q_i, x) = q_j \text{ for every } q_i, q_j \in Q \text{ and } x \in \Sigma \text{ if } L(q_i) \subseteq x^{-1}L(q_j)\}$
   \item $q_I$ is the set of states whose associated residual is a subset of the language \textit{L} recognized by \automaton{}
   \item $F = \{q_i | q_i \in Q \text{ such that } \varepsilon \in L(q_i)\}$
 \end{itemize}

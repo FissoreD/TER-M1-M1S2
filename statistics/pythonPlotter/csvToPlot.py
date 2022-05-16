@@ -51,7 +51,7 @@ def plotCsv(df: pd.DataFrame, comparator: str, algos: str, fileName: str):
         ax.plot(x_line, y_line, linestyle='--', color=j, label=i)
     leg = ax.legend()
     ax.set_xlabel(
-        "Regex" if 'benchMark' not in fileName else 'State number in minimum DFA')
+        "n" if 'benchMark' not in fileName else 'State number in minimum DFA')
     ax.set_ylabel(comparator)
     savePlot(fig, fileName)
     # show(fig)
@@ -77,6 +77,7 @@ def plotAllCsv():
             algo, comparator = col.split(" ", 1)
             infos["algo"].add(algo)
             infos["comp"].add(comparator)
+        print(infos)
         for comparator in infos["comp"]:
             fig = plotCsv(df, comparator, infos["algo"],
                           f"{folderPath}{comparator}.png")

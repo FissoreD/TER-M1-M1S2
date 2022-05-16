@@ -1,0 +1,142 @@
+\subsection{L* Execution}
+\begin{enumerate}
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{c||c}
+            $T_1$         & $\varepsilon$ \\
+            \hline\hline
+            $\varepsilon$ & 1             \\
+            \hline\hline
+            b             & 1             \\
+            a             & 0             \\
+          \end{tabular}
+        \end{minipage} \quad
+        \begin{minipage}{0.6\textwidth}
+          The table is not closed, because $row(a) = 0$ is not presente in S. \\
+          $b$ will be promoted.
+        \end{minipage}
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{c||c}
+            $T_2$         & $\varepsilon$ \\
+            \hline\hline
+            $\varepsilon$ & 1             \\
+            a             & 0             \\
+            \hline\hline
+            b             & 1             \\
+            ab            & 0             \\
+            aa            & 1             \\
+          \end{tabular}
+        \end{minipage}\quad
+        \begin{minipage}{0.6\textwidth}
+          $ab$ and $aa$ have been added in $SA$ to respect the condiction where : $\forall x \in S, \forall y \in \Sigma, \exists z \in S_{ext} \text{ such that } x \cdot y = z $.\\
+          The table is closed ($\forall x \in SA, \exists s \in S | row(x) = row(s)$) and consistent (there are no two similar rows in $S$), the \textit{Learner} can send its conjecture.
+        \end{minipage}
+
+  \item \begin{minipage}{0.3\textwidth}
+          \input{sections/automata/L_aut1.tex}
+        \end{minipage}\quad
+        \begin{minipage}{0.6\textwidth}
+          This is the automaton sent.
+          The states are $0$ and $1$ since there are two distinct rows in the upper part of the table, $1$ is the initial state since $row(\varepsilon) = 0$ and it is also accepting since $T(\varepsilon) = 1$.\\
+          Transitions are made as follow : \\
+          \begin{itemize}
+            \item $\delta(1, a) = \delta(row(\varepsilon), a) = row(\varepsilon \cdot a) = 0$.
+            \item $\delta(1, b) = \delta(row(\varepsilon), b) = row(\varepsilon \cdot b) =  1$.
+            \item $\delta(0, a) = \delta(row(a), a) = row(a \cdot a) =  1$.
+            \item $\delta(0, b) = \delta(row(a), b) = row(a \cdot b) = 0$.
+          \end{itemize}
+          However, the automaton is not valid, since the word \textit{aba} is accepted by the conjecture but not by the \textit{Teacher}.
+        \end{minipage}
+
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{c||c}
+            $T_3$         & $\varepsilon$ \\
+            \hline\hline
+            $\varepsilon$ & 1             \\
+            a             & 0             \\
+            aba           & 0             \\
+            ab            & 0             \\
+            \hline\hline
+            b             & 1             \\
+            aa            & 1             \\
+            abab          & 0             \\
+            abaa          & 0             \\
+            abb           & 1             \\
+          \end{tabular}
+        \end{minipage} \quad
+        \begin{minipage}{0.5\textwidth}
+          $aba$ as been added in $S$ as well as each of its prefixes. $abab, abaa \text{ and } abb$ have been added in $SA$ to keep the $O.T.$ complete. \\
+          This table is not consistent : $row(a) = row(aba)$ but taking $row(a \cdot a) \neq row(aba \cdot abaa)$. Column $a$ is going to be added beacause $T(a \cdot a \cdot \varepsilon) \neq row(aba \cdot a \cdot \varepsilon)$
+        \end{minipage}
+
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{c||c|c}
+            $T_4$         & $\varepsilon$ & a \\
+            \hline\hline
+            $\varepsilon$ & 1             & 0 \\
+            a             & 0             & 1 \\
+            aba           & 0             & 0 \\
+            ab            & 0             & 0 \\
+            \hline\hline
+            b             & 1             & 1 \\
+            aa            & 1             & 1 \\
+            abab          & 0             & 0 \\
+            abaa          & 0             & 0 \\
+            abb           & 1             & 1 \\
+          \end{tabular}
+        \end{minipage} \quad
+        \begin{minipage}{0.5\textwidth}
+          $T_43$ is not closed : $row(b)$ is not present in $S$, so it will be promoted.
+        \end{minipage}
+
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{c||c|c}
+            $T_5$         & $\varepsilon$ & a \\
+            \hline\hline
+            $\varepsilon$ & 1             & 0 \\
+            a             & 0             & 1 \\
+            aba           & 0             & 0 \\
+            ab            & 0             & 0 \\
+            b             & 1             & 1 \\
+            \hline\hline
+            aa            & 1             & 1 \\
+            abab          & 0             & 0 \\
+            abaa          & 0             & 0 \\
+            abb           & 1             & 1 \\
+            bb            & 1             & 1 \\
+            ba            & 1             & 1 \\
+          \end{tabular}
+        \end{minipage} \quad
+        \begin{minipage}{0.5\textwidth}
+          $T_5$ is not consistent $row(aba) = row(ab)$ but $row(abab) \neq row(abb)$
+          Column $b$ is going to be added beacause $T(aba \cdot b \cdot \varepsilon) \neq row(ab \cdot b \cdot \varepsilon)$
+        \end{minipage}
+
+  \item \begin{minipage}{0.3\textwidth}
+          \begin{tabular}{c||c|c|c}
+            $T_6$         & $\varepsilon$ & a & b \\
+            \hline\hline
+            $\varepsilon$ & 1             & 0 & 1 \\
+            a             & 0             & 1 & 0 \\
+            aba           & 0             & 0 & 0 \\
+            ab            & 0             & 0 & 1 \\
+            b             & 1             & 1 & 1 \\
+            \hline\hline
+            aa            & 1             & 1 & 1 \\
+            abab          & 0             & 0 & 0 \\
+            abaa          & 0             & 0 & 0 \\
+            abb           & 1             & 1 & 1 \\
+            bb            & 1             & 1 & 1 \\
+            ba            & 1             & 1 & 1 \\
+          \end{tabular}
+        \end{minipage} \quad
+        \begin{minipage}{0.5\textwidth}
+          $T_6$ is closed and consistent.
+        \end{minipage}
+
+  \item \begin{minipage}{0.3\textwidth}
+          \input{sections/automata/L_aut2.tex}
+        \end{minipage}\quad\\
+        \begin{minipage}{0.6\textwidth}
+          This automaton recognized perfectly the language proposed by the Teacher, so the algorithm can stop.
+        \end{minipage}
+\end{enumerate}

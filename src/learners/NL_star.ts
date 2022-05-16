@@ -50,8 +50,8 @@ export class NL_star extends LearnerBase {
     this.prime_lines = [...this.S, ...this.SA].filter(l => this.is_prime(l));
   }
 
-  add_elt_in_S(new_elt: string) {
-    super.add_elt_in_S(new_elt);
+  add_elt_in_S(new_elt: string, after_equiv = false) {
+    super.add_elt_in_S(new_elt, after_equiv);
     this.check_prime_lines()
     return;
   }
@@ -143,6 +143,6 @@ export class NL_star extends LearnerBase {
   }
 
   table_to_update_after_equiv(answer: string): void {
-    this.add_elt_in_E(answer);
+    this.add_elt_in_S(answer, true);
   }
 }

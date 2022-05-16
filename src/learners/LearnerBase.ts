@@ -182,7 +182,7 @@ export abstract class LearnerBase {
       this.automaton = automaton;
       let answer = this.make_equiv(automaton);
       if (answer != undefined) {
-        this.table_to_update_after_equiv(answer!)
+        this.table_to_update_after_equiv(answer!, false)
         this.automaton = undefined;
       } else {
         this.finish = true;
@@ -204,11 +204,27 @@ export abstract class LearnerBase {
     return this.equiv_number;
   }
 
+  get_consistente_counter() {
+    return this.consistence_counter;
+  }
+
+  get_closedness_counter() {
+    return this.closedness_counter;
+  }
+
+  get_state_number() {
+    return this.automaton!.state_number()
+  }
+
+  get_transition_number() {
+    return this.automaton!.transition_number()
+  }
+
   /**
    * Every learner can update differently the observation table according to its implementation
    * @param answer the answer of teacher after equiv question
    */
-  abstract table_to_update_after_equiv(answer: string): void;
+  abstract table_to_update_after_equiv(answer: string, after_equiv: boolean): void;
 
   abstract make_automaton(): Automaton;
 

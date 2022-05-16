@@ -70,6 +70,6 @@ export class L_star extends LearnerBase {
   }
 
   table_to_update_after_equiv(answer: string): void {
-    this.add_elt_in_S(answer);
+    this.add_elt_in_S(answer, true);
   }
 }

@@ -23,16 +23,16 @@ Here are some examples of regular langauges and their corresponting automata are
     $L = \{a, aa, ...\}$ is the language of words represented by the regular expression $a^+$.
 \end{example}
 
-\begin{figure}
+\begin{figure}[h]
     \centering
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}{0.45\textwidth}
         \centering
         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
             \node[state,initial, accepting, initial text=] (q_I) {$q_I$};
         \end{tikzpicture}
         \caption{Automaton of \cref{example:lang_eps}}
     \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}{0.45\textwidth}
         \centering
         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
             \node[state,initial text=, initial] (q_I) {$q_I$};
@@ -44,7 +44,7 @@ Here are some examples of regular langauges and their corresponting automata are
         \end{tikzpicture}
         \caption{Automaton of \cref{example:lang_ab_len2}}
     \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}{0.45\textwidth}
         \centering
         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
             \node[state,initial text=, initial] (q_I) {$q_I$};
@@ -81,9 +81,9 @@ DFAs have important properties since it is computationally "easy" to test if a w
 
 \begin{example}[DFA vs NFA]
     Here an exemple of two minimal automata defining the language over the alphabet $\alphabetN{} = \{a, b\}$ for strings with an $a$ in the second letter from last position (same as $L = regex((a+b)^*a(a+b))$).
-    \begin{figure}
+    \begin{figure}[h]
         \centering
-        \begin{subfigure}[b]{0.45\textwidth}
+        \begin{subfigure}{0.45\textwidth}
             \centering
             \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
                 \node[state,initial, initial text=] (q_I) {$q_I$};
@@ -97,7 +97,7 @@ DFAs have important properties since it is computationally "easy" to test if a w
             \caption{NFA}
             \label{subfig:nfa_x_star_ax}
         \end{subfigure}
-        \begin{subfigure}[b]{0.45\textwidth}
+        \begin{subfigure}{0.45\textwidth}
             \centering
             \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
                 \node[state,initial, initial text=] (q_I) {$q_I$};

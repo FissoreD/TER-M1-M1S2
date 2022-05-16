@@ -16,7 +16,7 @@ import { myLog } from "../tools/Utilities.js";
  * interactions with the teacher.
  */
 
-let toWrite = false
+let toWrite = true
 
 let fileName = "wrostDFA";
 if (toWrite) {

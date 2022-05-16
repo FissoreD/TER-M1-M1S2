@@ -90,6 +90,7 @@ export function initiate_global_vars() {
     let newTeacherOption: HTMLOptionElement;
     if (regexAlreadyExists) {
       newTeacherOption = regexAlreadyExists as HTMLOptionElement;
+      currentTeacher = mapTeacherValue[teacherSelector.selectedOptions[0].value];
     } else {
       currentTeacher = new TeacherAutomaton(
         newRegex.value,
