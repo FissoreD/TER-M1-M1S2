@@ -2,12 +2,12 @@
 \begin{enumerate}
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c}
-            $T_1$         & $\varepsilon$ \\
+            $T_1$ & $\E$ \\
             \hline\hline
-            $\varepsilon$ & 1             \\
+            $\E$  & 1    \\
             \hline\hline
-            b             & 1             \\
-            a             & 0             \\
+            b     & 1    \\
+            a     & 0    \\
           \end{tabular}
         \end{minipage} \quad
         \begin{minipage}{0.6\textwidth}
@@ -16,14 +16,14 @@
         \end{minipage}
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c}
-            $T_2$         & $\varepsilon$ \\
+            $T_2$ & $\E$ \\
             \hline\hline
-            $\varepsilon$ & 1             \\
-            a             & 0             \\
+            $\E$  & 1    \\
+            a     & 0    \\
             \hline\hline
-            b             & 1             \\
-            ab            & 0             \\
-            aa            & 1             \\
+            b     & 1    \\
+            ab    & 0    \\
+            aa    & 1    \\
           \end{tabular}
         \end{minipage}\quad
         \begin{minipage}{0.6\textwidth}
@@ -36,11 +36,11 @@
         \end{minipage}\quad
         \begin{minipage}{0.6\textwidth}
           This is the automaton sent.
-          The states are $0$ and $1$ since there are two distinct rows in the upper part of the table, $1$ is the initial state since $row(\varepsilon) = 0$ and it is also accepting since $T(\varepsilon) = 1$.\\
+          The states are $0$ and $1$ since there are two distinct rows in the upper part of the table, $1$ is the initial state since $row(\E) = 0$ and it is also accepting since $T(\E) = 1$.\\
           Transitions are made as follow : \\
           \begin{itemize}
-            \item $\delta(1, a) = \delta(row(\varepsilon), a) = row(\varepsilon \cdot a) = 0$.
-            \item $\delta(1, b) = \delta(row(\varepsilon), b) = row(\varepsilon \cdot b) =  1$.
+            \item $\delta(1, a) = \delta(row(\E), a) = row(\E \cdot a) = 0$.
+            \item $\delta(1, b) = \delta(row(\E), b) = row(\E \cdot b) =  1$.
             \item $\delta(0, a) = \delta(row(a), a) = row(a \cdot a) =  1$.
             \item $\delta(0, b) = \delta(row(a), b) = row(a \cdot b) = 0$.
           \end{itemize}
@@ -49,39 +49,39 @@
 
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c}
-            $T_3$         & $\varepsilon$ \\
+            $T_3$ & $\E$ \\
             \hline\hline
-            $\varepsilon$ & 1             \\
-            a             & 0             \\
-            aba           & 0             \\
-            ab            & 0             \\
+            $\E$  & 1    \\
+            a     & 0    \\
+            aba   & 0    \\
+            ab    & 0    \\
             \hline\hline
-            b             & 1             \\
-            aa            & 1             \\
-            abab          & 0             \\
-            abaa          & 0             \\
-            abb           & 1             \\
+            b     & 1    \\
+            aa    & 1    \\
+            abab  & 0    \\
+            abaa  & 0    \\
+            abb   & 1    \\
           \end{tabular}
         \end{minipage} \quad
         \begin{minipage}{0.5\textwidth}
-          $aba$ as been added in $S$ as well as each of its prefixes. $abab, abaa \text{ and } abb$ have been added in $SA$ to keep the $O.T.$ complete. \\
-          This table is not consistent : $row(a) = row(aba)$ but taking $row(a \cdot a) \neq row(aba \cdot abaa)$. Column $a$ is going to be added beacause $T(a \cdot a \cdot \varepsilon) \neq row(aba \cdot a \cdot \varepsilon)$
+          $aba$ as been added in $S$ as well as each of its prefixes. $abab, abaa \text{ and } abb$ have been added in $SA$ to keep the \OT complete. \\
+          This table is not consistent : $row(a) = row(aba)$ but taking $row(a \cdot a) \neq row(aba \cdot abaa)$. Column $a$ is going to be added beacause $T(a \cdot a \cdot \E) \neq row(aba \cdot a \cdot \E)$
         \end{minipage}
 
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c|c}
-            $T_4$         & $\varepsilon$ & a \\
+            $T_4$ & $\E$ & a \\
             \hline\hline
-            $\varepsilon$ & 1             & 0 \\
-            a             & 0             & 1 \\
-            aba           & 0             & 0 \\
-            ab            & 0             & 0 \\
+            $\E$  & 1    & 0 \\
+            a     & 0    & 1 \\
+            aba   & 0    & 0 \\
+            ab    & 0    & 0 \\
             \hline\hline
-            b             & 1             & 1 \\
-            aa            & 1             & 1 \\
-            abab          & 0             & 0 \\
-            abaa          & 0             & 0 \\
-            abb           & 1             & 1 \\
+            b     & 1    & 1 \\
+            aa    & 1    & 1 \\
+            abab  & 0    & 0 \\
+            abaa  & 0    & 0 \\
+            abb   & 1    & 1 \\
           \end{tabular}
         \end{minipage} \quad
         \begin{minipage}{0.5\textwidth}
@@ -90,43 +90,43 @@
 
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c|c}
-            $T_5$         & $\varepsilon$ & a \\
+            $T_5$ & $\E$ & a \\
             \hline\hline
-            $\varepsilon$ & 1             & 0 \\
-            a             & 0             & 1 \\
-            aba           & 0             & 0 \\
-            ab            & 0             & 0 \\
-            b             & 1             & 1 \\
+            $\E$  & 1    & 0 \\
+            a     & 0    & 1 \\
+            aba   & 0    & 0 \\
+            ab    & 0    & 0 \\
+            b     & 1    & 1 \\
             \hline\hline
-            aa            & 1             & 1 \\
-            abab          & 0             & 0 \\
-            abaa          & 0             & 0 \\
-            abb           & 1             & 1 \\
-            bb            & 1             & 1 \\
-            ba            & 1             & 1 \\
+            aa    & 1    & 1 \\
+            abab  & 0    & 0 \\
+            abaa  & 0    & 0 \\
+            abb   & 1    & 1 \\
+            bb    & 1    & 1 \\
+            ba    & 1    & 1 \\
           \end{tabular}
         \end{minipage} \quad
         \begin{minipage}{0.5\textwidth}
           $T_5$ is not consistent $row(aba) = row(ab)$ but $row(abab) \neq row(abb)$
-          Column $b$ is going to be added beacause $T(aba \cdot b \cdot \varepsilon) \neq row(ab \cdot b \cdot \varepsilon)$
+          Column $b$ is going to be added beacause $T(aba \cdot b \cdot \E) \neq row(ab \cdot b \cdot \E)$
         \end{minipage}
 
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c|c|c}
-            $T_6$         & $\varepsilon$ & a & b \\
+            $T_6$ & $\E$ & a & b \\
             \hline\hline
-            $\varepsilon$ & 1             & 0 & 1 \\
-            a             & 0             & 1 & 0 \\
-            aba           & 0             & 0 & 0 \\
-            ab            & 0             & 0 & 1 \\
-            b             & 1             & 1 & 1 \\
+            $\E$  & 1    & 0 & 1 \\
+            a     & 0    & 1 & 0 \\
+            aba   & 0    & 0 & 0 \\
+            ab    & 0    & 0 & 1 \\
+            b     & 1    & 1 & 1 \\
             \hline\hline
-            aa            & 1             & 1 & 1 \\
-            abab          & 0             & 0 & 0 \\
-            abaa          & 0             & 0 & 0 \\
-            abb           & 1             & 1 & 1 \\
-            bb            & 1             & 1 & 1 \\
-            ba            & 1             & 1 & 1 \\
+            aa    & 1    & 1 & 1 \\
+            abab  & 0    & 0 & 0 \\
+            abaa  & 0    & 0 & 0 \\
+            abb   & 1    & 1 & 1 \\
+            bb    & 1    & 1 & 1 \\
+            ba    & 1    & 1 & 1 \\
           \end{tabular}
         \end{minipage} \quad
         \begin{minipage}{0.5\textwidth}

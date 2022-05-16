@@ -1,6 +1,6 @@
 \section{L* and NL* exectution with example}
 
-This section aims to provide an example of the execution of the two algorithms taking the unknown language $U$ defind by $regex(\varepsilon+(b+aa+abb)(a+b)^*)$ % $+(b+aa+abb)(a+b)*
+This section aims to provide an example of the execution of the two algorithms taking the unknown language $U$ defind by $regex(\E+(b+aa+abb)(a+b)^*)$ % $+(b+aa+abb)(a+b)*
 \input{sections/annexe/example/L_example.tex}
 \input{sections/annexe/example/NL_example.tex}
 
@@ -9,13 +9,13 @@ In this section I would like to explain why the \textit{mDFA} has one state more
 
 
 
-\begin{algorithm}[H]Let's start with the regular expression of $U = regex(\varepsilon+(b+aa+abb)(a+b)^*)$. The residuals of this language can be found recursively with \cref{algo:find_residuals}.
+\begin{algorithm}[H]Let's start with the regular expression of $U = regex(\E+(b+aa+abb)(a+b)^*)$. The residuals of this language can be found recursively with \cref{algo:find_residuals}.
   \caption{Algo to find residuals of a language U}
   \label{algo:find_residuals}
   \KwData{$U$, $\Sigma$}
   \KwResult{$\mathcal{R}$ = The set of residuals of $U$}
   $\mathcal{R} \gets \{\}$ \tcp*{Initialisation of $\mathcal{R}$}
-  $E \gets \{\varepsilon\}$\tcp*{The list of words to treat}
+  $E \gets \{\E\}$\tcp*{The list of words to treat}
   \While{$E.length > 0$}{
     $current \gets E.pop()$\;
     $residual = (current)^{-1}L\footnote{This operation can be performed, for example, with the \textit{Brzozowski derivative} algorithm}$\;
@@ -36,8 +36,8 @@ Let's apply this algorithm over $U$.
 \begin{tabular}{c|c|c|c|c}
   $Iteration$ & current       & Operation                   & $\mathcal{R}$                                      & $E$                    \\
   \hline\hline
-  1           & $\varnothing$ & $\varnothing$               & $\mathcal{R} = \{\}$                               & $\{\varepsilon\}$      \\
-  2           & $\varepsilon$ & $\varepsilon^{-1}U = U$     & $\mathcal{R} = \mathcal{R} \cup \{U\}$             & $\{a, b\}$             \\
+  1           & $\varnothing$ & $\varnothing$               & $\mathcal{R} = \{\}$                               & $\{\E\}$               \\
+  2           & $\E$          & $\E^{-1}U = U$              & $\mathcal{R} = \mathcal{R} \cup \{U\}$             & $\{a, b\}$             \\
   3           & $a$           & $a^{-1}U = (a+bb)(a+b)^*$   & $\mathcal{R} = \mathcal{R} \cup \{(a+bb)(a+b)^*\}$ & $\{b, aa, ab\}$        \\
   4           & $b$           & $b^{-1}U = (a+b)^*$         & $\mathcal{R} = \mathcal{R} \cup \{(a+b)^*\}$       & $\{aa, ab, ba, bb\}$   \\
   5           & $aa$          & $(aa)^{-1}U = (a+b)^*$      & $-$                                                & $\{ab, ba, bb\}$       \\

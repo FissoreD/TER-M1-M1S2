@@ -1,80 +1,90 @@
 \section{Learnig with L* }
 \label{section:L}
 
-The L* algorithm, described by Dana Angluin in \cite{LPaper}, is a learning algorithm. Its goal is to build a \textit{minimal} DFA recognizing an unknown language \langU{} thanks to interactions between a \learner{} and a \teacher{} through membership and equivalence queries.
-
-\begin{definition}[Type of queries]
-  A membership query is represented as a function which maps a word $w$ to \{True, False\} and an equivalence query maps an automaton \automaton{} to \{True, $w \in \Sigma^*$\}, where $w$ is a counter-exemple if \automaton{} does not recognize \langU{}.
-\end{definition}
-
-\begin{definition}[Counter-exemple]
-  A counter-example is a word belonging to the symmetric difference of \langU{} and $L(\automatonN{})$. The symmetric difference between to sets $A$ and $B$ is a set $S$ containing all the elements that are in $A$ and not in $B$ or that are in $B$ and not in $A$, we can note it as : $A \Delta B \equiv (A \cap \bar{B}) \cup (\bar{A} \cap B)$.
-\end{definition}
-
-Mathematically :\\
-let w be a word over an alphabet \alphabet{}, \automaton{} an automaton and \langU{} the language to be learnt, then
-\[ member(w) =
-  \begin{cases}
-    \text{True}  & \quad \text{if } w \in U \\
-    \text{False} & \quad \text{otherwise}
-  \end{cases}
-\]
-\[ equiv(\automatonN{}) =
-  \begin{cases}
-    \text{True} & \quad \text{if } \automatonN{} \text{ recognizes } U           \\
-    w           & \quad \text{otherwise, where } w \in U \Delta L(\automatonN{})
-  \end{cases}
-\]
-
+The \textit{L*} algorithm, described by Dana Angluin in \cite{LPaper}, is a learning algorithm whose goal is to build a \textit{mDFA} recognizing an unknown language $\U$ thanks to membership and equivalence queries. This operation is done with some important bricks that should be considered taken into account to let the algorithm work. Some of these bricks will also be reused in by the \textit{NL*} algorithm.
 
 \subsection{The observation table (O.T.)}
-Every time an answer is received by the learner, it is important to store it somewhere to be able to increase the overall knowledge. In fact, every piece of information obtained from the teacher is immediatly added to the observation table (\textit{O.T.}).
+In previous section, we have talked about how \textit{Learner} and \textit{Teacher} interact, but it is also very important that every time the \textit{Learner} received an answer is stored in memory to construct little by little our overall knowledge to find, a day, the right automaton $\A$. To do this every piece of information obtained is immediatly added to a particular table called the observation table (noted \OT).
 
 \begin{definition}[Observation Table]
-  The observation table is the memory of the learner, composed by two non-empty sets of words, $S$ and $E$, and a dictionnary $T$.
+  The observation table is the memory of the \textit{Learner} where rows are indexed by the elements of a non-empty set of words called $S$, columns by elements of another non-empty set of words called $E$. We also have a mapping $T : \omega \rightarrow \{0, 1\}$ and the cell $c_{i,j}$ of the \OT is given by $T(S[i] \cdot E[j])$\footnote{$S[i]$ (resp. $E[j]$) indicates the $i^{th}$ (resp $j^{th}$) element of $S$ (resp. $E$). Even if sets have no order, we consider for simplicity that the $i^{th} $ element of the set is the $i^{th}$ element added in it}.
 \end{definition}
-
-We define also $SA = S \cdot \Sigma$ made by the concatenation of words of S and every symbol of \alphabet{} that are not in $S$, mathematically $\forall s \in S, \: \forall c \in \Sigma, \: SA = \{s \cdot c \text{ such that } s \cdot c \notin S \} $, and $S_{ext} = S \cup SA$ containing the union of $S$ and $SA$.
-\begin{example}
-  If $S = \{\varepsilon, a\}$ and $\Sigma = \{a, b\}$ then $S_{ext} = \{\varepsilon, a, b, aa, ab\}$.
-\end{example}
-
-The \textit{O.T.} can be seen as a matrix where rows are indexed by $S_{ext}$ and columns are indexed by $E$. The dictionnary $T$ finally stores for every cell $c_{i,j}$ if the concatenation of the $i^{th}$ word of $S_{ext}$ and the $j^{th}$ word of $E$ belongs to $U$. We split this matrix in the \upperPart{} with the rows of $S$ and the \lowerPart{} with rows of $SA$.
-
 
 $S$ (resp. $E$) has an important property, that will be discussed next, since it is \textit{prefix-closed} (resp. \textit{suffix-closed}).
 
-\begin{definition}
-  A non-empty set of words $W$ is \textit{prefix-closed} (resp. \textit{suffix-closed}) if it contains every prefix (resp. \textit{suffix}) of every word of it. And, to garantee this property $W$ should of course contain $\varepsilon$.
+\begin{definition}[Prefix (resp. Suffix)]
+  A prefix (resp. suffix) of a word $\omega$, noted $Pref(\omega)$ (resp. $Suff(\omega)$), is a word $\omega_1 \in \Sigma^*$ such that $\exists \omega_2 \in \Sigma^*$ where $\omega_1 \cdot \omega_2 = \omega$ (resp. $\omega_2 \cdot \omega_1 = \omega$).
 \end{definition}
+
+\begin{definition}[Prefix-closedness (resp. Suffix-closedness)]
+  A non-empty set $S$ of words is \textit{prefix-closed} if
+  \[\forall \omega \in S, \forall Pref(\omega), Pref(\omega) \in S\]
+  and suffix-closed if
+  \[\forall \omega \in S, \forall Suff(\omega), Suff(\omega) \in S\]
+  In both cases, $S$ should contain $\E$.
+\end{definition}
+
+
+The \OT table must be completed by all word on the form $\omega \cdot \alpha$ for $\forall \omega \in S$ and $\forall \alpha \in \Sigma$ if $\omega \cdot \alpha \notin S$. This set of new words are added to the rows of the \OT and stored in a set called $SA$.
+\[SA = \{\forall s \in S, \forall c \in \Sigma : s \cdot c \mid s \cdot c \notin S \} \]
+We also note $S_{ext}$ to be $S_{ext} = S \cup SA$.
+
+\begin{example}
+  If $S = \{\E, a, aa\}$ and $\Sigma = \{a, b\}$ then
+  \begin{align*}
+    SA      & = \left\{ b, ab, aaa, aab \right\}\footnote{$b$ is in $SA$ since it is the concatenation of $\E \in S$ and $b \in Sigma$}
+    \\
+    S_{ext} & = \left\{\E, a, aa, b, ab, aaa, aab\right\}
+  \end{align*}
+\end{example}
+
+To make the \OT more clear, we will divide it into two parts : the \upperPart containing rows indexed by elements of $S$ and the \lowerPart containing rows indexed by element of $SA$.
+
+\begin{notation}[row function]
+  For every $\omega$ in $S_{ext}$, $row(\omega)$ is the bit-vector made buy the concatenation of all $T(\omega \cdot \omega')$ for $\forall \omega' \in E$.
+\end{notation}
+
+\begin{remark}
+  Adding a word $\omega$ in $S_{ext}$ where $\omega$ is at position $i$ means that every cell $c_{i,j}$ for $\forall 0 \leq j \leq |E|$\footnote{$|E|$ is the cardinal of E, that is the number of element of this set}, we send a membership query to the Teacher and we store the answer in the corresponding cell of the \OT
+\end{remark}
 
 \subsection{Closedness and Consistence in L*}
 
-In L* an \textit{O.T.} should be at every time closed and consistence.
+In both algorithms, the \OT should respect the closedness and the consistence properties but the definition of them varies from the two algorithms. In this section we are going to define these properties for the L* algorithm.
 
 \begin{definition}[Closedness]
-  The \textit{O.T.} is closed if every row of the \lowerPart{} is also present in the \upperPart{}.
+  The \OT is closed if every row of the \lowerPart is also present in the \upperPart.
+  \[\forall \omega \in SA, \exists \omega' \in S : row(\omega) = row(\omega')\]
 \end{definition}
 
-If the table is not closed then there exists an element $s$ of $SA$ where $row(s)$ is not in the \upperPart{}. To restore the closedness of the observation table, $s$ will be promoted to $S$ and $\forall x \in \Sigma \text{ if } s \cdot x \notin SA \text{ then } s \cdot x \text{ is added to } SA$.
+\begin{definition}[Row Similarity] Two row $r_1, r_2$ are similar if they have same corresponding bit-vecotor.
+\end{definition}
+
+\begin{definition}[Row Promotion]
+  \label{def:rowProm}
+  Given an word $\omega \in SA$ at position, then $row(\omega)$, or equivalently $\omega$ is promoted when $\omega$ is moved from $SA$ to $S$. After a promotion, the \OT must be completed again.
+\end{definition}
 
 \begin{lemma}
   \label{lemmaPromoteLinePrefixClosedness}
-  If we move an element from $SA$ to $S$ then $S$ will remain \textit{prefix-closed}.
+  If we move an element from $SA$ to $S$ then $S$ remains \textit{prefix-closed}.
 \end{lemma}
 
 \begin{proof}
-  Every element of $SA$ is the concatenation of an element in $S$ and a letter of $\Sigma$. We have that $Pref(w) = Pref(w' \cdot a) = \{w' \cdot a\} \cup Pref(w')$ and every $Pref(w')$ is already in $S$ since $S$ is \textit{prefix-closed}. Therefore adding \word{} won't inpact the \textit{prefix-closedness} of $S$.
+  Every element $\omega$ of $SA$ is the concatenation of an element $\omega' \in S$ and a letter $\alpha \in \Sigma$. We have that $Pref(\omega) = Pref(\omega' \cdot a) = \{\omega' \cdot a\} \cup Pref(\omega')$. By definition, $S$ is prefix-closed, so if $\omega \in S$ every $Pref(\omega')$ is already in $S$. Therefore adding $\omega$ in $S$ will not impact the prefix-closedness of $S$.
 \end{proof}
 
+If the table is not closed then $\exists \omega \in SA$ such that $\nexists \omega' \in S : row(\omega) = row(\omega')$. To make the \OT closed we promote $row(\omega)$ and then, as said in \cref{def:rowProm}, we complete again the \OT
+
 \begin{definition}[Consistence]
-  The \textit{O.T.} is consistent if for every $s_1,s_2 \in S$ and $row(s_1) = row(s_2)$, in this case $s_1,s_2$ are colled similar rows, then for every $x \in \Sigma$, $row(s_1 \cdot x) = row(s_2 \cdot x)$.
+  The \OT is consistent if for every $\omega_1,\omega_2 \in S$, if $row(\omega_1) = row(\omega_2)$ then for every $\alpha \in \Sigma$, $row(\omega_1 \cdot \alpha) = row(\omega_2 \cdot \alpha)$.
+  \[\forall \omega_1,\omega_2 \in S, \forall \alpha \in \Sigma :  row(\omega_1) = row(\omega_2) \rightarrow row(\omega_1 \cdot \alpha) = row(\omega_2 \cdot \alpha)\]
 \end{definition}
 
-If the table is not consistent, we have $row(w_1) = row(w_2)$ and $row(w_1 \cdot x) \neq row(w_2 \cdot x)$ for some $x \in \Sigma \text{ and some }w_1, w_2 \in S$. We can restore the consistence by making $w_1$ and $w_2$ no more similar: we find an $e \in E$ such that $T(w_1 \cdot x \cdot e) \neq T(w_2 \cdot x \cdot e)$ and we add $x \cdot e$ in $E$. In this way, the new bit of $row(w_1)$ is different from the new bit of $row(w_2)$ therefore the two rows are no more similar.
+If the table is not consistent, there exists $row(\omega_1) = row(\omega_2)$ and $row(\omega_1 \cdot \alpha) \neq row(\omega_2 \cdot \alpha)$ for some $\alpha \in \Sigma \text{ and some }\omega_1, \omega_2 \in S$. We can restore the consistence property by making $\omega_1$ and $\omega_2$ no more similar. To do this, we can add a new column in the \OT in such a way that the new bit $b_1$ added in $row(\omega_1)$ is different from the new bit $b_2$ added in $row(\omega_2)$. To be sure to find the right column to add, we look for an $e \in E$ such that $T(\omega_1 \cdot \alpha \cdot e) \neq T(\omega_2 \cdot \alpha \cdot e)$ and we add $\alpha \cdot e$ in $E$. In this way we are sure that $b_1 = T(\omega_1 \cdot \alpha \cdot e)$ will be different from $b_2 = T(\omega_2 \cdot \alpha \cdot e)$. Is in this moment that we can understand utility of the additianal set $SA$. When we look for $T(\omega_1 \cdot \alpha \cdot e)$ (similarly for the case of $\omega_2$), we are guaranteed that $\omega_1 \cdot \alpha \cdot e$ exists in $T$ since, $\omega_1$ being in $S$, we are sure that $\omega_1' = \omega_1 \cdot \alpha \in S_{ext}$ (either $\omega_1' \in S$ or $\omega_1' \in SA$). So $T(\omega_1 \cdot \alpha \cdot e) = T(\omega_1' \cdot e)$ exists.
 
 \begin{lemma}
-  If we move an element of the type $x \cdot e$ where $x \in Sigma \text{ and } e \in E$ then $E$ remains \textit{suffix-closed}.
+  If we add a word $\omega = \alpha \cdot e$ where $\alpha \in \Sigma \text{ and } e \in E$ then $E$ remains \textit{suffix-closed}.
 \end{lemma}
 
 The proof is analogue to the proof of \cref{lemmaPromoteLinePrefixClosedness}.
@@ -85,13 +95,13 @@ When the observation table is closed and consistent, the Learner can send to Tea
 
 The conjecture is made on the form of an automaton where :
 \begin{itemize}
-  \item $Q = \{row(s), \forall s \in S\}$;
-  \item $\delta(row(s), x) = row(s \cdot x), \forall s \in S, x \in \Sigma\}$;
-  \item $q_I = row(\varepsilon)$;
-  \item $F = \{row(s) | s \in S \text{ and } T(s) = 1 \}$.
+  \item $Q = \{row(\omega), \forall \omega \in S\}$;
+  \item $\delta(row(\omega), \alpha) = \{row(\omega \cdot \alpha), \forall \omega \in S, \alpha \in \Sigma\}$\footnote{Again we know that $\omega' = \omega\cdot\alpha$ exists in $S_{ext}$ since at wrost $\omega'$ is in $SA$, the table being complete };
+  \item $q_I = row(\E)$;
+  \item $F = \{row(\omega) \mid \omega \in S \text{ and } T(\omega) = 1 \}$.
 \end{itemize}
 
-After the sending of the conjecture, if the Teacher answers \textit{Yes} the algorithm stops, otherwise a counter-exemple $c$ is provided. $c$ is added to the $S$ set and if needed $S$ is completed to reamins prefix-closed and for $\forall x \in \Sigma, \text{ if } c \cdot x \notin S_{ext}  \text{ then } SA = SA \cup \{c \cdot x\}$.
+After the sending of the conjecture, if the Teacher answers \textit{Yes} the algorithm stops, otherwise a counter-exemple $\omega$ is provided. $\omega$ and all of its prefixes are to $S$ and again the \OT is completed.
 
 \begin{lemma}
   \label{lemma:L_trans_from_QI}
@@ -101,11 +111,11 @@ After the sending of the conjecture, if the Teacher answers \textit{Yes} the alg
 \begin{proof}
   We proove this by induction.\\
   Let's take a word $w$ over $S_{ext}$ and let $q_I$ be the initial state. \\
-  If $length(w) = 0$, then $\delta(q_I, \varepsilon) = \delta(row(\varepsilon), \varepsilon) =  row(\varepsilon \cdot \varepsilon) = row(\varepsilon) = q_I$ that is true by definition.\\
+  If $length(w) = 0$, then $\delta(q_I, \E) = \delta(row(\E), \E) =  row(\E \cdot \E) = row(\E) = q_I$ that is true by definition.\\
   Let's suppose this property true for every word $w_n \in S_{ext}$ of length $n$, we want to proove that $\delta(q_I, w_{n+1}) = row(w_{n+1})$ for a word $w \in S_{ext}$ of length $n+1$.\\
   Let $w_{n+1}$ be a word of length $n+1$ and let $w = w_n \cdot x$ where $x \in \Sigma$ and $w_n$ is the prefix of $w_{n+1}$ with length $n$. Since $S_{ext}$ is prefix closed, then $w_n$ should exists.\\
   We have $\delta(q_I, w_{n+1}) = \delta(q_I, w_n \cdot x) = \delta(\delta(q_I, w_n), x)$. By the induction hypothesis, $\delta(q_I, w_n)$ exists since $length(w_n) = n$ and is equal to $row(w_n)$, therefore $\delta(\delta(q_I, w_n), x) = \delta(row(w_n), x)$. \\
-  The \textit{O.T.} is closed so $\exists s \in S$ such that $row(w_n) = row(s)$ and so $\delta(row(w_n), x) = \delta(row(s), x)$.\\
+  The \OT is closed so $\exists s \in S$ such that $row(w_n) = row(s)$ and so $\delta(row(w_n), x) = \delta(row(s), x)$.\\
   By definition of the transition function, $\delta(row(s), x) = row(s \cdot x)$ and by construction of the $O.T$, for every $s \in S$ there exists an element in $S_{ext}$ equals to the concatenation of this word and a letter of $\Sigma$.\\
   We can conclude that $\delta(q_I, w_{n+1}) = \delta(row(s), x) = row(s \cdot x)$, and, again, since the table is closed, $\exists s' \in S$ such that $row(s \cdot x) = row(s')$ and since every row of the upper-part is linked to a state $q_i$ of \automaton{} and this state correspond the ending state of the run of the word $w_{n+1}$.
 \end{proof}
@@ -117,7 +127,7 @@ After the sending of the conjecture, if the Teacher answers \textit{Yes} the alg
 
 \begin{proof}
   As previous lemma, we proove this by induction on the length of the word $e$.\\
-  If $length(e) = 0$, then $e = \varepsilon$ and by definition, $row(s \cdot \varepsilon) = row(s)$ is acceptant if $T(s) = 1$.\\
+  If $length(e) = 0$, then $e = \E$ and by definition, $row(s \cdot \E) = row(s)$ is acceptant if $T(s) = 1$.\\
   Let's suppose this property true for every word $e_n$ of length $n$.\\
   Let $e_{n+1} \in E$ be a word of length $n + 1$, $e_n \in E$ the suffix of $e_{n+1}$ of length $n - 1$ and $x \in \Sigma$ such that $x \cdot e_n = e_{n+1}$. Since $E$ is suffix close, we know that $e_n$ should exist in $E$.\\
   We have that $\delta(q_I, s \cdot e_{n+1}) = \delta(q_I, s \cdot x \cdot e_n) = \delta(\delta(q_I, s), x \cdot e_n) = \delta(row(s), x \cdot e_n) = \delta(\delta(row(s), x), e_n)$.\\
@@ -154,7 +164,7 @@ The algorithm terminates only if the Teacher answer $Yes$ to a \textit{equivalen
 
 We know, by definition, that the language $U$ known by the teacher is regular. It means that the number $n$ of its residuals is finite implying that the number of states of the minimum DFA recognizing it and the number of different rows in the $O.T$ is finite (and equal to $n$).
 
-If in a certain moment we have $n' < n$ different rows and the table is closed and consistent, the Learner make its conjecture and sends it to the Teacher. This conjecture cannot be the good one, and the counter-example provided will have an associated row similar to a row in $S$ but which makes the \textit{O.T.} no more consistent. The Learner repeats the algorithm, and every time the table is not consistent, the $n'$ will increase of one. When $n' = n$ the conjecture will have $n$ states, the same of the minimum DFA, and therefore since a minimum DFA is unique, the teacher will answer $Yes$ to the last conjecture allowing the algorithm to stop.
+If in a certain moment we have $n' < n$ different rows and the table is closed and consistent, the Learner make its conjecture and sends it to the Teacher. This conjecture cannot be the good one, and the counter-example provided will have an associated row similar to a row in $S$ but which makes the \OT no more consistent. The Learner repeats the algorithm, and every time the table is not consistent, the $n'$ will increase of one. When $n' = n$ the conjecture will have $n$ states, the same of the minimum DFA, and therefore since a minimum DFA is unique, the teacher will answer $Yes$ to the last conjecture allowing the algorithm to stop.
 
 \subsubsection{Time complexity}
 Let suppose that the \cref{L_star_algo} takes constant time to check if the table is consistent and closed and to create an automaton from the $O.T$ and pose $A$ the minimum DFA recognizing $U$.

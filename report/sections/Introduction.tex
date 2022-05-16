@@ -1,30 +1,32 @@
 \section{Introduction}
 
-\subsection{Learning from Teacher}
+% \subsection{Learning from Teacher}
 
 % Imagine you are in a foreign country and you want to take a beverage from a vending machine using an alphabet you don't know. The first thing you do is trying to make some attemps to find the right procedure to select the product you want. At the end thanks to the answers given by the vending machine you will be able to understand the right path of actions to follow in order to get your beverage.
 
 % One of the goals of computer science is to create clever algorithms able to adapt theirshelves to not known environment. We can say that humans have the natural capacity to increase their knowledge thanks to intuition and memory and education is a good example of how information is passed from teachers to students.
 
-Humans have the ability to learn. This is the ability to understand theorical informations or practical behaviour to different situation. This phase of understanding is usually possible by performing some actions and then registering the consequence.
+Humans have the ability to learn. This is the ability to understand theorical informations or practical behaviour from different situations. This phase of learning is usually possible by performing some actions and then registering the consequence.
 
-A classic example may be the \textit{vending machine} in a foreign country. If you want to get a cup of coffee from that machine and you don't know the language suggesting you how to communicate with it, the normal way to get your cup is to press keys in some order and every time you get an answer from the machine, you can understand if the sequence of action is correct and if not repeat the procedure from the begining, without remaking the mistakes you make before.
+A classic example may be the \textit{vending machine} in a foreign country. If you want to get a cup of coffee from that machine and you don't know its language, the normal way to get your cup is to press the keys randomly and every time you get an answer from the machine, you can understand if the sequence of actions you permformed is correct. If not, you repeat the procedure from the begining, without remaking the mistakes you made before.
 
-Another example is a game you don't know the rules and lettle by little you understand it with some attempt until the moment you understand how to play it.
+Another example is a game you don't know the rules and little by little you understand it thanks to some attempt until the moment you know how to play it.
 
-In any case we see this interaction between a \textit{Learner} and a \textit{Teacher} and it is interesting to recreate this behaviour in our computers as a kind of a basic learning system. The goal of this report is to
+In any case we see this interaction between a \textit{Learner} and an entity (the vending machine or the the gmae) called the \textit{Teacher}. It is interesting to replicate the behaviour of the \textit{Learner} in our computers to simulate the learning process from the \textit{Teacher}. The goal of this report is to focus on two main algorithms that have been realized to understand regular languages in polynomial time (I'm referring in particular to the Dana Angluin's paper \cite{LPaper} and the Benedikt Bollig \textit{et al.}'s paper \cite{NLPaper}).
+
+After some introduction about how these algorithms work, I will talk about my implementation of them and some results that I was able to get in term of their performances.
 
 % TODO --------------------------------------------------------
 
-It is interesting to simulate this precept and recreate the \textit{education} system thanks to two different entities, a \learner{} willing to learn an unknown language \textit{L} and a \teacher{}, the owner of \textit{L}.
-% create a system able to understand an unknown language performing actions, registering their consequence until it has enough information to say that the language is now learnt. This process can be represented by a \learner{}, the system willing to learn the new language, and a \teacher{}, the oracle containing the unknwon language which will answer about the validity or not of the received question.
+% It is interesting to simulate this precept and recreate the \textit{education} system thanks to two different entities, a \learner{} willing to learn an unknown language \textit{L} and a \teacher{}, the owner of \textit{L}.
+% % create a system able to understand an unknown language performing actions, registering their consequence until it has enough information to say that the language is now learnt. This process can be represented by a \learner{}, the system willing to learn the new language, and a \teacher{}, the oracle containing the unknwon language which will answer about the validity or not of the received question.
 
-The interactions between \learner{} and \teacher{} are various, for instance, \teacher{} may give informations to the \learner{} without being solliceted, or can provide not relible or useless informations and so on and mutually the \learner{} may not make well-formed questions or may not pay attention to the received answers.
+% The interactions between \learner{} and \teacher{} are various, for instance, \teacher{} may give informations to the \learner{} without being solliceted, or can provide not relible or useless informations and so on and mutually the \learner{} may not make well-formed questions or may not pay attention to the received answers.
 
-In this project, we are going to reduce the uncountable ways of communication between these two entities and allow only two kind of interactions : membership queries where the \learner{} asks if a sentence belongs to the unknown language and the \teacher{} can answer \textit{yes} or \textit{no} and
-equivalence queries where the \learner{} sends to the teacher the language lerant (in the form of an automaton) and the \teacher{} answers either \textit{yes} if if recognizes the good language, otherwise provides a counter-examplele.
+% In this project, we are going to reduce the uncountable ways of communication between these two entities and allow only two kind of interactions : membership queries where the \learner{} asks if a sentence belongs to the unknown language and the \teacher{} can answer \textit{yes} or \textit{no} and
+% equivalence queries where the \learner{} sends to the teacher the language lerant (in the form of an automaton) and the \teacher{} answers either \textit{yes} if if recognizes the good language, otherwise provides a counter-examplele.
 
-\subsection{Structure of this report}
-In this report we are going to illustrate briefly the concept of \textit{Finate State Automata} defining "regular languages".
+% % \subsection{Structure of this report}
+% % In this report we are going to illustrate briefly the concept of \textit{Finate State Automata} defining "regular languages".
 
-Then we are going to introduce the L* \cite{LPaper} and the NL* \cite{NLPaper} algorithms and finally we compare them in term of performances and quality of results.
+% % Then we are going to introduce the L* \cite{LPaper} and the NL* \cite{NLPaper} algorithms and finally we compare them in term of performances and quality of results.

@@ -2,12 +2,12 @@
 \begin{enumerate}
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c}
-            $T_1$                       & $\varepsilon$ \\
+            $T_1$              & $\E$ \\
             \hline\hline
-            *$\varepsilon$\footnotemark & 1             \\
+            *$\E$\footnotemark & 1    \\
             \hline\hline
-            *b                          & 1             \\
-            *a                          & 0             \\
+            *b                 & 1    \\
+            *a                 & 0    \\
           \end{tabular}
         \end{minipage} \footnotetext{Prime rows are indicated by a leading asterisk} \quad
         \begin{minipage}{0.6\textwidth}
@@ -16,30 +16,30 @@
 
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c}
-            $T_2$          & $\varepsilon$ \\
+            $T_2$ & $\E$ \\
             \hline\hline
-            *$\varepsilon$ & 1             \\
-            *a             & 0             \\
+            *$\E$ & 1    \\
+            *a    & 0    \\
             \hline\hline
-            *b             & 1             \\
-            *ab            & 0             \\
-            *aa            & 1             \\
+            *b    & 1    \\
+            *ab   & 0    \\
+            *aa   & 1    \\
           \end{tabular}
         \end{minipage}\quad
         \begin{minipage}{0.6\textwidth}
-          $T_2$ is not consistent : $row(a) \sqsubseteq row(\varepsilon)$ but $row(a \cdot a) \not\sqsubseteq row(\varepsilon \cdot a)$. Column $a$ is going to be added beacause $T(a \cdot a \cdot \varepsilon) \neq row(\varepsilon \cdot a \cdot \varepsilon)$.
+          $T_2$ is not consistent : $row(a) \sqsubseteq row(\E)$ but $row(a \cdot a) \not\sqsubseteq row(\E \cdot a)$. Column $a$ is going to be added beacause $T(a \cdot a \cdot \E) \neq row(\E \cdot a \cdot \E)$.
         \end{minipage}
 
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c |c}
-            $T_3$          & $\varepsilon$ & a \\
+            $T_3$ & $\E$ & a \\
             \hline\hline
-            *$\varepsilon$ & 1             & 0 \\
-            *a             & 0             & 1 \\
+            *$\E$ & 1    & 0 \\
+            *a    & 0    & 1 \\
             \hline\hline
-            *b             & 1             & 1 \\
-            *ab            & 0             & 0 \\
-            *aa            & 1             & 1 \\
+            *b    & 1    & 1 \\
+            *ab   & 0    & 0 \\
+            *aa   & 1    & 1 \\
           \end{tabular}
         \end{minipage}\quad
         \begin{minipage}{0.6\textwidth}
@@ -48,34 +48,34 @@
 
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c |c}
-            $T_4$          & $\varepsilon$ & a \\
+            $T_4$ & $\E$ & a \\
             \hline\hline
-            *$\varepsilon$ & 1             & 0 \\
-            *a             & 0             & 1 \\
-            *ab            & 0             & 0 \\
+            *$\E$ & 1    & 0 \\
+            *a    & 0    & 1 \\
+            *ab   & 0    & 0 \\
             \hline\hline
-            b              & 1             & 1 \\
-            aa             & 1             & 1 \\
-            abb            & 1             & 1 \\
-            *aba           & 0             & 0 \\
+            b     & 1    & 1 \\
+            aa    & 1    & 1 \\
+            abb   & 1    & 1 \\
+            *aba  & 0    & 0 \\
           \end{tabular}
         \end{minipage}\quad
         \begin{minipage}{0.6\textwidth}
-          $T_4$ is not consistent : $row(ab) \sqsubseteq row(a)$ but $row(ab \cdot b) \not\sqsubseteq row(a \cdot b)$. Column $b$ is going to be added beacause $T(ab \cdot b \cdot \varepsilon) \neq row(a \cdot b \cdot \varepsilon)$.
+          $T_4$ is not consistent : $row(ab) \sqsubseteq row(a)$ but $row(ab \cdot b) \not\sqsubseteq row(a \cdot b)$. Column $b$ is going to be added beacause $T(ab \cdot b \cdot \E) \neq row(a \cdot b \cdot \E)$.
         \end{minipage}
 
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c |c|c}
-            $T_5$          & $\varepsilon$ & a & b \\
+            $T_5$ & $\E$ & a & b \\
             \hline\hline
-            *$\varepsilon$ & 1             & 0 & 1 \\
-            *a             & 0             & 1 & 0 \\
-            *ab            & 0             & 0 & 1 \\
+            *$\E$ & 1    & 0 & 1 \\
+            *a    & 0    & 1 & 0 \\
+            *ab   & 0    & 0 & 1 \\
             \hline\hline
-            b              & 1             & 1 & 1 \\
-            aa             & 1             & 1 & 1 \\
-            abb            & 1             & 1 & 1 \\
-            *aba           & 0             & 0 & 0 \\
+            b     & 1    & 1 & 1 \\
+            aa    & 1    & 1 & 1 \\
+            abb   & 1    & 1 & 1 \\
+            *aba  & 0    & 0 & 0 \\
           \end{tabular}
         \end{minipage}\quad
         \begin{minipage}{0.6\textwidth}
@@ -85,18 +85,18 @@
 
   \item \begin{minipage}{0.3\textwidth}
           \begin{tabular}{c||c |c|c}
-            $T_6$          & $\varepsilon$ & a & b \\
+            $T_6$ & $\E$ & a & b \\
             \hline\hline
-            *$\varepsilon$ & 1             & 0 & 1 \\
-            *a             & 0             & 1 & 0 \\
-            *ab            & 0             & 0 & 1 \\
-            *aba           & 0             & 0 & 0 \\
+            *$\E$ & 1    & 0 & 1 \\
+            *a    & 0    & 1 & 0 \\
+            *ab   & 0    & 0 & 1 \\
+            *aba  & 0    & 0 & 0 \\
             \hline\hline
-            b              & 1             & 1 & 1 \\
-            aa             & 1             & 1 & 1 \\
-            abb            & 1             & 1 & 1 \\
-            *abab          & 0             & 0 & 0 \\
-            *abaa          & 0             & 0 & 0 \\
+            b     & 1    & 1 & 1 \\
+            aa    & 1    & 1 & 1 \\
+            abb   & 1    & 1 & 1 \\
+            *abab & 0    & 0 & 0 \\
+            *abaa & 0    & 0 & 0 \\
           \end{tabular}
         \end{minipage}\quad
         \begin{minipage}{0.6\textwidth}
@@ -111,12 +111,12 @@
           Construction of this automaton :
           \begin{enumerate}
             \item $Q = {101,010,001,000}$ which are the Prime rows in $S$;
-            \item $Q_I = {101,001,000}$ which are all the rows that are covered by $row(\varepsilon)$;
-            \item $F = {101}$ which is the only prime row having a $1$ in the column of $\varepsilon$;
-            \item Transitions are more complicated to analyze, I will only describe those starting from the state $101$. We have $row(\varepsilon) = 101$ and we have to calculate the transition when reading :
+            \item $Q_I = {101,001,000}$ which are all the rows that are covered by $row(\E)$;
+            \item $F = {101}$ which is the only prime row having a $1$ in the column of $\E$;
+            \item Transitions are more complicated to analyze, I will only describe those starting from the state $101$. We have $row(\E) = 101$ and we have to calculate the transition when reading :
                   \begin{enumerate}
-                    \item $a \rightarrow row(\varepsilon \cdot a) = 010$ and the set of rows that are covered by $010$ is ${010, 000}$, so we draw two transitions labelled with $a$ from $101$ to $010$ and to $000$;
-                    \item $b \rightarrow row(\varepsilon \cdot b) = 111$ and the set of rows that are covered by $111$ is ${010, 000, 101, 001}$, so we draw four transitions labelled with $a$ from $101$ to $010$, $000$, $101$ and $001$.
+                    \item $a \rightarrow row(\E \cdot a) = 010$ and the set of rows that are covered by $010$ is ${010, 000}$, so we draw two transitions labelled with $a$ from $101$ to $010$ and to $000$;
+                    \item $b \rightarrow row(\E \cdot b) = 111$ and the set of rows that are covered by $111$ is ${010, 000, 101, 001}$, so we draw four transitions labelled with $a$ from $101$ to $010$, $000$, $101$ and $001$.
                   \end{enumerate}
           \end{enumerate}
           Moreover, this automaton recognizes precicly the language proposed by the Teacher, so the algorithm can stop.

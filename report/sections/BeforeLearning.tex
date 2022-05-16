@@ -1,0 +1,30 @@
+\section{Before Learning}
+The two algorithms proposed by Dana Angluin and Benedikt Bollig \textit{et al} are called respectively \textit{L*} and \textit{NL*}. Their goal is to understand a regular an unknown language $\U$ and output a conjecture which, when accepted, will be an automaton $\A$ where $\LA = \U$.
+
+Both algorithms works on the idea that a \textit{Learner} has to interact with a \textit{Teacher} which knwos $\U$ and the communications are divided into two kinds of queries.
+
+\begin{definition}[Membership query]
+  A \textit{membership query} is a question from the \textit{Learner} to the \textit{Teacher} where the \textit{Learner} wants to know if a word $\omega$ belongs to $\U$.
+\end{definition}
+
+\begin{definition}[Equivalence query]
+  An \textit{equivalence query} is a conjecutre is an automaton $\A$ sent to the \textit{Teacher} which accepts as answer \textit{Yes} if $\LA = \U$ else a word $\omega$ which is in $\U$ but not in $\LA$ or vice versa. We call $\omega$ a \textit{counter-example}.
+\end{definition}
+
+We also note a counter-example as a word $\omega$ belonging to the simmetrical difference between ($\Delta$) $\LA$ and $\U$.
+\[\LA \Delta \U \equiv (\LA \cap \overline{\U}) \cup (\overline{\LA} \cap \U)\]
+
+Mathematically :
+\begin{align*}
+  member(\omega) & =
+  \begin{cases}
+    \text{True}  & \quad \text{if } \omega \in \U \\
+    \text{False} & \quad \text{otherwise}
+  \end{cases}
+  \\
+  equiv(\A)      & =
+  \begin{cases}
+    \text{Yes}               & \quad \text{if } \LA = \U \\
+    \omega \in \U \Delta \LA & \quad \text{otherwise}
+  \end{cases}
+\end{align*}

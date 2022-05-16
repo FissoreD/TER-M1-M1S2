@@ -83,6 +83,9 @@ sorting=ynt
 \newtheorem{notation}{Notation}
 \newtheorem{lemma}{Lemma}
 
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
 \graphicspath{img/}
 
 \makeatletter         

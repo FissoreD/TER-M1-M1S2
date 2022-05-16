@@ -1,128 +1,170 @@
-\section{Finate State Automaton}
+\section{Regular Languages and Finite State Automata}
 
-\subsection{Description}
-An automaton \automaton{} is a computing device used in abstract computer science to understand a regular language \lang{} which can be seen as a set of words formed with the concatenation of zero or more letters \letter{} belonging to an alphabet, and a finite set of symbols, noted \alphabet{}.
+% \subsection{Description}
+An automaton \automaton{} is a computing device used in abstract computer science to understand regular languages seen as a set of words formed with the concatenation of zero or more letters \letter{} belonging to an alphabet noted \alphabet{}. We note $\Sigma^*$ as the set of all words over the alphabet $\Sigma$, including $\E$ : the word of length 0.
 
 \begin{theorem}[Kleene's theorem]
-    A language is called regular if it can be represented by a regular expression, a finite state automaton or a context free grammar.
+  \label{th:kleene}
+  A language is called regular if it can be represented by a regular expression or equivalently by a finite state automaton.
 \end{theorem}
 
-Here are some examples of regular langauges and their corresponting automata are shown in \cref{simple_automata}.
-\begin{example}{Epsilon language}
-    \label{example:lang_eps}
-    $L = \{\varepsilon\}$ is the language with only a word of length zero.
-\end{example}
+A recursive definition of a regular language can be expressed by the following grammar :
+\[ L = \varnothing \mid \E \mid \alpha \mid L \cup L \mid \overline{L} \mid L \cdot L \mid L^* \]
+where :
+\begin{itemize}
+  \item $\varnothing$ is the empty language;
+  \item $\E$ is the word of length 0;
+  \item $\alpha$ is a symbol belonging to the alphabet $\Sigma$;
+  \item $L_1 \cup L_2 = \{w \in \Sigma^* \mid w \in L_1 \vee w \in L_2\}$ ;
+  \item $L_1 \cdot L_2 = \{w \in \Sigma \mid \exists w_1 \in L_1, \exists w_2 \in L_2 \text{ and } w_1 \cdot w_2 = w\footnote{Note $ w_1 \cdot w_2$ is the concatenation of the word $w_1$ followed by the word $w_2$}\}$;
+  \item $\overline{L} = \{w \in \Sigma^* \mid w \notin L\}$;
+  \item To define $L^*$ let $V^0 = {\E}$, $V^1 = V$ and $V^{i+1} = V^i \cdot V$, then $L^* = \bigcup\limits_{i=0}^{\infty} L_{i}$.
+\end{itemize}
+
+% As said in \cref{th:kleene} every language can be represented by an automaton.
+
+% Here are some examples of regular langauges whose corresponding automata are shown in \cref{simple_automata}.
+% \begin{example}{Epsilon language}
+%     \label{example:lang_eps}
+%     $L = \{\E\}$ is the language with only a word of length zero.
+% \end{example}
+
+% \begin{example}
+%     \label{example:lang_ab_len2}
+%     $L = \{aa, ab, ba, bb\}$ is the language formed by all strings with all combinations of two characters on the alphabet $\Sigma = \{a, b\}$ with corresponding regular expression $(a+b)(a+b)$
+% \end{example}
+
+% \begin{example}
+%     \label{example:a_start}
+%     $L = \{\E, a, aa, ...\}$ is the language of words represented by the regular expression $a*$.
+% \end{example}
+
+% \begin{figure}[h]
+%     \centering
+%     \begin{subfigure}{0.45\textwidth}
+%         \centering
+%         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+%             \node[state,initial, accepting, initial text=] (q_I) {$q_I$};
+%         \end{tikzpicture}
+%         \caption{Automaton of \cref{example:lang_eps}}
+%     \end{subfigure}
+%     \begin{subfigure}{0.45\textwidth}
+%         \centering
+%         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+%             \node[state,initial text=, initial] (q_I) {$q_I$};
+%             \node[state] (q_1) [right=of q_I] {$q_1$};
+%             \node[state, accepting] (q_2) [right=of q_1] {$q_2$};
+%             \path[->]
+%             (q_I) edge  node {a,b} (q_1)
+%             (q_1) edge  node {a,b} (q_2);
+%         \end{tikzpicture}
+%         \caption{Automaton of \cref{example:lang_ab_len2}}
+%     \end{subfigure}
+%     \begin{subfigure}{0.45\textwidth}
+%         \centering
+%         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+%             \node[state,initial text=, initial] (q_I) {$q_I$};
+%             \node[state, accepting] (q_1) [right=of q_I] {$q_1$};
+%             \path[->]
+%             (q_I) edge  node {a} (q_1)
+%             (q_1) edge [loop above] node {a} ();
+%         \end{tikzpicture}
+%         \caption{Automaton of \cref{example:a_start}}
+%     \end{subfigure}
+%     \caption{Some simple automata}
+%     \label{simple_automata}
+% \end{figure}
+
+% In \cref{simple_automata} we see that a \textit{finite} automaton is composed by a finite set of states linked by labelled arrows called \textit{transitions}.
+
+% The set of states that are directly linked with a state \qi{} are called successor of \qi{} and noted $Succ(q_i)$, and the predecessors of \qi{}, noted $Pred(q_i)$, are those states having \qi{} has a successor. Moreover, if a state is pointed by an arrow with no predecessor, then it is an initial state and if a state is marked with a double cdotle then it is called an accepting state.
+
+% We say that a word \word{} is accepted by \automaton{} or belongs to \langA{}, the language recognized by \automaton{}, if, from an initial state we can join an accepting state by reading each letter of \word{}.
+
+\begin{definition}[Automaton]
+  An automaton \automaton{} is represented by a 5-tuple $\left\langle \Sigma, \mathcal{Q}, \delta, q_I, F\right\rangle $ where \alphabet{} is the alphabet, \states{} is the set of states composing the automaton, $\delta$ is the set of transition, \qzero{} $\in \statesN{}$ is the initial state and $F \subseteq \mathcal{Q}$ is the set of accepting states. A transition $\delta$ is a mapping $Q \times \Sigma \rightarrow Q$.
+\end{definition}
 
 \begin{example}
-    \label{example:lang_ab_len2}
-    $L = \{aa, ab, ba, bb\}$ is the language formed by all strings with all combinations of two characters on the alphabet $\Sigma = \{a, b\}$ with corresponding regular expression $(a+b)(a+b)$
+  A transition like $\delta(q_i, \alpha) = q_j$ means that we can move from state $q_i$ to state $q_j$ when reading symbol $\alpha$.
 \end{example}
 
-\begin{example}
-    \label{example:a_plus}
-    $L = \{a, aa, ...\}$ is the language of words represented by the regular expression $a^+$.
-\end{example}
+A state $q_i$ is called successor of another state $q_j$ if there exists $\delta(q_i, \alpha) = q_j$ for some $\alpha \in \Sigma$. If $q_j$ is successor of $q_i$ then $q_i$ is the predecessor of $q_j$.
 
-\begin{figure}[h]
-    \centering
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
-            \node[state,initial, accepting, initial text=] (q_I) {$q_I$};
-        \end{tikzpicture}
-        \caption{Automaton of \cref{example:lang_eps}}
-    \end{subfigure}
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
-            \node[state,initial text=, initial] (q_I) {$q_I$};
-            \node[state] (q_1) [right=of q_I] {$q_1$};
-            \node[state, accepting] (q_2) [right=of q_1] {$q_2$};
-            \path[->]
-            (q_I) edge  node {a,b} (q_1)
-            (q_1) edge  node {a,b} (q_2);
-        \end{tikzpicture}
-        \caption{Automaton of \cref{example:lang_ab_len2}}
-    \end{subfigure}
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
-            \node[state,initial text=, initial] (q_I) {$q_I$};
-            \node[state, accepting] (q_1) [right=of q_I] {$q_1$};
-            \path[->]
-            (q_I) edge  node {a} (q_1)
-            (q_1) edge [loop above] node {a} ();
-        \end{tikzpicture}
-        \caption{Automaton of \cref{example:a_plus}}
-    \end{subfigure}
-    \caption{Some simple automata}
-    \label{simple_automata}
-\end{figure}
-
-In \cref{simple_automata} we see that a \textit{finite} automaton is composed by a finite set of states linked by labelled arrows called \textit{transitions}.
-
-The set of states that are directly linked with a state \qi{} are called successor of \qi{} and noted $Succ(q_i)$, and the predecessors of \qi{}, noted $Pred(q_i)$, are those states having \qi{} has a successor. Moreover, if a state is pointed by an arrow with no predecessor, then it is an initial state and if a state is marked with a double cdotle then it is called an accepting state.
-
-We say that a word \word{} is accepted by \automaton{} or belongs to \langA{}, the language recognized by \automaton{}, if, from an initial state we can join an accepting state by reading each letter of \word{}.
-
-\begin{notation}
-    An automaton \automaton{} is usually represented by a 5-tuple $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ where \alphabet{} is the alphabet, \states{} is the set of states composing the automaton, \transition{} is the set of transition of \automaton{} \qzero{} $\in \statesN{}$ is the starting state and \qend{} is the set of accepting states in \states{}. A transition \transition{} is a triple $(q_i, \alpha, q_j)$ saying that it is possible to go to the state $q_j$ from the state $q_i$ when the symbol $\alpha$ is read.
-\end{notation}
+Following the construction of the automaton $\A$, and expecially focusing on the transition function of it, it is possible to classify $\A$ into two different classes.
 
 \begin{definition}[DFA and NFA]
-    If $\forall (q_i, \alpha, q_j) \in \transitionN{}, \nexists (q_i, \alpha, q_j') \in \transitionN{} \mid q_j \neq q_j'$ that is, if for every state $q_i \in \statesN{}$, there does not exist two different transitions from \qi{} with the same label, then the automaton is said to be \textit{deterministic} and noted \textit{DFA}, otherwise the automaton is called \textit{non deterministic} and noted \textit{NFA}.
+  If for every state $q_i \in \statesN{}$ and for every letter $\alpha \in \Sigma$ there exists one successor by $\alpha$ then the automaton is \textit{deterministic} and noted \textit{DFA}, otherwise the automaton is called \textit{non deterministic} and noted \textit{NFA}.
 \end{definition}
 
-DFAs have important properties since it is computationally "easy" to test if a word is accepted by \automaton{}. On the other hand a NFA can be exponentially more succint in term of number of states than a DFA, but checking the acceptance of a word in an NFA is in general more difficult task.
+We can define a \textit{DFA} also with a logic formula :
+\[\forall q_i \in \mathcal{Q}, \forall \alpha \in \Sigma \text{ if } \exists \delta_1, \delta_2 \in \delta \text{ such that } \delta_1(q_i, \alpha) = q_j' \vee \delta_2(q_i, \alpha) = q_j'' \rightarrow q_j' = q_j'' \]
+
+Since every regular language can be represented by an automaton, be it deterministic or not, it is also possible to apply interection, union and complemantion on automaton. The main problem is that complemantion can be ``easily'' done on \textit{DFA} but it becomes a really ``difficult'' task if we have a \textit{NFA}. The complematation of an \textit{NFA} $\A$ can only be done after having \textit{determinised}\footnote{The determinisation operation aims to transform an automaton $\A$ into an automaton $\A'$ where $\A'$ is deterministic} $\A$ which is a \textit{PSPACE-complete} problem and may ask exponential time.
+
+However \textit{NFA} has the big advantage that they can be exponentially smaller that the corresponding \textit{DFA} and this may be interresting expecially if we care about space resources.
+
+\begin{remark}
+  \textit{NFA} and \textit{DFA} have same expressiveness meaining that \[\bigcup NFA = \bigcup DFA = \bigcup RegularLanguages\]
+\end{remark}
 
 \begin{definition}[Minimal automaton]
-    An automaton \automaton{} is minimal if it is not possible to construct a smaller automaton $\automatonN{}'$ for the same language having less states than \automaton{}.
+  An automaton \automaton{} is minimal if it is not possible to construct a smaller automaton $\automatonN{}'$ for the same language having less states than \automaton{}.
 \end{definition}
 
+Moreover we say that a minimal \textit{DFA}, noted \textit{mDFA}, is unique, whereas minal \textit{NFA}, noted \textit{mNFA}, can be various.
+
+Finally we define regular expression with the following grammar :
+\[R = \omega \mid R + R \mid R \cot R \mid R^* \mid (R)\]
+where $\omega$ is a word belonging to $\Sigma^*$, the ``$+$'' symbol indicates the union operator (or the logic or), ``$\cdot$'' is the concatenation of two regular expression, the ``$*$'' is defined as for regular languages and finally parentheses allows to introduce priority over the other operators.
+
 \begin{example}[DFA vs NFA]
-    Here an exemple of two minimal automata defining the language over the alphabet $\alphabetN{} = \{a, b\}$ for strings with an $a$ in the second letter from last position (same as $L = regex((a+b)^*a(a+b))$).
-    \begin{figure}[h]
-        \centering
-        \begin{subfigure}{0.45\textwidth}
-            \centering
-            \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
-                \node[state,initial, initial text=] (q_I) {$q_I$};
-                \node[state] (q_1) [right=of q_I] {$q_1$};
-                \node[state, accepting] (q_2) [right=of q_1] {$q_2$};
-                \path[->]
-                (q_I) edge [loop above] node {a,b} ()
-                (q_I) edge  node {a} (q_1)
-                (q_1) edge  node {a,b} (q_2);
-            \end{tikzpicture}
-            \caption{NFA}
-            \label{subfig:nfa_x_star_ax}
-        \end{subfigure}
-        \begin{subfigure}{0.45\textwidth}
-            \centering
-            \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
-                \node[state,initial, initial text=] (q_I) {$q_I$};
-                \node[state] (q_1) [right=of q_I] {$q_1$};
-                \node[state, accepting] (q_2) [above right=of q_1] {$q_2$};
-                \node[state, accepting] (q_3) [below right=of q_1] {$q_3$};
-                \path[->]
-                (q_I) edge [loop above] node {b} ()
-                (q_2) edge [loop above] node {a} ()
-                (q_I) edge  node {a} (q_1)
-                (q_1) edge  node {a} (q_2)
-                (q_1) edge  node {a} (q_2)
-                (q_2) edge  node {b} (q_3)
-                (q_3) edge[bend left, below]  node {b} (q_I)
-                (q_3) edge[bend left, below]  node {a} (q_1)
-                (q_1) edge[bend left, above]  node {b} (q_3);
-            \end{tikzpicture}
-            \caption{DFA}
-            \label{subfig:dfa_x_star_ax}
-        \end{subfigure}
-        \caption{NFA vs DFA}
-        \label{fig:nfa_vs_dfa}
-    \end{figure}
-    In \cref{fig:nfa_vs_dfa} you see that the NFA needs less states then the corresponding mimimum DFA, but if we are in state $q_I$ and we read an $a$ we can go either in state $q_I$ or in state $q_1$. It's this ambiguity that makes the NFA difficult to treat.
+  In \cref{fig:nfa_vs_dfa} an exemple of two minimal automata for the language $L = (a+b)^*a(a+b)$ where we can see that the NFA needs less states then the corresponding mimimum DFA.
+  \begin{figure}[h]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+      \centering
+      \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+        \node[state,initial, initial text=] (q_I) {$q_I$};
+        \node[state] (q_1) [right=of q_I] {$q_1$};
+        \node[state, accepting] (q_2) [right=of q_1] {$q_2$};
+        \path[->]
+        (q_I) edge [loop above] node {a,b} ()
+        (q_I) edge  node {a} (q_1)
+        (q_1) edge  node {a,b} (q_2);
+      \end{tikzpicture}
+      \caption{NFA}
+      \label{subfig:nfa_x_star_ax}
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+      \centering
+      \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+        \node[state,initial, initial text=] (q_I) {$q_I$};
+        \node[state] (q_1) [right=of q_I] {$q_1$};
+        \node[state, accepting] (q_2) [above right=of q_1] {$q_2$};
+        \node[state, accepting] (q_3) [below right=of q_1] {$q_3$};
+        \path[->]
+        (q_I) edge [loop above] node {b} ()
+        (q_2) edge [loop above] node {a} ()
+        (q_I) edge  node {a} (q_1)
+        (q_1) edge  node {a} (q_2)
+        (q_1) edge  node {a} (q_2)
+        (q_2) edge  node {b} (q_3)
+        (q_3) edge[bend left, below]  node {b} (q_I)
+        (q_3) edge[bend left, below]  node {a} (q_1)
+        (q_1) edge[bend left, above]  node {b} (q_3);
+      \end{tikzpicture}
+      \caption{DFA}
+      \label{subfig:dfa_x_star_ax}
+    \end{subfigure}
+    \caption{NFA vs DFA}
+    \label{fig:nfa_vs_dfa}
+  \end{figure}
 \end{example}
+
+\subsection{Some notation}
+We note $\A$ for automata, $L = \LA$ to say that the language recognized by the automaton $\A$ is $L$. An expression of type $L = (a+b)$ indicates that $L$ is recognized by the regular expression $(a+b)$. If not specified we suppose $\Sigma$ to be equal to ${a, b}$ and $\omega$ be a word over $\Sigma^*$.
+
 
 % \begin{theorem}
 %   Every DFA has an unique minimal DFA representing the same langauge with the minimal number of states and to know if two DFAs are equivalent, we can minimize and compare them.

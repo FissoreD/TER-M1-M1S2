@@ -11,12 +11,12 @@ However it is less evident how the \textit{Teacher} should verify if a conjectur
 
 From this moment on let's suppose that the \textit{Teacher} is the \textit{Minimal Adequate Teacher} and that the language is represent by the \textit{Automaton} \automaton{}.
 
-When the \textit{Learner} sends the conjecture $\mathcal{A}'$, the \textit{Teacher} has to perform the simmetrical difference of $L(\mathcal{A}) \Delta L(\mathcal{A'})$ to find the counter-example of shortest length. This operation can be made in the following way :
+When the \textit{Learner} sends the conjecture $\A'$, the \textit{Teacher} has to perform the simmetrical difference of $L(\A) \Delta L(\mathcal{A'})$ to find the counter-example of shortest length. This operation can be made in the following way :
 
 \begin{algorithm}
-  \caption{Shortest counter-example in $L(\mathcal{A}) \Delta L(\mathcal{A'})$}
-  $A_1 \gets \mathcal{A} \cap \bar{\mathcal{A'}}$\;
-  $A_2 \gets \mathcal{A'} \cap \bar{\mathcal{A}}$\;
+  \caption{Shortest counter-example in $L(\A) \Delta L(\mathcal{A'})$}
+  $A_1 \gets \A \cap \overline{\mathcal{A'}}$\;
+  $A_2 \gets \mathcal{A'} \cap \overline{\A}$\;
   $w_1 \gets \text{ the shortest word accepted by } A_1$\;
   $w_2 \gets \text{ the shortest word accepted by } A_2$\;
   \Return shortest($w_1, w_2$)\;
@@ -34,10 +34,10 @@ The page is available at \url{https://fissored.github.io/TER-M1-S2/} and allows 
 
 The regular expression should be encoded with the following grammar :
 \[ R = symbol \; | \; R + R \; | \; RR \; | \;R^* \; | \;(R) \]
-where symbol can be every alpha-numeric character. The empty string $\varepsilon$ is encoded with the $\$$ symbol.
+where symbol can be every alpha-numeric character. The empty string $\E$ is encoded with the $\$$ symbol.
 
 \begin{example}
-  \[(a + b)+\$+ab^*+(ab)^*\] indicates the language containg $\{\varepsilon,a, b,  ab, abb, abbb\dots, ab, abab, ababab\dots\}$.
+  \[(a + b)+\$+ab^*+(ab)^*\] indicates the language containg $\{\E,a, b,  ab, abb, abbb\dots, ab, abab, ababab\dots\}$.
 \end{example}
 
 Once the Teacher created, the user can run step by step or the entire algorithm and every phase of the execution will be displayed. The \textit{Message} section contains information about the \textit{closedness} and the \textit{consistence} of the $O.T$. Once these two properties are satisfied, the automaton corresponding to the conjecture is displayed (thanks the \textit{d3-graphviz.js} library).
@@ -100,7 +100,7 @@ However we can also note that interestingly the number of equivalence queries is
 
 An other particular phenomen we can see is the number of time the table is found not consistent, which grows linearly for the \textit{L*} instead of being exponentially as for the two other plots.
 
-Let's suppose that we are the \textit{Learner} then we send our first three membership queries we think that the language is the empty one since $\forall x \in{\varepsilon, a, b}, \text{ the Teacher answers that } x \notin U$. The first counter-exemple we receive is the shortest word belonging to $U$ which in this case is a word $w$ of length $n+1$ with a leading $a$ where $w \in U \text{ and } \forall x \in Pref(w) | x \neq w \rightarrow x \notin U$. Futhermore, for every prefix x and y different from w, x and y belong to two different residuals and all of them are exactly the prime residuals of $U$. From these prime residual \textit{L*} is capable to reconstruct the composed residual while adding column in $E$. On the other hand \textit{NL*} since it adds the first counter-exemple in $E$ it is able to find prime without having any consistence problem, since every new row will be prime and so the verification of closedness is enough to understand the language.
+Let's suppose that we are the \textit{Learner} then we send our first three membership queries we think that the language is the empty one since $\forall x \in{\E, a, b}, \text{ the Teacher answers that } x \notin U$. The first counter-exemple we receive is the shortest word belonging to $U$ which in this case is a word $w$ of length $n+1$ with a leading $a$ where $w \in U \text{ and } \forall x \in Pref(w) | x \neq w \rightarrow x \notin U$. Futhermore, for every prefix x and y different from w, x and y belong to two different residuals and all of them are exactly the prime residuals of $U$. From these prime residual \textit{L*} is capable to reconstruct the composed residual while adding column in $E$. On the other hand \textit{NL*} since it adds the first counter-exemple in $E$ it is able to find prime without having any consistence problem, since every new row will be prime and so the verification of closedness is enough to understand the language.
 
 \subsubsection{Size(RFSA) is exponentially bigger than Size(mNFA)}
 In this section we are going to show the behaviour of the two algorithms on a particular class of regular expressions depending on a fixed parameter $n$ where \textit{cRFSA} has exactly the same size of the \textit{mDFA} but where the corresponding \textit{mNFA} is exponentially smaller.\\
@@ -152,7 +152,7 @@ The statistics of the execution of the two algorithms are shown in \cref{fig:wro
   \label{fig:wrostRFSA}
 \end{figure}
 
-We can see that the number of state are the same for the two class of Automata and that the number of Membership an Closedness problems are similar. What change is the number of equivalence queries which is particularly smaller for the \textit{NL*} algorithm as for the number of time where the \textit{O.T.} is found not consistent. This is because adding counter-exemples in $E$ instead of $S$ is in general a good mean to be able to distinguish autonomously newer residuals. New residuals are also useful to reduce the number of Consistence problem increasing however the number of Closedness problem.
+We can see that the number of state are the same for the two class of Automata and that the number of Membership an Closedness problems are similar. What change is the number of equivalence queries which is particularly smaller for the \textit{NL*} algorithm as for the number of time where the \OT is found not consistent. This is because adding counter-exemples in $E$ instead of $S$ is in general a good mean to be able to distinguish autonomously newer residuals. New residuals are also useful to reduce the number of Consistence problem increasing however the number of Closedness problem.
 
 \subsection{Results over generical Teachers}
 

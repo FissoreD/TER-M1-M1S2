@@ -15,7 +15,7 @@ A residual of \textit{L} is a new language $L'$ where $L = \{u \cdot v, \text{ f
 
 \begin{example}
   \label{example:residual}
-  $L = (aa)^*$, which is the set of word over the alphabet $\{a\}$, has two residuals $L_1 = (aa)*$ and $L_2 = a(aa)*$ where ${\varepsilon}^{-1} L = L_1$ and $a^{-1}L = L_2$. We can see that these two residuals are the only one which can be derived from \textit{L} since if we continue to try to calculate $(aa)^{-1}L$ we obtain $L_1$ and if we try to calculate $(aaa)^{-1}L$ we obtain $L_2$. We can therefore understand that for every word $w_e$ from the set of words of even length $E$, we have $w_e^{-1}L = L_1$ and for every word $w_o$ from the set of words of odd length $EO$, we have $w_o^{-1}L = L_2$.
+  $L = (aa)^*$, which is the set of word over the alphabet $\{a\}$, has two residuals $L_1 = (aa)*$ and $L_2 = a(aa)*$ where ${\E}^{-1} L = L_1$ and $a^{-1}L = L_2$. We can see that these two residuals are the only one which can be derived from \textit{L} since if we continue to try to calculate $(aa)^{-1}L$ we obtain $L_1$ and if we try to calculate $(aaa)^{-1}L$ we obtain $L_2$. We can therefore understand that for every word $w_e$ from the set of words of even length $E$, we have $w_e^{-1}L = L_1$ and for every word $w_o$ from the set of words of odd length $EO$, we have $w_o^{-1}L = L_2$.
 \end{example}
 
 \begin{definition}
@@ -34,12 +34,12 @@ A residual of \textit{L} is a new language $L'$ where $L = \{u \cdot v, \text{ f
     \item $Q = \bigcup_{i=1}^{n}L_i$
     \item $\delta = \{(q_i, x) = q_j \text{ for every } q_i, q_j \in Q \text{ and } x \in \Sigma \text{ if } x^{-1}L(q_i) = L(q_j)\}$
     \item $q_I$ is the state associated to the $i^{th}$ residual having
-    \item $F = \{q_i \in Q \text{ such that } \varepsilon \in L_i\}$
+    \item $F = \{q_i \in Q \text{ such that } \E \in L_i\}$
   \end{itemize}
   The created automaton is minimum since for any state $q_i, q_j, L(q_i) \neq L(q_j)$.
 \end{proof}
 
-Starting from these definitions, we can see that in the \textit{O.T.} of the L* algorithm every row is associated to a state of a mDFA and therefore to a residual.
+Starting from these definitions, we can see that in the \OT of the L* algorithm every row is associated to a state of a mDFA and therefore to a residual.
 
 \begin{definition}
   An $RFSA$ is a \textit{non-deterministic} automaton where every state represents a residual of \textit{L}.
@@ -58,7 +58,7 @@ A canonical $RFSA$ $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \q
   \item $Q = $ the set of prime residual of L
   \item $\delta = \{(q_i, x) = q_j \text{ for every } q_i, q_j \in Q \text{ and } x \in \Sigma \text{ if } L(q_i) \subseteq x^{-1}L(q_j)\}$
   \item $q_I$ is the set of states whose associated residual is a subset of the language \textit{L} recognized by \automaton{}
-  \item $F = \{q_i | q_i \in Q \text{ such that } \varepsilon \in L(q_i)\}$
+  \item $F = \{q_i | q_i \in Q \text{ such that } \E \in L(q_i)\}$
 \end{itemize}
 
 A canonical $RFSA$ \automaton{} may have potentially less states than the number of states of a $mDFA$ since \textit{composed} residuals are not present in  \automaton{}. It has been prooved in  \cite{RFSA} that the size of a canonical $RFSA$ may vary from the size of a minimum $NFA$ to the size of a $mDFA$ and so, depending to the language, it may occures that a canonical $RFSA$ may be exponentially smaller than a $mDFA$.
@@ -71,7 +71,7 @@ As said in the previous section, every row of the $O.T$ reprents a residual of t
 
 \begin{definition}[Row covering]
   \label{def:row-covering}
-  A row $r_1$ of the \textit{O.T.} is covered ($\sqsubseteq$) by a row $r_2$ if every bit of $r_1$ is less or equal of the corresponding bit in $r_2$.
+  A row $r_1$ of the \OT is covered ($\sqsubseteq$) by a row $r_2$ if every bit of $r_1$ is less or equal of the corresponding bit in $r_2$.
 \end{definition}
 
 \begin{definition}[Row union]
@@ -79,17 +79,17 @@ As said in the previous section, every row of the $O.T$ reprents a residual of t
 \end{definition}
 
 \begin{definition}[Composed and Prime Rows]
-  A row $r$ of the \textit{O.T.} is composed if it exists a subset of rows $R'$ not including $r$ such that $r = \bigsqcup_{r_i \in R'}r_i$
+  A row $r$ of the \OT is composed if it exists a subset of rows $R'$ not including $r$ such that $r = \bigsqcup_{r_i \in R'}r_i$
 \end{definition}
 
 \begin{definition}[Closedness]
-  The \textit{O.T.} is closed if every prime row of every prime line of the lower part of the table is already present in the upper part.
+  The \OT is closed if every prime row of every prime line of the lower part of the table is already present in the upper part.
 \end{definition}
 
 To restore the closedness of the observation table, $s$ will be promoted to $S$ and $\forall x \in \Sigma \text{ if } s \cdot x \notin SA \text{ then } s \cdot x \text{ is added to } SA$.
 
 \begin{definition}[Consistence]
-  The \textit{O.T.} is consistent if for every $s_1,s_2 \in S$ and $row(s_1) \sqsubseteq row(s_2)$, in this case $s_1,s_2$ are colled RFSA-similar, then for every $x \in \Sigma$, $row(s_1 \cdot x) = row(s_2 \cdot x)$.
+  The \OT is consistent if for every $s_1,s_2 \in S$ and $row(s_1) \sqsubseteq row(s_2)$, in this case $s_1,s_2$ are colled RFSA-similar, then for every $x \in \Sigma$, $row(s_1 \cdot x) = row(s_2 \cdot x)$.
 \end{definition}
 
 If the table is not consistent, we have $row(w_1) \sqsubseteq row(w_2)$ and $row(w_1 \cdot x) \not\sqsubseteq row(w_2 \cdot x) \text{ for some } x \in \Sigma \text{ and some }w_1, w_2 \in S$. We can restore the consistence by making $w_1$ and $w_2$ no more RFSA-similar: we find an $e \in E$ such that $T(w_1 \cdot x \cdot e) \sqsupset T(w_2 \cdot x \cdot e)$ and we add $x \cdot e$ in $E$.
@@ -102,7 +102,7 @@ The conjecture is made as following :
 \begin{itemize}
   \item $Q = \{row(s), \forall s \in S \text{ and } row(s) \text{ is  prime} \}$;
   \item $\delta(row(s), x) = row(s'), \forall s \in S, x \in \Sigma, s' \in S_{ext} \text{ where } row(s) \text{ is Prime and } row(s') \sqsubseteq row(s \cdot x)\}$;
-  \item $q_I = row(s), \forall s \in S \text{ such that } row(s) \text{ is Prime and } row(s) \sqsubseteq row(\varepsilon) $;
+  \item $q_I = row(s), \forall s \in S \text{ such that } row(s) \text{ is Prime and } row(s) \sqsubseteq row(\E) $;
   \item $F = \{row(s) | s \in S \text{ and } T(s) = 1 \}$.
 \end{itemize}
 
@@ -118,7 +118,7 @@ The proof is really similar to the proof of \cref{lemma:L_trans_from_QI} conside
 The word acceptance of \textit{NL*} can be proveed similarly to \cref{lemma:L_acceptance}. We can also note that :
 \begin{itemize}
   \item the automaton created is no necessarily deterministic, since the transition function allow multiple successor from any state taking any letter over $\Sigma$;
-  \item the automaton may have multiple initial states, all states whose row is covered by $row(\varepsilon)$, and that it is also possible that $row(\varepsilon)$ is not in $Q_I$ if it is a composed row;
+  \item the automaton may have multiple initial states, all states whose row is covered by $row(\E)$, and that it is also possible that $row(\E)$ is not in $Q_I$ if it is a composed row;
   \item the automaton created is the canonical $RFSA$ since the represented states are only those whose corresponding line is a prime line.
 \end{itemize}
 
@@ -130,11 +130,11 @@ As for the L* algorithm, NL* is correct since the solution must be approved by t
 \subsubsection{Terminaison}
 As for the L* algorithm, NL* terminates beacause the number of residual of the language is finite and if the conjecture is not accepted, the counter-exemple, will permit the Learner to find a new residual until all \textit{prime} residuals are found.
 
-A little precision of why NL* add the counter-exemple $c$ in $E$ and not in $S$. In general, the given counter-exemple belongs to a residual that is not correctly represented by the sent automaton. However, $c$ may belongs to a residual which is composed and therefore the algorithm will not gain enough information to find improve the \textit{O.T.} since composed rows are not considered for the closedness and consistence check. The intuition of why adding $c$ into $E$ is good to make NL* terminate is because in this way we add a bit to each row of the $O.T$ and in this way we are able to distinguish rows having $s$ as suffix.
+A little precision of why NL* add the counter-exemple $c$ in $E$ and not in $S$. In general, the given counter-exemple belongs to a residual that is not correctly represented by the sent automaton. However, $c$ may belongs to a residual which is composed and therefore the algorithm will not gain enough information to find improve the \OT since composed rows are not considered for the closedness and consistence check. The intuition of why adding $c$ into $E$ is good to make NL* terminate is because in this way we add a bit to each row of the $O.T$ and in this way we are able to distinguish rows having $s$ as suffix.
 
 
 \subsubsection{Time complexity}
-Similarly to L* the time complexity can be computed as the number of cells of the \textit{O.T.} supposing that all other operation of the algorithm runs in a constant time.
+Similarly to L* the time complexity can be computed as the number of cells of the \OT supposing that all other operation of the algorithm runs in a constant time.
 
 In the wrost case the language of the Teacher has not composed residual and so the automaton created by NL* will have exactly the same number of state of the corresponding minimum DFA. That's why the time complexity is $O(n^2 \times m)$.
 
