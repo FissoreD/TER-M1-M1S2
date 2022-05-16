@@ -23,7 +23,7 @@ where :
 
 % As said in \cref{th:kleene} every language can be represented by an automaton.
 
-% Here are some examples of regular langauges whose corresponding automata are shown in \cref{simple_automata}.
+% Here are some examples of regular languages whose corresponding automata are shown in \cref{simple_automata}.
 % \begin{example}{Epsilon language}
 %     \label{example:lang_eps}
 %     $L = \{\E\}$ is the language with only a word of length zero.
@@ -77,7 +77,7 @@ where :
 
 % In \cref{simple_automata} we see that a \textit{finite} automaton is composed by a finite set of states linked by labelled arrows called \textit{transitions}.
 
-% The set of states that are directly linked with a state \qi{} are called successor of \qi{} and noted $Succ(q_i)$, and the predecessors of \qi{}, noted $Pred(q_i)$, are those states having \qi{} has a successor. Moreover, if a state is pointed by an arrow with no predecessor, then it is an initial state and if a state is marked with a double cdotle then it is called an accepting state.
+% The set of states that are directly linked with a state \qi{} are called successor of \qi{} and noted $Succ(q_i)$, and the predecessors of \qi{}, noted $Pred(q_i)$, are those states having \qi{} has a successor. Moreover, if a state is pointed by an arrow with no predecessor, then it is an initial state and if a state is marked with a double circle then it is called an accepting state.
 
 % We say that a word \word{} is accepted by \automaton{} or belongs to \langA{}, the language recognized by \automaton{}, if, from an initial state we can join an accepting state by reading each letter of \word{}.
 
@@ -91,7 +91,7 @@ where :
 
 A state $q_i$ is called successor of another state $q_j$ if there exists $\delta(q_i, \alpha) = q_j$ for some $\alpha \in \Sigma$. If $q_j$ is successor of $q_i$ then $q_i$ is the predecessor of $q_j$.
 
-Following the construction of the automaton $\A$, and expecially focusing on the transition function of it, it is possible to classify $\A$ into two different classes.
+Following the construction of the automaton $\A$, and especially focusing on the transition function of it, it is possible to classify $\A$ into two different classes.
 
 \begin{definition}[DFA and NFA]
   If for every state $q_i \in \statesN{}$ and for every letter $\alpha \in \Sigma$ there exists one successor by $\alpha$ then the automaton is \textit{deterministic} and noted \textit{DFA}, otherwise the automaton is called \textit{non deterministic} and noted \textit{NFA}.
@@ -100,26 +100,26 @@ Following the construction of the automaton $\A$, and expecially focusing on the
 We can define a \textit{DFA} also with a logic formula :
 \[\forall q_i \in \mathcal{Q}, \forall \alpha \in \Sigma \text{ if } \exists \delta_1, \delta_2 \in \delta \text{ such that } \delta_1(q_i, \alpha) = q_j' \vee \delta_2(q_i, \alpha) = q_j'' \rightarrow q_j' = q_j'' \]
 
-Since every regular language can be represented by an automaton, be it deterministic or not, it is also possible to apply interection, union and complemantion on automaton. The main problem is that complemantion can be ``easily'' done on \textit{DFA} but it becomes a really ``difficult'' task if we have a \textit{NFA}. The complematation of an \textit{NFA} $\A$ can only be done after having \textit{determinised}\footnote{The determinisation operation aims to transform an automaton $\A$ into an automaton $\A'$ where $\A'$ is deterministic} $\A$ which is a \textit{PSPACE-complete} problem and may ask exponential time.
+Since every regular language can be represented by an automaton, be it deterministic or not, it is also possible to apply intersection, union and complementation on automaton. The main problem is that complementation can be ``easily'' done on \textit{DFA} but it becomes a really ``difficult'' task if we have a \textit{NFA}. The complementation of an \textit{NFA} $\A$ can only be done after having \textit{determinized}\footnote{The determinisation operation aims to transform an automaton $\A$ into an automaton $\A'$ where $\A'$ is deterministic} $\A$ which is a \textit{PSPACE-complete} problem and may ask exponential time.
 
-However \textit{NFA} has the big advantage that they can be exponentially smaller that the corresponding \textit{DFA} and this may be interresting expecially if we care about space resources.
+However \textit{NFA} has the big advantage that they can be exponentially smaller that the corresponding \textit{DFA} and this may be interesting especially if we care about space resources.
 
 \begin{remark}
-  \textit{NFA} and \textit{DFA} have same expressiveness meaining that \[\bigcup NFA = \bigcup DFA = \bigcup RegularLanguages\]
+  \textit{NFA} and \textit{DFA} have same expressiveness meaning that \[\bigcup NFA = \bigcup DFA = \bigcup RegularLanguages\]
 \end{remark}
 
 \begin{definition}[Minimal automaton]
   An automaton \automaton{} is minimal if it is not possible to construct a smaller automaton $\automatonN{}'$ for the same language having less states than \automaton{}.
 \end{definition}
 
-Moreover we say that a minimal \textit{DFA}, noted \textit{mDFA}, is unique, whereas minal \textit{NFA}, noted \textit{mNFA}, can be various.
+Moreover we say that a minimal \textit{DFA}, noted \textit{mDFA}, is unique, whereas minimal \textit{NFA}, noted \textit{mNFA}, can be various.
 
 Finally we define regular expression with the following grammar :
 \[R = \omega \mid R + R \mid R \cot R \mid R^* \mid (R)\]
 where $\omega$ is a word belonging to $\Sigma^*$, the ``$+$'' symbol indicates the union operator (or the logic or), ``$\cdot$'' is the concatenation of two regular expression, the ``$*$'' is defined as for regular languages and finally parentheses allows to introduce priority over the other operators.
 
 \begin{example}[DFA vs NFA]
-  In \cref{fig:nfa_vs_dfa} an exemple of two minimal automata for the language $L = (a+b)^*a(a+b)$ where we can see that the NFA needs less states then the corresponding mimimum DFA.
+  In \cref{fig:nfa_vs_dfa} an example of two minimal automata for the language $L = (a+b)^*a(a+b)$ where we can see that the NFA needs less states then the corresponding minimal DFA.
   \begin{figure}[h]
     \centering
     \begin{subfigure}{0.45\textwidth}
@@ -167,7 +167,7 @@ We note $\A$ for automata, $L = \LA$ to say that the language recognized by the 
 
 
 % \begin{theorem}
-%   Every DFA has an unique minimal DFA representing the same langauge with the minimal number of states and to know if two DFAs are equivalent, we can minimize and compare them.
+%   Every DFA has an unique minimal DFA representing the same language with the minimal number of states and to know if two DFAs are equivalent, we can minimize and compare them.
 % \end{theorem}
 
 % \begin{theorem}

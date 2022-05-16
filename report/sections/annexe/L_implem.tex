@@ -1,7 +1,7 @@
 \section{L* algorithm implementation}
 
 \begin{algorithm}[H]
-  \caption{Angluil L* algorithm}
+  \caption{Angluin L* algorithm}
   \label{L_star_algo}
   \KwIn{$\Sigma$}
   \KwOut{$A \text{ such that } L(A) = U$}
@@ -21,7 +21,7 @@
     \Else{
       $A \gets createAutomaton(S, E, T)$\;
       $teacherAnswer \gets equiv(A)$\;
-      \uIf{$\text{teacherAnswer is a counter exemple t}$}{
+      \uIf{$\text{teacherAnswer is a counter example t}$}{
         \For{$p \in Pref(t)$}{
           $\text{add p to S and complete this row with membership queries }$\;
         }

@@ -1,8 +1,8 @@
-\section{Learnig with NL* }
+\section{Learning with NL* }
 
-The NL* algorithm, described by Benedikt Boolig \textit{et al.} in \cite{NLPaper}, is an algorithm based on L* whose goal is to learn an unknown language $U$ building potentially smaller automata then those built by L*. To achieve this goal, NL* outputs a particular class of non deterministic automata which are called \textit{Residual final state automata (RFSA)} which can have less states then the equivalent minimun DFA.
+The NL* algorithm, described by Benedikt Bollig \textit{et al.} in \cite{NLPaper}, is an algorithm based on L* whose goal is to learn an unknown language $U$ building potentially smaller automata then those built by L*. To achieve this goal, NL* outputs a particular class of non deterministic automata which are called \textit{Residual final state automata (RFSA)} which can have less states then the equivalent minimum DFA.
 
-\subsection{Resudial final state automaton (RFSA)}
+\subsection{Residual final state automaton (RFSA)}
 \label{sec:RFSA}
 
 We have seen in \cref{section:L} that the L* algorithm is able to create a minimum DFA recognizing a regular language where each state is associated to a particular row of the $O.T$.
@@ -28,7 +28,7 @@ A residual of \textit{L} is a new language $L'$ where $L = \{u \cdot v, \text{ f
 \end{theorem}
 
 \begin{proof}
-  $\rightarrow$ Let \automaton{} be a minimum DFA, $q_I$ the initial state of \automaton{}, $q_i$ a state of \automaton{} and $L(\automatonN{}, q_i)$ the language recognized by \automaton{} where $q_i$ is the initial state. For every $q_i$ of \automaton{}, $L(\automatonN{}, q_i)$ is a residual $L'$ of \textit{L}. In fact the syntactic monoid $M$ containg the words $w$ such that $w^{-1}L = L'$ is the set of the runs of the automaton starting from $q_I$ leading to $q_i$. \\
+  $\rightarrow$ Let \automaton{} be a minimum DFA, $q_I$ the initial state of \automaton{}, $q_i$ a state of \automaton{} and $L(\automatonN{}, q_i)$ the language recognized by \automaton{} where $q_i$ is the initial state. For every $q_i$ of \automaton{}, $L(\automatonN{}, q_i)$ is a residual $L'$ of \textit{L}. In fact the syntactic monoid $M$ containing the words $w$ such that $w^{-1}L = L'$ is the set of the runs of the automaton starting from $q_I$ leading to $q_i$. \\
   $\leftarrow$ Given the set of residuals $\{L_1, L_2, \dots, L_n\}$ of \textit{L} and an alphabet $\Sigma$. By \cref{def:monoid}, for every $L_i$ there exists an associated monoid $M_i$ such that $w^{-1}L_i = L$ for all $w \in M_i$. We can construct the minimal DFA $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \qend{} $\rangle$ where :
   \begin{itemize}
     \item $Q = \bigcup_{i=1}^{n}L_i$
@@ -61,13 +61,13 @@ A canonical $RFSA$ $\langle$ \alphabet{}, \states{}, \transition{}, \qzero{}, \q
   \item $F = \{q_i | q_i \in Q \text{ such that } \E \in L(q_i)\}$
 \end{itemize}
 
-A canonical $RFSA$ \automaton{} may have potentially less states than the number of states of a $mDFA$ since \textit{composed} residuals are not present in  \automaton{}. It has been prooved in  \cite{RFSA} that the size of a canonical $RFSA$ may vary from the size of a minimum $NFA$ to the size of a $mDFA$ and so, depending to the language, it may occures that a canonical $RFSA$ may be exponentially smaller than a $mDFA$.
+A canonical $RFSA$ \automaton{} may have potentially less states than the number of states of a $mDFA$ since \textit{composed} residuals are not present in  \automaton{}. It has been proved in  \cite{RFSA} that the size of a canonical $RFSA$ may vary from the size of a minimum $NFA$ to the size of a $mDFA$ and so, depending to the language, it may occurs that a canonical $RFSA$ may be exponentially smaller than a $mDFA$.
 
 \subsection{Closedness and Consistence in NL*}
 
-NL* owns the prefix-closed $S$ set of word, the suffix-closed set of words $E$ and the observation table $O.T$ which are defined exactly as in the L* algorithm. But there are some differencies on the definition of the closedness and consistence.
+NL* owns the prefix-closed $S$ set of word, the suffix-closed set of words $E$ and the observation table $O.T$ which are defined exactly as in the L* algorithm. But there are some differences on the definition of the closedness and consistence.
 
-As said in the previous section, every row of the $O.T$ reprents a residual of the language, and since NL* goal is to construct a canonical $RFSA$, it is important to introduce the notion of row covering.
+As said in the previous section, every row of the $O.T$ represents a residual of the language, and since NL* goal is to construct a canonical $RFSA$, it is important to introduce the notion of row covering.
 
 \begin{definition}[Row covering]
   \label{def:row-covering}
@@ -89,7 +89,7 @@ As said in the previous section, every row of the $O.T$ reprents a residual of t
 To restore the closedness of the observation table, $s$ will be promoted to $S$ and $\forall x \in \Sigma \text{ if } s \cdot x \notin SA \text{ then } s \cdot x \text{ is added to } SA$.
 
 \begin{definition}[Consistence]
-  The \OT is consistent if for every $s_1,s_2 \in S$ and $row(s_1) \sqsubseteq row(s_2)$, in this case $s_1,s_2$ are colled RFSA-similar, then for every $x \in \Sigma$, $row(s_1 \cdot x) = row(s_2 \cdot x)$.
+  The \OT is consistent if for every $s_1,s_2 \in S$ and $row(s_1) \sqsubseteq row(s_2)$, in this case $s_1,s_2$ are called RFSA-similar, then for every $x \in \Sigma$, $row(s_1 \cdot x) = row(s_2 \cdot x)$.
 \end{definition}
 
 If the table is not consistent, we have $row(w_1) \sqsubseteq row(w_2)$ and $row(w_1 \cdot x) \not\sqsubseteq row(w_2 \cdot x) \text{ for some } x \in \Sigma \text{ and some }w_1, w_2 \in S$. We can restore the consistence by making $w_1$ and $w_2$ no more RFSA-similar: we find an $e \in E$ such that $T(w_1 \cdot x \cdot e) \sqsupset T(w_2 \cdot x \cdot e)$ and we add $x \cdot e$ in $E$.
@@ -106,16 +106,16 @@ The conjecture is made as following :
   \item $F = \{row(s) | s \in S \text{ and } T(s) = 1 \}$.
 \end{itemize}
 
-After the sending of the conjecture, if the Teacher answers \textit{Yes} the algorithm stops, otherwise a counter-exemple $c$ is provided. $c$ is added to the $E$ set and if needed $E$ is completed to reamins suffix-closed.
+After the sending of the conjecture, if the Teacher answers \textit{Yes} the algorithm stops, otherwise a counter-example $c$ is provided. $c$ is added to the $E$ set and if needed $E$ is completed to remains suffix-closed.
 
 \begin{lemma}
   Let $q_I$ be the initial states and $s $ a word in $S_{ext}$ then $\delta(q_I, s) \sqsubseteq row(s)$.
 \end{lemma}
 
-The proof is really similar to the proof of \cref{lemma:L_trans_from_QI} considering that now we do not use the equality relation between states, but the coverning ($\sqsubseteq$) relaction defined in \cref{def:row-covering}.
+The proof is really similar to the proof of \cref{lemma:L_trans_from_QI} considering that now we do not use the equality relation between states, but the covering ($\sqsubseteq$) relation defined in \cref{def:row-covering}.
 
 
-The word acceptance of \textit{NL*} can be proveed similarly to \cref{lemma:L_acceptance}. We can also note that :
+The word acceptance of \textit{NL*} can be proved similarly to \cref{lemma:L_acceptance}. We can also note that :
 \begin{itemize}
   \item the automaton created is no necessarily deterministic, since the transition function allow multiple successor from any state taking any letter over $\Sigma$;
   \item the automaton may have multiple initial states, all states whose row is covered by $row(\E)$, and that it is also possible that $row(\E)$ is not in $Q_I$ if it is a composed row;
@@ -128,14 +128,14 @@ The word acceptance of \textit{NL*} can be proveed similarly to \cref{lemma:L_ac
 As for the L* algorithm, NL* is correct since the solution must be approved by the Teacher and by hypothesis the Teacher makes no mistakes.
 
 \subsubsection{Terminaison}
-As for the L* algorithm, NL* terminates beacause the number of residual of the language is finite and if the conjecture is not accepted, the counter-exemple, will permit the Learner to find a new residual until all \textit{prime} residuals are found.
+As for the L* algorithm, NL* terminates because the number of residual of the language is finite and if the conjecture is not accepted, the counter-example, will permit the Learner to find a new residual until all \textit{prime} residuals are found.
 
-A little precision of why NL* add the counter-exemple $c$ in $E$ and not in $S$. In general, the given counter-exemple belongs to a residual that is not correctly represented by the sent automaton. However, $c$ may belongs to a residual which is composed and therefore the algorithm will not gain enough information to find improve the \OT since composed rows are not considered for the closedness and consistence check. The intuition of why adding $c$ into $E$ is good to make NL* terminate is because in this way we add a bit to each row of the $O.T$ and in this way we are able to distinguish rows having $s$ as suffix.
+A little precision of why NL* add the counter-example $c$ in $E$ and not in $S$. In general, the given counter-example belongs to a residual that is not correctly represented by the sent automaton. However, $c$ may belongs to a residual which is composed and therefore the algorithm will not gain enough information to find improve the \OT since composed rows are not considered for the closedness and consistence check. The intuition of why adding $c$ into $E$ is good to make NL* terminate is because in this way we add a bit to each row of the $O.T$ and in this way we are able to distinguish rows having $s$ as suffix.
 
 
 \subsubsection{Time complexity}
 Similarly to L* the time complexity can be computed as the number of cells of the \OT supposing that all other operation of the algorithm runs in a constant time.
 
-In the wrost case the language of the Teacher has not composed residual and so the automaton created by NL* will have exactly the same number of state of the corresponding minimum DFA. That's why the time complexity is $O(n^2 \times m)$.
+In the worst case the language of the Teacher has not composed residual and so the automaton created by NL* will have exactly the same number of state of the corresponding minimum DFA. That's why the time complexity is $O(n^2 \times m)$.
 
-However this complexity can be reduce in practice, expecially if the language $U$ has a lot of composed residual since in this case the automaton should need less information to construct its $RFSA$.
+However this complexity can be reduce in practice, especially if the language $U$ has a lot of composed residual since in this case the automaton should need less information to construct its $RFSA$.

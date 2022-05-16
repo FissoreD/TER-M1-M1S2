@@ -1,17 +1,17 @@
 \section{My implementation of the L* and NL*}
-During this semester, I've implemeted the two algorithms to better understand them and at the end to be able to compare their performances.
+During this semester, I've implemented the two algorithms to better understand them and at the end to be able to compare their performances.
 
 \subsection{About the Teacher}
-In this report I have barely explained what a \textit{Teacher} is. As said in the Introduction, a \textit{Teacher} is an entity knowing the language and answering to membership and equivalence quieries. It is easy to see how a membership query can be answered: if the \textit{Teacher} knows the language, it can only submit the received word to the langauge and check if the word is in it.
+In this report I have barely explained what a \textit{Teacher} is. As said in the Introduction, a \textit{Teacher} is an entity knowing the language and answering to membership and equivalence queries. It is easy to see how a membership query can be answered: if the \textit{Teacher} knows the language, it can only submit the received word to the language and check if the word is in it.
 
 However it is less evident how the \textit{Teacher} should verify if a conjecture is valid or if not to send the counter-example.
 \begin{definition}
-  The \textit{Teacher} providing every time a counter-exemple of shortest length is called \textit{Minimal Adequate Teacher}.
+  The \textit{Teacher} providing every time a counter-example of shortest length is called \textit{Minimal Adequate Teacher}.
 \end{definition}
 
 From this moment on let's suppose that the \textit{Teacher} is the \textit{Minimal Adequate Teacher} and that the language is represent by the \textit{Automaton} \automaton{}.
 
-When the \textit{Learner} sends the conjecture $\A'$, the \textit{Teacher} has to perform the simmetrical difference of $L(\A) \Delta L(\mathcal{A'})$ to find the counter-example of shortest length. This operation can be made in the following way :
+When the \textit{Learner} sends the conjecture $\A'$, the \textit{Teacher} has to perform the symmetrical difference of $L(\A) \Delta L(\mathcal{A'})$ to find the counter-example of shortest length. This operation can be made in the following way :
 
 \begin{algorithm}
   \caption{Shortest counter-example in $L(\A) \Delta L(\mathcal{A'})$}
@@ -30,21 +30,21 @@ In this way we are guaranteed that the \textit{Teacher} is the \textit{Minimal A
 
 I've decided to use TypeScript as programming language to be able to easily display the execution of these algorithms thanks to a dedicated HTML page.
 
-The page is available at \url{https://fissored.github.io/TER-M1-S2/} and allows to choose both to run the \textit{L*} and the \textit{NL*} algorithms. Some preload Theachers have been upload to let the uses test immediatly them but it is also possible to enter a choosen regular expression to build the Teacher and pass it to the Learner.
+The page is available at \url{https://fissored.github.io/TER-M1-S2/} and allows to choose both to run the \textit{L*} and the \textit{NL*} algorithms. Some preloaded Teachers have been upload to let the uses test immediately them but it is also possible to enter a chosen regular expression to build the Teacher and pass it to the Learner.
 
 The regular expression should be encoded with the following grammar :
 \[ R = symbol \; | \; R + R \; | \; RR \; | \;R^* \; | \;(R) \]
 where symbol can be every alpha-numeric character. The empty string $\E$ is encoded with the $\$$ symbol.
 
 \begin{example}
-  \[(a + b)+\$+ab^*+(ab)^*\] indicates the language containg $\{\E,a, b,  ab, abb, abbb\dots, ab, abab, ababab\dots\}$.
+  \[(a + b)+\$+ab^*+(ab)^*\] indicates the language containing $\{\E,a, b,  ab, abb, abbb\dots, ab, abab, ababab\dots\}$.
 \end{example}
 
 Once the Teacher created, the user can run step by step or the entire algorithm and every phase of the execution will be displayed. The \textit{Message} section contains information about the \textit{closedness} and the \textit{consistence} of the $O.T$. Once these two properties are satisfied, the automaton corresponding to the conjecture is displayed (thanks the \textit{d3-graphviz.js} library).
 
 You can see test word membership with the buttons next to the automaton.
 
-If a counter-exemple is provided then it is written in the \textit{Message} section otherwise the automaton has been approved and the algorithm can stop.
+If a counter-example is provided then it is written in the \textit{Message} section otherwise the automaton has been approved and the algorithm can stop.
 
 The history of the operations made by the \textit{Learner} is saved in memory and can be re-taken with the arrows on the side of the screen.
 
@@ -52,11 +52,11 @@ The history of the operations made by the \textit{Learner} is saved in memory an
 Once compiled in JavaScript, the source files which doesn't need a browser to work, can be run in terminal thanks to the NodeJs environment. \\
 This has allowed me to create some files to test the performances of the two algorithms in term of how many interaction are performed between the \textit{Learner} and \textit{Teacher}, the number of state of the final conjectures of the two algorithms and so on. \\
 All of this statistics are written in a CSV file and the transformed into plots with the \textit{mathplotlib} library of Python.\\
-The test of comparaison aims to provide \textit{Teachers} to the two \textit{Learners} and then to find the limits of them. As said in \cref{sec:RFSA}, the number of state of a canical \textit{RFSA} may be equal of exponentially smaller then a \textit{mDFA}. So it is interesting to compare \textit{L*} and \textit{NL*} on languages which touches the two bounds of the \textit{RFSA}.
+The test of comparison aims to provide \textit{Teachers} to the two \textit{Learners} and then to find the limits of them. As said in \cref{sec:RFSA}, the number of state of a canonical \textit{RFSA} may be equal of exponentially smaller then a \textit{mDFA}. So it is interesting to compare \textit{L*} and \textit{NL*} on languages which touches the two bounds of the \textit{RFSA}.
 
 
 \subsubsection{Size(RFSA) is exponentially smaller then Size(mDFA)}
-Languages recognizing by the regular expression $U = regex((a+b)^*a(a+b)^n)$ for a fixed $n$ is knwon to build automaton whose number of states increse exponentially every time we increase the value of $n$. However $U$ can be represented by a \textit{mNFA} whose number of state is equal to $n+1$ and each of this states represent a prime residual. So we can intuitively understand that $U$ can be also represented by a canonical \textit{RFSA} which has the same number of the \textit{NFA}.
+Languages recognizing by the regular expression $U = regex((a+b)^*a(a+b)^n)$ for a fixed $n$ is known to build automaton whose number of states increase exponentially every time we increase the value of $n$. However $U$ can be represented by a \textit{mNFA} whose number of state is equal to $n+1$ and each of this states represent a prime residual. So we can intuitively understand that $U$ can be also represented by a canonical \textit{RFSA} which has the same number of the \textit{NFA}.
 
 \begin{figure}[!htb]
   \centering
@@ -94,16 +94,16 @@ Languages recognizing by the regular expression $U = regex((a+b)^*a(a+b)^n)$ for
   \label{fig:wrostDFA}
 \end{figure}
 
-From \cref{fig:wrostDFA}, we can see that the \textit{L*} is much more excpensive thant \textit{NL*} we can see that as announced the number of states of the \textit{mDFA} is exponentially bigger then the \textit{cRFSA} but we can also see how the number of states really impcat the number of membership queries and the number of times the table is found to be not closed.
+From \cref{fig:wrostDFA}, we can see that the \textit{L*} is much more expensive thant \textit{NL*} we can see that as announced the number of states of the \textit{mDFA} is exponentially bigger then the \textit{cRFSA} but we can also see how the number of states really impact the number of membership queries and the number of times the table is found to be not closed.
 
-However we can also note that interestingly the number of equivalence queries is the same for the two algorithms since in fact if $n = 0$ the algorithms understand the language after only one equivalence query, after the first three three membership queries the table is learned and if $n > 1$ only two equivalence queries are sufficient beacuase the first is sent as for the previous case after the first three membership queries. Then the \textit{Teacher} provides the counter-example which is enough to distinguish every new residual until the \textit{Observation Table} becomes closed and consistent and this time the second conjecture perfefctly recognizes $U$.
+However we can also note that interestingly the number of equivalence queries is the same for the two algorithms since in fact if $n = 0$ the algorithms understand the language after only one equivalence query, after the first three three membership queries the table is learned and if $n > 1$ only two equivalence queries are sufficient because the first is sent as for the previous case after the first three membership queries. Then the \textit{Teacher} provides the counter-example which is enough to distinguish every new residual until the \textit{Observation Table} becomes closed and consistent and this time the second conjecture perfectly recognizes $U$.
 
-An other particular phenomen we can see is the number of time the table is found not consistent, which grows linearly for the \textit{L*} instead of being exponentially as for the two other plots.
+An other particular phenomenon we can see is the number of time the table is found not consistent, which grows linearly for the \textit{L*} instead of being exponentially as for the two other plots.
 
-Let's suppose that we are the \textit{Learner} then we send our first three membership queries we think that the language is the empty one since $\forall x \in{\E, a, b}, \text{ the Teacher answers that } x \notin U$. The first counter-exemple we receive is the shortest word belonging to $U$ which in this case is a word $w$ of length $n+1$ with a leading $a$ where $w \in U \text{ and } \forall x \in Pref(w) | x \neq w \rightarrow x \notin U$. Futhermore, for every prefix x and y different from w, x and y belong to two different residuals and all of them are exactly the prime residuals of $U$. From these prime residual \textit{L*} is capable to reconstruct the composed residual while adding column in $E$. On the other hand \textit{NL*} since it adds the first counter-exemple in $E$ it is able to find prime without having any consistence problem, since every new row will be prime and so the verification of closedness is enough to understand the language.
+Let's suppose that we are the \textit{Learner} then we send our first three membership queries we think that the language is the empty one since $\forall x \in{\E, a, b}, \text{ the Teacher answers that } x \notin U$. The first counter-example we receive is the shortest word belonging to $U$ which in this case is a word $w$ of length $n+1$ with a leading $a$ where $w \in U \text{ and } \forall x \in Pref(w) | x \neq w \rightarrow x \notin U$. Futhermore, for every prefix x and y different from w, x and y belong to two different residuals and all of them are exactly the prime residuals of $U$. From these prime residual \textit{L*} is capable to reconstruct the composed residual while adding column in $E$. On the other hand \textit{NL*} since it adds the first counter-example in $E$ it is able to find prime without having any consistence problem, since every new row will be prime and so the verification of closedness is enough to understand the language.
 
 \subsubsection{Size(RFSA) is exponentially bigger than Size(mNFA)}
-In this section we are going to show the behaviour of the two algorithms on a particular class of regular expressions depending on a fixed parameter $n$ where \textit{cRFSA} has exactly the same size of the \textit{mDFA} but where the corresponding \textit{mNFA} is exponentially smaller.\\
+In this section we are going to show the behavior of the two algorithms on a particular class of regular expressions depending on a fixed parameter $n$ where \textit{cRFSA} has exactly the same size of the \textit{mDFA} but where the corresponding \textit{mNFA} is exponentially smaller.\\
 This automaton is built recursively and is proposed in Section 6 of \cite{RFSA}. The construction is done for an automaton $A_n = \langle \Sigma, Q, Q_I, F, \delta \rangle $ where :
 \begin{itemize}
   \item $\Sigma = {a, b}$,
@@ -152,13 +152,13 @@ The statistics of the execution of the two algorithms are shown in \cref{fig:wro
   \label{fig:wrostRFSA}
 \end{figure}
 
-We can see that the number of state are the same for the two class of Automata and that the number of Membership an Closedness problems are similar. What change is the number of equivalence queries which is particularly smaller for the \textit{NL*} algorithm as for the number of time where the \OT is found not consistent. This is because adding counter-exemples in $E$ instead of $S$ is in general a good mean to be able to distinguish autonomously newer residuals. New residuals are also useful to reduce the number of Consistence problem increasing however the number of Closedness problem.
+We can see that the number of state are the same for the two class of Automata and that the number of Membership an Closedness problems are similar. What change is the number of equivalence queries which is particularly smaller for the \textit{NL*} algorithm as for the number of time where the \OT is found not consistent. This is because adding counter-examples in $E$ instead of $S$ is in general a good mean to be able to distinguish autonomously newer residuals. New residuals are also useful to reduce the number of Consistence problem increasing however the number of Closedness problem.
 
-\subsection{Results over generical Teachers}
+\subsection{Results over random Teachers}
 
-The third type of comparaison has been performed over a huge number of \textit{Teachers} on the form of automaton of size varying from $1$ to $100$. In this way we are able to see in averege the performances of \textit{L} versus \textit{NL*}.
+The third type of comparison has been performed over a huge number of \textit{Teachers} on the form of automaton of size varying from $1$ to $100$. In this way we are able to see in average the performances of \textit{L} versus \textit{NL*}.
 
-This benchmark has been done taking the \textit{Automata} from the \textit{GitHub} repository \url{https://github.com/parof/buchi-automata-benchmark}. Every automaton is supposed to represent a \textit{Büchi Automaton} and I have reused them to create \textit{mDFA}: after determinization and minimisation, I was able to get a lot of different \textit{mDFA} which I have sorted by number of states. Every \textit{Automaton} of the list has been transformed into a \textit{Teacher} and then, one by one, every \textit{Teacher} has been submitted to \textit{L*} and \textit{NL*} to get at the end the same statistics as before.
+This benchmark has been done taking the \textit{Automata} from the \textit{GitHub} repository \url{https://github.com/parof/buchi-automata-benchmark}. Every automaton is supposed to represent a \textit{Büchi Automaton} and I have reused them to create \textit{mDFA}: after making deterministic and minimal, I was able to get a lot of different \textit{mDFA} which I have sorted by number of states. Every \textit{Automaton} of the list has been transformed into a \textit{Teacher} and then, one by one, every \textit{Teacher} has been submitted to \textit{L*} and \textit{NL*} to get at the end the same statistics as before.
 
 \begin{figure}[!htb]
   \centering
@@ -196,15 +196,15 @@ This benchmark has been done taking the \textit{Automata} from the \textit{GitHu
   \label{fig:benchmark}
 \end{figure}
 
-We see in \cref{fig:benchmark} that as expected the number of state of \textit{cRFSA} is in general exponentially smaller than the \textit{mDFA} and that the number of equivalence and membership queries is about everitime the \textit{NL*} algorithm that outperform \textit{L*}. As expected the number of Consistence problem is won by the \textit{NL*} but curiously the Closedness comparaison is taken by the \textit{NL*} only after about $50$ states. We can intuitively understand that before $50$ states the \textit{Automata} generated by \textit{L*} and \textit{NL*} are in general pretty similar and so it is clear that adding every counter-exemple in $E$ cause the \textit{NL*} algorithm to find a lot of time the table to be not Close. In \cref{fig:TransitionBenchMarkCompare} we see that the number of transisitions of the \textit{mDFA} is linear to the number of its states, whereas the number of transisitions in the \textit{cRFSA}, even if it's number of states is exponentially smaller in averege then the \textit{mDFA}, is clearly bigger then the \textit{mDFA}. This is due to the fact that the \textit{cRFSA} tend to create a transition from a state $q_i$ to every state $q_i'$ if $L(q_i') \sqsubseteq L(q_i)$.
+We see in \cref{fig:benchmark} that as expected the number of state of \textit{cRFSA} is in general exponentially smaller than the \textit{mDFA} and that the number of equivalence and membership queries is about every time the \textit{NL*} algorithm that outperform \textit{L*}. As expected the number of Consistence problem is won by the \textit{NL*} but curiously the Closedness comparison is taken by the \textit{NL*} only after about $50$ states. We can intuitively understand that before $50$ states the \textit{Automata} generated by \textit{L*} and \textit{NL*} are in general pretty similar and so it is clear that adding every counter-example in $E$ cause the \textit{NL*} algorithm to find a lot of time the table to be not Close. In \cref{fig:TransitionBenchMarkCompare} we see that the number of transitions of the \textit{mDFA} is linear to the number of its states, whereas the number of transitions in the \textit{cRFSA}, even if it's number of states is exponentially smaller in average then the \textit{mDFA}, is clearly bigger then the \textit{mDFA}. This is due to the fact that the \textit{cRFSA} tend to create a transition from a state $q_i$ to every state $q_i'$ if $L(q_i') \sqsubseteq L(q_i)$.
 
 \section{Conclusion}
 
-In this paper, we have seen some idea on how regular languages can be understood in different way. We can build finite state automata which can be deterministic and so easy to understand by humans but which can take a lot of space in memory or non-deterministic automata which are less intuitive expacially if these automata have a lot of transition but which can be exponentially smaller than a \textit{mDFA}.
+In this paper, we have seen some idea on how regular languages can be understood in different way. We can build finite state automata which can be deterministic and so easy to understand by humans but which can take a lot of space in memory or non-deterministic automata which are less intuitive especially if these automata have a lot of transition but which can be exponentially smaller than a \textit{mDFA}.
 
-Other studies have been done to seek other way to create automaton which can be smaller then \textit{cRFSA}, for exemple we can have automata that uses logical operators on transitions such as the \textit{Alternating Finite State Automata} or other automata using symbolique links between symbols of the alphabet.
+Other studies have been done to seek other way to create automaton which can be smaller then \textit{cRFSA}, for example we can have automata that uses logical operators on transitions such as the \textit{Alternating Finite State Automata} or other automata using links between symbols of the alphabet.
 
-All of these algorithms are all an evolution of the \cite{LPaper} but works only on languages which are regular. It should be interesting to see if we are able to develop this concept of learning algorithms to languages belonging to grammars which my be context free, context sensitive and so on. But it is clear that the less limitation we add in our langauge, the more complicate will be to understand it.
+All of these algorithms are all an evolution of the \cite{LPaper} but works only on languages which are regular. It should be interesting to see if we are able to develop this concept of learning algorithms to languages belonging to grammars which my be context free, context sensitive and so on. But it is clear that the less limitation we add in our language, the more complicate will be to understand it.
 
 \subsection{Thanks}
-I would like to thanks Mme Di Giusto and Mr Lozes for their support during the development of this study, they have been really helpful to suggest me differnt approches to analyse and different point of view to interpretate the results I obtained.
+I would like to thanks Mme Di Giusto and Mr Lozes for their support during the development of this study, they have been really helpful to suggest me different approaches to analyze and different point of view to interpret the results I obtained.
