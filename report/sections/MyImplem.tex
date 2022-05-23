@@ -13,7 +13,7 @@ I have started to organize my \textit{GitHub} repository and created these folde
   \item \textit{statistics} containing the results of my comparisons of performances between \textit{L*} and \textit{NL*};
 \end{itemize}
 
-\subsection{About the Teacher}
+\subsection{My Teacher}
 
 A major problem that I soon had to overcome was represent the interactions between Learner and Teacher, (see \cref{eq:interactions}). That's why  I did not only have to implement the Learner, but also the Teacher.
 
@@ -44,16 +44,13 @@ The first two lines of this code are in fact those who are the most expensive in
 
 But first, before executing this algorithm, I had to find a way to correctly represents the Learner's conjecture and the Teacher's language to operate in a second moment the intersection and the complementation.
 
-\subsection{Learner's Conjecture and Teacher's Language representation}
+\subsubsection{Learner's Conjecture and Teacher's Language representation}
 
-The best way I found to represent the Teacher's Language was to think about the way the Learner's conjecture is naturally given by the two algorithms: an automaton. That's why I decided to also represent the Teacher's Language on the form of an automaton.
+The best way I found to represent the Teacher's Language was to think that the Learners return an Automaton when providing their conjecture. That's why I decided to also represent the Teacher's Language on the form of an automaton.
 
-Therefore, I implemented the Automaton class which has some key attributes to identify the main characteristics of an automaton but before, after some reflection, I also decided to create a \textit{State} class representing the states of the \textit{Automaton} where I added the information of successors (and predecessors) as attributes attached to the instancies of the class.
+I implemented the Automaton class which has some key attributes to identify the main characteristics of an automaton but before, after some reflection, I also decided to create a \textit{State} class representing the states of the \textit{Automaton} where I added the information of successors (and predecessors) as attributes attached to the instancies of the class.
 
-Finally I had:
-
-
-\begin{lstlisting}[caption=State class]
+\begin{minted}[linenos]{js}
 class State {
   isAccepting: boolean;
   isInitial: boolean;
@@ -70,7 +67,7 @@ class State {
   getSuccessor(symbol: string): State;
   getPredecessor(symbol: string): State;
 }
-\end{lstlisting}
+\end{minted}
 
 This implementation exploit a lot the \textit{Map} data-structure which is a fast way in \textit{JavaScript} to get a value from a given key. Since the Automaton can be not deterministic \textit{outTransition} associates a list of \textit{State}s to every symbol of the alphabet.
 
@@ -78,7 +75,7 @@ Moreover a \textit{State} ``knows'' if it is initial an accepting.
 
 Now I had the representation of a state and the class Automaton could be represented as:
 
-\begin{lstlisting}[caption = Automaton class]
+\begin{minted}[linenos]{js}
 class Automaton {
   states: Map<string, State>;
   initialStates: State[];
@@ -90,7 +87,8 @@ class Automaton {
 
   accept_word_nfa(word: string): boolean;
   minimize(): Automaton;
-\end{lstlisting}
+}
+\end{minted}
 
 We can see that all the fundamental element of the automaton are represented, there is the list of states, followed by the list of accepting and initial states. The alphabet is a list of string.
 
@@ -102,19 +100,21 @@ To do that I used the \textit{noam.js} library which contains some these useful 
 
 Having these ingredients, $\LA \cap \overline{\U}$ and $\overline{\LA} \cap \U$ could be easily calculated. I only want to point out that the complementation of an automaton takes linear time if the automaton is deterministic we modify the final states in $F' = \Q - F$ but if the automaton is not deterministic, that's the case for the \textit{NL*} algorithm, the only way we know to make the complementation is to determinize before the automaton which is a computationally difficult task.
 
-\subsection{Teacher shortest counter-example}
-To find the \textit{shortest} counter-example, in a first time I minimize the automaton with the Hopcroft's algorithm implemented in the \textit{Automaton} class. This algorithm has a complexity $O(n \log n)$. Then, I perform a \textit{BFS} search from the initial states\footnote{The initial states can be multiple in the NL*, that's why a use the plural.} to find the word of shortest length accepted by the Automaton.
+\subsubsection{Find the shortest counter-example}
+To find the \textit{shortest} counter-example, I perform a \textit{BFS} search from the initial states\footnote{The initial states can be multiple in the NL*, that's why a use the plural.} to find the word of shortest length accepted by the Automaton.
 
 I want to underline that if two automata, $\A_1$ and $\A_2$ are equivalent then $\A_1 \Delta \A_2$ gives a new automaton $\A_3$ which recognizes the emptyset $\varnothing$. If $\mathcal{\A}_1 \neq \mathcal{\A}_2$ then it exists at least a word which is accepted by $\A_1$ and not by $\A_2$ or vice-versa. When I launch the \textit{BFS} in $\A_3$, if no word is found, I return $\varnothing$ (I symbolize it with a string of length 0 in \textit{JavaScript}) or the counter-example in the other case.
 
 \subsection{The Observation Table}
 The Observation Table is implemented like this.
 
-\begin{lstlisting}[caption = Observation\_table class]
+\begin{minted}[linenos]{js}
   class Observation_table {
     private rows: string[];
     private columns: string[];
     private matrix: boolean[][];
+
+    ...
   
     add_column(column_name: string): void;
     set_value(row_name: string, column_name: string, bool: boolean): void;
@@ -122,7 +122,7 @@ The Observation Table is implemented like this.
     get_value(row_name: string, column_name: string): boolean;
     get_row(row_name: string): boolean[];
   }
-  \end{lstlisting}
+  \end{minted}
 
 It is a matrix of boolean with two dimensions indexed by rows (the $S$ and $SA$ sets) and columns (the $E$ set).
 
@@ -137,7 +137,7 @@ In this section I want to talk about how I have been able to represent the two L
 
 First of all, I realized that L* and NL* have in common some definitions. That's why I created a common abstract class which implements the shared methods and attributes of the algorithms.
 
-\begin{lstlisting}[caption = LearnerBase class]
+\begin{minted}[linenos]{js}
 abstract class LearnerBase {
   alphabet: string[];
   S: string[];
@@ -160,7 +160,7 @@ abstract class LearnerBase {
   abstract is_close(): string | undefined;
   abstract is_consistent(): string[] | undefined;
 }
-\end{lstlisting}
+\end{minted}
 
 The two methods \textit{make\_member} and \textit{make\_equiv} reproduce the interaction with the Teacher. In the two cases the Learner returns a string that is:
 
@@ -177,7 +177,7 @@ We can see that the abstract methods [Line 20 to 23] correspond to the closednes
 
 The NL* algorithm has in addition the \textit{prime\_lines} attribute storing the list of prime rows. It is constantly updated when the \textit{Observation Table} is modified thanks to some useful methods:
 
-\begin{lstlisting}
+\begin{minted}[linenos]{js}
 class NL_start extends LearnerBase {
   prime_rows: string[];
 
@@ -188,11 +188,11 @@ class NL_start extends LearnerBase {
   is_covered(row1: string, row2: string): boolean;
   check_prime_lines(): void;
 }
-\end{lstlisting}
+\end{minted}
 
 These methods are implemented intuitively following the definition explained in \cref{def:row-covering} and \cref{def:row-union}.
 
-\subsection{About the HTML implementation}
+\subsection{The HTML page}
 
 All these classes are meant to implement the essential bricks to make the learning algorithms work. However I wanted to display these interactions graphically via the \textit{HTML} language.
 

@@ -56,6 +56,8 @@
 
 
 \usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage[outputdir=.aux]{minted}
+
 \crefname{algocf}{Algorithm}{Algorithms}
 
 % Bibliography

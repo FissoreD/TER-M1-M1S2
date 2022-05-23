@@ -8,3 +8,5 @@ test
 
 ./statistics/**
 .vscode/settings.json
+public/out.js
+public/out.d.ts
