@@ -7,7 +7,9 @@ All of these statistics can be obtained by executing the files into the \textit{
 The statistics aim to see the strength and the weaknesses of the to Learners, therefore I have tested them over specific \textit{Regular Expressions (RegEx)}. These \textit{RegEx} take into account the size of the \textit{cRFSA}: since it \textit{can} be exponentially smaller than the size of the \textit{mDFA}.
 
 \subsection{The cRFSA is exponentially smaller then the mDFA}
-Languages recognizing by the \textit{RegEx} $\U = (a+b)^*a(a+b)^n$ for a chosen $n$ are known to build \textit{mDFA} whose number of states increase exponentially every time we increase the value of $n$. It is also known that these same \textit{RegEx} can be represented by \textit{non-deterministic} automata (\textit{NFA}) whose number of state grows linearly with $n$. Moreover if we analyze the language recognized by every state of these automata represent exactly all of the \textit{prime} residuals of $\U$. So we can intuitively understand that $U$ can be also represented by a \textit{cRFSA} which has the same number of state as the \textit{NFA}.
+Languages recognizing by the \textit{RegEx} $\U = (a+b)^*a(a+b)^n$ for a chosen $n$ are known to build \textit{mDFA} whose number of states increase exponentially every time we increase the value of $n$. It is also known that these same \textit{RegEx} can be represented by \textit{non-deterministic} automata (\textit{NFA}) whose number of state grows linearly with $n$.
+
+If we calculate the \textit{prime} residuals of $\U$ we can see that their number equals $n+1$. We can intuitively understand that $\U$ can be represented by a \textit{cRFSA} which has the same number of state as the \textit{NFA}.
 
 \begin{figure}[!htb]
   \centering
@@ -45,17 +47,17 @@ Languages recognizing by the \textit{RegEx} $\U = (a+b)^*a(a+b)^n$ for a chosen 
   \label{fig:wrostDFA}
 \end{figure}
 
-From \cref{fig:wrostDFA}, we can see that the \textit{L*} is much more expensive than \textit{NL*}. As announced the number of states of the \textit{mDFA}'s curve is exponential compared to $n$ and that this also impact the number of transitions, membership queries and closedness problems.
+From \cref{fig:wrostDFA}, we can see that \textit{L*} is much more expensive than \textit{NL*}. As announced the number of states of the \textit{mDFA}'s curve is exponential compared to $n$ and that this also impact the number of transitions, membership queries and closedness problems.
 
-An other particular plot is \cref{fig:ConsistenceWrostDFACompare} where the number of Consistence Problems grows linearly for \textit{L*} and equals zero for NL*.
+In \cref{fig:ConsistenceWrostDFACompare} we see that the number of Consistence Problems grows linearly for \textit{L*} and equals zero for \textit{NL*}.
 
 Let's analyze at first L*.
 
-Starting from $\U = (a+b)^*a(a+b)^n$. L* sends a first conjecture thinking that $\U = \varnothing$ since $\E, a$ and $b$ are not in $\U$. However the Teacher give back a counter-example of the shortest word $\omega$ belonging to $S$\footnote{The Teacher is supposed to be the \textit{Minimal Adequate Teacher}}. We have that $\omega = a^{n+1}$ and that all prefix of $\omega$ are not in $\U$. We will have that the table will not be consistent: $row(\E) = row(a^n)$ but $row(\E \cdot a) \neq row(a^n \cdot a)$. So we add the new column $a$. This new column will make $row(\E) = row(a^{n-1})$ but $row(\E \cdot a) \neq row(a^{n-1} \cdot a)$. We continue in this way $n$ times and at that moment we will have $E = \{\E, a, \dots, a^n\}$. This will stop the table to be not consistent since there will be no more similar row in $S$. Since the automaton associated to $\U$ has precisely $2^{n+1}$ states then to have $2^{n+1}$ different rows in $S$ (one for each state of the \textit{mDFA}), and knowing that after the first $n$ consistence problems, L* will have to find $2^{n+1}-n$ closedness problem to promote rows from $SA$ to $S$.
+Let $\U = (a+b)^*a(a+b)^n$. \textit{L*} sends a first conjecture thinking that $\U = \varnothing$ since $\E, a$ and $b$ are not in $\U$. However the Teacher give back a counter-example of the shortest word $\omega$ belonging to $S$\footnote{The Teacher is supposed to be the \textit{Minimal Adequate Teacher}}. We have that $\omega = a^{n+1}$ and that all prefix of $\omega$ are not in $\U$. We will have that the table will not be consistent: $row(\E) = row(a^n)$ but $row(\E \cdot a) \neq row(a^n \cdot a)$. So we add the new column $a$. This new column will make $row(\E) = row(a^{n-1})$ but $row(\E \cdot a) \neq row(a^{n-1} \cdot a)$. We continue in this way $n$ times and at that moment we will have $E = \{\E, a, \dots, a^n\}$. This will stop the table to be not consistent since there will be no more similar row in $S$. Since the automaton associated to $\U$ has precisely $2^{n+1}$ states then to have $2^{n+1}$ different rows in $S$ (one for each state of the \textit{mDFA}), and knowing that after the first $n$ consistence problems, L* will have to find $2^{n+1}-n$ closedness problem to promote rows from $SA$ to $S$.
 
 Let's now analyze the NL* behavior.
 
-This algorithm as said in \cref{section:NL}, tries to find all prime residuals of $\U$. After the first conjecture, that, as for the L* is supposed to accept the language $\U = \varepsilon$, the Learner receives the counter-example $c = a^n$. Since \textit{NL} adds the counter-example to $E$ and so it will directly make $E = \{\E, a, \dots, a^n\}$. This coincides with the number of residuals of $\U$. In this case the  algorithms only has to promote $n$ rows, one for each residual and this is possible since the promotion of a rows will create new rows in $SA$ to respect make the \OT complete.
+This algorithm, as said in \cref{section:NL}, tries to find all prime residuals of $\U$. After the first conjecture, that, as for the L* is supposed to accept the language $\U = \varepsilon$, the Learner receives the counter-example $c = a^n$. Since \textit{NL} adds the counter-example to $E$ and so it will directly make $E = \{\E, a, \dots, a^n\}$. This coincides with the number of residuals of $\U$. In this case the  algorithms only has to promote $n$ rows, one for each residual and this is possible since the promotion of a rows will create new rows in $SA$ to respect make the \OT complete.
 
 We can finally note that the number of equivalence queries is the same for the two algorithms since:
 \begin{itemize}
@@ -130,7 +132,7 @@ Finally, it is interesting to see that the number of transition of the \textit{c
 
 The third type of comparison has been performed over a huge number of \textit{Teachers} on the form of \textit{mDFA} of size varying from $1$ to $100$ states. In this way we are able to see in average the performances of \textit{L} versus \textit{NL*}.
 
-This benchmark has been done taking the \textit{Automata} from the \textit{GitHub} repository \url{https://github.com/parof/buchi-automata-benchmark}. Every automaton (they are about ) is supposed to represent a \textit{Büchi Automaton} over a binary alphabet and I have reused them to create \textit{mDFA}. I have transformed then every \textit{Automaton} of the list into a \textit{Teacher} and then, one by one, every \textit{Teacher} has been submitted to \textit{L*} and \textit{NL*} to get at the end some statistics that I could compare to those proposed by Bollig \textit{et al.} in \cite{NLPaper}.
+This benchmark has been done taking the \textit{Automata} from the \textit{GitHub} repository \url{https://github.com/parof/buchi-automata-benchmark}. Every automaton (it is sample of about $2000$ automata) is supposed to represent a \textit{Büchi Automaton} over a binary alphabet and I have reused them to create \textit{mDFA}. I have transformed then every \textit{Automaton} of the list into a \textit{Teacher} and then, one by one, every \textit{Teacher} has been submitted to \textit{L*} and \textit{NL*} to get at the end some statistics that I could compare to those proposed by Bollig \textit{et al.} in \cite{NLPaper}.
 
 \begin{figure}[!htb]
   \centering
@@ -215,7 +217,7 @@ The time complexity is a bit more complicated to calculate. Let $N$ the size of 
   \item $O(n \times m)$ to calculate the intersection of two automata of size $n$ and $m$;
   \item $O(n)$ to test if the automaton is empty or find a counter-example.
 \end{itemize}
-The equivalence ask for:$(\LA \cap \overline{\mathcal{L}(\A')}) \cup (\overline{\LA} \cap \mathcal{L}(\A'))$ and applying the previous complexity asks $O(2 \times (N + n + N \times n)) = O(n \times N)$.
+The equivalence ask for: $(\LA \cap \overline{\mathcal{L}(\A')}) \cup (\overline{\LA} \cap \mathcal{L}(\A'))$ taking $O(2 \times (N + n + N \times n)) = O(n \times N)$.
 
 The Learner complexity is $O(n^3)$ because the size of the longest counter-example will be at most $n$\footnote{The counter-example will always be of least length}.
 
