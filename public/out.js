@@ -710,67 +710,54 @@ define("teacher/Teacher", ["require", "exports", "automaton/Automaton", "teacher
     let t1 = new TeacherTakingAut_js_2.TeacherTakingAut({
         automaton: Automaton_js_2.Automaton.strToAutomaton(`
 [0]
-a0,[14]->[12]
-a0,[14]->[11]
-a0,[14]->[2]
-a0,[14]->[0]
+a1,[14]->[9]
 a1,[14]->[7]
-a1,[14]->[5]
-a0,[13]->[12]
-a0,[13]->[7]
-a1,[13]->[14]
+a0,[13]->[8]
 a0,[12]->[8]
 a0,[12]->[5]
-a0,[12]->[1]
-a1,[12]->[12]
-a0,[11]->[6]
-a1,[11]->[14]
-a1,[11]->[8]
-a1,[11]->[2]
-a0,[10]->[11]
-a1,[10]->[2]
-a0,[9]->[12]
-a0,[9]->[6]
-a0,[9]->[3]
-a1,[9]->[14]
-a1,[9]->[7]
-a0,[8]->[9]
-a0,[8]->[7]
-a0,[8]->[3]
-a1,[8]->[11]
-a1,[8]->[8]
-a1,[8]->[5]
-a1,[7]->[14]
-a0,[6]->[10]
-a0,[6]->[9]
-a0,[6]->[8]
-a0,[6]->[6]
-a1,[6]->[14]
-a1,[6]->[5]
-a1,[6]->[1]
-a0,[5]->[7]
-a1,[5]->[4]
-a1,[4]->[4]
-a1,[4]->[1]
-a0,[3]->[10]
-a0,[3]->[5]
-a1,[3]->[1]
-a0,[2]->[13]
-a0,[2]->[11]
-a1,[2]->[0]
+a1,[12]->[0]
+a0,[11]->[14]
+a0,[11]->[9]
+a1,[11]->[3]
+a0,[10]->[9]
+a0,[10]->[7]
+a1,[10]->[8]
+a1,[10]->[5]
+a0,[9]->[5]
+a1,[9]->[6]
+a1,[8]->[13]
+a1,[8]->[9]
+a0,[7]->[13]
+a1,[7]->[12]
+a1,[7]->[10]
+a1,[7]->[2]
+a1,[7]->[1]
+a0,[6]->[7]
+a0,[6]->[1]
+a0,[5]->[13]
+a0,[5]->[2]
+a0,[5]->[0]
+a0,[4]->[14]
+a0,[4]->[11]
+a1,[4]->[7]
+a0,[3]->[11]
+a0,[3]->[8]
+a1,[3]->[10]
+a1,[3]->[2]
+a1,[2]->[7]
+a1,[2]->[6]
+a1,[2]->[2]
 a0,[1]->[9]
-a0,[1]->[7]
-a1,[1]->[14]
-a1,[1]->[10]
-a1,[1]->[3]
-a1,[1]->[1]
-a0,[0]->[13]
+a0,[1]->[0]
+a1,[1]->[4]
+a0,[0]->[10]
+a0,[0]->[4]
 a0,[0]->[0]
-a1,[0]->[12]
+a1,[0]->[14]
+a1,[0]->[9]
 a1,[0]->[8]
-a1,[0]->[7]
-a1,[0]->[3]
-[8]
+[10]
+[7]
 [0]
 
 `)
@@ -915,7 +902,7 @@ define("learners/LearnerBase", ["require", "exports", "tools/Utilities"], functi
                 this.automaton = automaton;
                 let answer = this.make_equiv(automaton);
                 if (answer != undefined) {
-                    this.table_to_update_after_equiv(answer);
+                    this.table_to_update_after_equiv(answer, false);
                     this.automaton = undefined;
                 }
                 else {
@@ -927,6 +914,24 @@ define("learners/LearnerBase", ["require", "exports", "tools/Utilities"], functi
             while (!this.finish) {
                 this.make_next_query();
             }
+        }
+        get_member_number() {
+            return this.member_number;
+        }
+        get_equiv_number() {
+            return this.equiv_number;
+        }
+        get_consistente_counter() {
+            return this.consistence_counter;
+        }
+        get_closedness_counter() {
+            return this.closedness_counter;
+        }
+        get_state_number() {
+            return this.automaton.state_number();
+        }
+        get_transition_number() {
+            return this.automaton.transition_number();
         }
         same_row(a, b) {
             return this.observation_table[a] == this.observation_table[b];
@@ -991,7 +996,7 @@ define("learners/L_star", ["require", "exports", "automaton/Automaton", "learner
             }
         }
         table_to_update_after_equiv(answer) {
-            this.add_elt_in_S(answer);
+            this.add_elt_in_S(answer, true);
         }
     }
     exports.L_star = L_star;
@@ -1145,7 +1150,7 @@ define("html_interactions/HTML_LearnerBase", ["require", "exports", "Main", "too
                                 this.pile_actions.push(() => {
                                     this.message().innerHTML = "";
                                     (0, Main_js_1.clear_automaton_HTML)();
-                                    this.table_to_update_after_equiv(answer);
+                                    this.learner.table_to_update_after_equiv(answer, true);
                                     this.clear_table();
                                     this.draw_table();
                                 });
@@ -1190,9 +1195,6 @@ define("html_interactions/HTML_L_star", ["require", "exports", "learners/L_star"
         The column "${new_col}" will be added in E since T(${s1 + new_col}) ≠ T(${s2 + new_col}) 
         [Note : ${new_col} = ${fstChar} ∘ ${sndChar} and ${fstChar} ∈ Σ and ${sndChar} ∈ E]`;
         }
-        table_to_update_after_equiv(answer) {
-            this.learner.add_elt_in_S(answer, true);
-        }
     }
     exports.HTML_L_star = HTML_L_star;
 });
@@ -1228,8 +1230,8 @@ define("learners/NL_star", ["require", "exports", "automaton/Automaton", "learne
         check_prime_lines() {
             this.prime_lines = [...this.S, ...this.SA].filter(l => this.is_prime(l));
         }
-        add_elt_in_S(new_elt) {
-            super.add_elt_in_S(new_elt);
+        add_elt_in_S(new_elt, after_equiv = false) {
+            super.add_elt_in_S(new_elt, after_equiv);
             this.check_prime_lines();
             return;
         }
@@ -1253,7 +1255,7 @@ define("learners/NL_star", ["require", "exports", "automaton/Automaton", "learne
                         let value_s2_p = this.observation_table[s2 + a];
                         if (!this.is_covered(value_s1_p, value_s2_p)) {
                             for (let i = 0; i < this.E.length; i++) {
-                                if (this.observation_table[s1 + a][i] <
+                                if (this.observation_table[s1 + a][i] >
                                     this.observation_table[s2 + a][i] && !this.E.includes(a + this.E[i])) {
                                     this.consistence_counter++;
                                     return [s1, s2, a + this.E[i]];
@@ -1263,19 +1265,19 @@ define("learners/NL_star", ["require", "exports", "automaton/Automaton", "learne
                     }
                     return;
                 }
-                for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
-                    for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
-                        let s1 = this.S[s1_ind];
-                        let s2 = this.S[s2_ind];
-                        let test1 = testCovering(s1, s2);
-                        if (test1)
-                            return test1;
-                        let test2 = testCovering(s2, s1);
-                        if (test2)
-                            return test1;
-                    }
-                }
             };
+            for (let s1_ind = 0; s1_ind < this.S.length; s1_ind++) {
+                for (let s2_ind = s1_ind + 1; s2_ind < this.S.length; s2_ind++) {
+                    let s1 = this.S[s1_ind];
+                    let s2 = this.S[s2_ind];
+                    let test1 = testCovering(s1, s2);
+                    if (test1)
+                        return test1;
+                    let test2 = testCovering(s2, s1);
+                    if (test2)
+                        return test2;
+                }
+            }
             return;
         }
         make_automaton() {
@@ -1309,7 +1311,7 @@ define("learners/NL_star", ["require", "exports", "automaton/Automaton", "learne
             return this.automaton;
         }
         table_to_update_after_equiv(answer) {
-            this.add_elt_in_E(answer);
+            this.add_elt_in_S(answer, true);
         }
     }
     exports.NL_star = NL_star;
@@ -1340,9 +1342,6 @@ define("html_interactions/HTML_NL_star", ["require", "exports", "learners/NL_sta
         row(${s1 ? s1 : "ε"}) ⊑ row(${s2 ? s2 : "ε"}) where ${s1 ? s1 : "ε"}, ${s2 ? s2 : "ε"} ∈ S but row(${s1 + new_col[0]}) ⋢ row(${s2 + new_col[0]});
         The column "${new_col}" will be added in E since T(${s1 + new_col}) ≠ T(${s2 + new_col}) 
         [Note : ${new_col} = ${fstChar} ∘ ${sndChar} and ${fstChar} ∈ Σ and ${sndChar} ∈ E]`;
-        }
-        table_to_update_after_equiv(answer) {
-            this.learner.add_elt_in_E(answer, true);
         }
     }
     exports.HTML_NL_star = HTML_NL_star;
@@ -1445,6 +1444,7 @@ define("Main", ["require", "exports", "teacher/Teacher", "html_interactions/HTML
             let newTeacherOption;
             if (regexAlreadyExists) {
                 newTeacherOption = regexAlreadyExists;
+                currentTeacher = mapTeacherValue[teacherSelector.selectedOptions[0].value];
             }
             else {
                 currentTeacher = new TeacherAutomaton_js_2.TeacherAutomaton(newRegex.value, `My automaton with regex = (${newRegex.value})`);
@@ -1597,24 +1597,24 @@ define("learners/Observation_table", ["require", "exports", "tools/Utilities"], 
     exports.Observation_table = void 0;
     class Observation_table {
         constructor() {
-            this.columns = {};
-            this.rows = {};
+            this.columns = [];
+            this.rows = [];
             this.matrix = [[]];
         }
         add_column(column_name) {
-            this.columns[column_name] = Object.keys(this.columns).length;
+            this.columns.push(column_name);
         }
         add_row(row_name) {
-            this.rows[row_name] = Object.keys(this.rows).length;
+            this.rows.push(row_name);
         }
         set_value(row_name, column_name, bool) {
-            this.matrix[this.rows[row_name]][this.columns[column_name]] = bool;
+            this.matrix[this.rows.indexOf(row_name)][this.columns.indexOf(column_name)] = bool;
         }
         get_value(row_name, column_name) {
-            return this.matrix[this.rows[row_name]][this.columns[column_name]];
+            return this.matrix[this.rows.indexOf(row_name)][this.columns.indexOf(column_name)];
         }
         get_row(row_name) {
-            return this.matrix[this.rows[row_name]];
+            return this.matrix[this.rows.indexOf(row_name)];
         }
         same_row(row1, row2) {
             const r1 = this.get_row(row1);
@@ -1639,7 +1639,7 @@ define("test_nodejs/Automaton_minimize_test", ["require", "exports", "tools/Util
     (0, Utilities_js_12.myLog)({ a: [a.minimize().matrix_to_mermaid()] });
     (0, Utilities_js_12.myLog)({ a: [] });
 });
-define("test_nodejs/PrintFunction", ["require", "exports", "assert", "fs"], function (require, exports, assert_1, fs_1) {
+define("test_nodejs/PrintFunction", ["require", "exports", "learners/LearnerBase", "assert", "fs"], function (require, exports, LearnerBase_js_3, assert_1, fs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.writeToFile = exports.clearFile = exports.csvHead = exports.printCsvCompare = exports.printInfo = void 0;
@@ -1649,10 +1649,11 @@ define("test_nodejs/PrintFunction", ["require", "exports", "assert", "fs"], func
     exports.printInfo = printInfo;
     let printCsvCompare = (L, NL) => {
         (0, assert_1.strict)(L.teacher == NL.teacher);
-        return `${L.teacher.regex},${L.teacher.alphabet.length},${L.teacher.description.split(",")[0]},${L.member_number},${NL.member_number},${L.equiv_number},${NL.equiv_number},${L.automaton?.state_number()},${NL.automaton?.state_number()},${L.automaton?.transition_number()},${NL.automaton?.transition_number()}`;
+        let printProperty = (propery) => `${propery.call(L)},${propery.call(NL)}`;
+        return `${L.teacher.regex}, ${L.teacher.alphabet.length}, ${L.teacher.description.split(",")[0]}, ${printProperty(LearnerBase_js_3.LearnerBase.prototype.get_member_number)}, ${printProperty(LearnerBase_js_3.LearnerBase.prototype.get_equiv_number)}, ${printProperty(LearnerBase_js_3.LearnerBase.prototype.get_state_number)}, ${printProperty(LearnerBase_js_3.LearnerBase.prototype.get_transition_number)}, ${printProperty(LearnerBase_js_3.LearnerBase.prototype.get_closedness_counter)}, ${printProperty(LearnerBase_js_3.LearnerBase.prototype.get_consistente_counter)}`;
     };
     exports.printCsvCompare = printCsvCompare;
-    exports.csvHead = "Regex,Length alphabet,Description,L Membership queries,NL Membership queries,L Equivalence queries,NL Equivalence queries,L State nb in A,NL State nb in A,L Transition nb in A,NL Transition nb in A";
+    exports.csvHead = "Regex,Length alphabet,Description,L Membership queries,NL Membership queries,L Equivalence queries,NL Equivalence queries,L State nb in A,NL State nb in A,L Transition nb in A,NL Transition nb in A,L Closedness,NL Closedness,L Consistence,NL Consistence";
     let fileNameToCsv = (fileName) => "./statistics/" + fileName + ".csv";
     let clearFile = (fileName) => (0, fs_1.writeFileSync)(fileNameToCsv(fileName), "");
     exports.clearFile = clearFile;
@@ -1665,27 +1666,7 @@ define("test_nodejs/CompareBenchMark", ["require", "exports", "fs", "test_nodejs
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let benchMark = true;
-    let path = ("./statistics/" + (benchMark ? "benchMark/" : "automata/")), fileName = benchMark ? "benchMark" : "randomAutomata", files = (0, fs_2.readdirSync)(path), automata = [], minStateNb = 3, maxStateNb = 5, toWrite = false;
-    let l = [
-        '1.5-0.1/A13.ba', '1.5-0.1/A17.ba', '1.5-0.1/A19.ba', '1.5-0.1/A2.ba', '1.5-0.1/A37.ba', '1.5-0.1/A42.ba',
-        '1.5-0.1/A44.ba', '1.5-0.1/A58.ba', '1.5-0.1/A7.ba', '1.5-0.1/A82.ba', '1.5-0.1/A85.ba', '1.5-0.1/A93.ba',
-        '1.5-0.1/A99.ba', '1.5-0.1/B12.ba', '1.5-0.1/B18.ba', '1.5-0.1/B23.ba', '1.5-0.1/B37.ba', '1.5-0.1/B48.ba', '1.5-0.1/B49.ba',
-        '1.5-0.1/B5.ba', '1.5-0.1/B58.ba', '1.5-0.1/B60.ba', '1.5-0.1/B71.ba',
-        '1.5-0.1/B80.ba', '1.5-0.1/B9.ba',
-        '1.5-0.2/A2.ba', '1.5-0.2/A42.ba', '1.5-0.2/A89.ba',
-        '1.5-0.2/A9.ba', '1.5-0.2/B15.ba', '1.5-0.2/B30.ba', '1.5-0.2/B48.ba', '1.5-0.2/B53.ba', '1.5-0.2/B59.ba',
-        '1.5-0.2/B71.ba', '1.5-0.2/B81.ba',
-        '1.5-0.2/B92.ba', '1.5-0.3/A36.ba',
-        '1.5-0.3/A5.ba', '1.5-0.3/A52.ba', '1.5-0.4/A50.ba', '1.5-0.4/A53.ba', '1.5-0.4/A65.ba', '',
-        '1.5-0.5/A2.ba', '1.5-0.5/A4.ba', '1.5-0.5/A69.ba', '1.5-0.5/A96.ba',
-        '1.5-0.5/B20.ba', '1.5-0.5/B79.ba',
-        '1.5-0.5/B91.ba', '1.5-0.6/A5.ba',
-        '1.5-0.6/B89.ba', '1.5-0.6/B97.ba', '1.5-0.7/A40.ba',
-        '1.5-0.7/A64.ba', '1.5-0.7/B50.ba',
-        '1.5-0.7/B73.ba', '1.5-0.8/A42.ba',
-        '1.5-0.8/A88.ba', '1.5-0.8/B54.ba', '1.5-0.9/A40.ba',
-        '1.5-0.9/B16.ba', '1.5-1/B86.ba'
-    ];
+    let path = ("./statistics/" + (benchMark ? "benchMark/" : "automata/")), fileName = benchMark ? "benchMark" : "randomAutomata", files = (0, fs_2.readdirSync)(path), automata = [], minStateNb = 0, maxStateNb = 63, toWrite = false;
     for (const underFolder of files) {
         (0, Utilities_js_13.myLog)({ a: [underFolder] });
         if (!underFolder.startsWith("1.5"))
@@ -1723,18 +1704,21 @@ define("test_nodejs/CompareBenchMark", ["require", "exports", "fs", "test_nodejs
         let L = new L_star_js_3.L_star(teacher), NL = new NL_star_js_3.NL_star(teacher);
         (0, Utilities_js_13.myLog)({ a: ["=".repeat(90)] });
         console.error(file, "Current benchmark :", index, "/", automata.length, "With state number", teacher.automaton.state_number());
-        (0, Utilities_js_13.myLog)({ a: [file, "Current benchmark :", index, "/", automata.length, "With state number", teacher.automaton.state_number()] });
+        (0, Utilities_js_13.myLog)({ a: [file, "Current benchmark :", index, "/", automata.length, "With state number", teacher.automaton.state_number()], toLog: true });
         L.make_all_queries();
         console.error("In L*");
-        (0, Utilities_js_13.myLog)({ a: ["-".repeat(80)] });
+        (0, Utilities_js_13.myLog)({ a: [(0, PrintFunction_js_1.printInfo)(L, "L*")], toLog: true });
         NL.make_all_queries();
+        (0, Utilities_js_13.myLog)({ a: ["-".repeat(80)] });
         console.error("In NL*");
-        if (L.consistence_counter > 0 && L.closedness_counter > 0 &&
-            NL.consistence_counter > 0 && NL.closedness_counter > 0 &&
-            L.equiv_number > NL.equiv_number) {
-            (0, Utilities_js_13.myLog)({ a: [(0, PrintFunction_js_1.printInfo)(L, "L*")] });
-            (0, Utilities_js_13.myLog)({ a: [(0, PrintFunction_js_1.printInfo)(NL, "NL*")] });
-            (0, Utilities_js_13.myLog)({ a: [(0, PrintFunction_js_1.printCsvCompare)(L, NL)] });
+        (0, Utilities_js_13.myLog)({ a: [(0, PrintFunction_js_1.printInfo)(NL, "NL*")], toLog: true });
+        if (L.consistence_counter > 1 && L.closedness_counter > 1 &&
+            NL.consistence_counter > 1 && NL.closedness_counter > 1 &&
+            L.equiv_number > NL.equiv_number && NL.equiv_number > 0) {
+            (0, Utilities_js_13.myLog)({ a: [(0, PrintFunction_js_1.printInfo)(L, "L*")], toLog: true });
+            (0, Utilities_js_13.myLog)({ a: [(0, PrintFunction_js_1.printInfo)(NL, "NL*")], toLog: true });
+            (0, Utilities_js_13.myLog)({ a: [(0, PrintFunction_js_1.printCsvCompare)(L, NL)], toLog: true });
+            break;
         }
         if (toWrite)
             (0, PrintFunction_js_1.writeToFile)(fileName, (0, PrintFunction_js_1.printCsvCompare)(L, NL));
@@ -1825,7 +1809,7 @@ define("test_nodejs/LearnerCompare", ["require", "exports", "learners/NL_star", 
 define("test_nodejs/Test_wrost_DFA", ["require", "exports", "test_nodejs/PrintFunction", "learners/L_star", "learners/NL_star", "teacher/TeacherNoAutomaton", "tools/Utilities"], function (require, exports, PrintFunction_js_3, L_star_js_5, NL_star_js_5, TeacherNoAutomaton_js_2, Utilities_js_15) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let toWrite = false;
+    let toWrite = true;
     let fileName = "wrostDFA";
     if (toWrite) {
         (0, PrintFunction_js_3.clearFile)(fileName);
@@ -1873,7 +1857,7 @@ define("test_nodejs/Test_wrost_DFA", ["require", "exports", "test_nodejs/PrintFu
 define("test_nodejs/Test_wrost_RFSA", ["require", "exports", "test_nodejs/PrintFunction", "learners/L_star", "learners/NL_star", "teacher/TeacherTakingAut", "automaton/Automaton", "automaton/automaton_type", "tools/Utilities"], function (require, exports, PrintFunction_js_4, L_star_js_6, NL_star_js_6, TeacherTakingAut_js_5, Automaton_js_10, automaton_type_js_6, Utilities_js_16) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let toWrite = false;
+    let toWrite = true;
     let fileName = "wrostRFSA";
     if (toWrite) {
         (0, PrintFunction_js_4.clearFile)(fileName);

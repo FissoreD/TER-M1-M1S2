@@ -1,8 +1,8 @@
 import { Automaton, State } from "../automaton/Automaton.js";
-import { TeacherAutomaton } from "./TeacherAutomaton.js";
-import { TeacherNoAutomaton } from "./TeacherNoAutomaton.js";
+import { TeacherAutomatonStr } from "./TeacherAutomatonStr.js";
+import { TeacherRegex } from "./TeacherRegex.js";
 import { allStringFromAlphabet } from "../tools/Utilities.js";
-import { TeacherTakingAut } from "./TeacherTakingAut.js";
+import { TeacherAutomaton } from "./TeacherAutomaton.js";
 
 export interface Teacher {
   description: string;
@@ -24,13 +24,13 @@ export interface Teacher {
 /** 
  * a teacher accepting a + (ba)*
  */
-export let teacher_a_or_baStar = new TeacherAutomaton("a+(ba)*");
+export let teacher_a_or_baStar = new TeacherAutomatonStr("a+(ba)*");
 
 /** 
  * a teacher accepting the language over {0, 1}
  * of strings with even number of 0 and even number of 1
  */
-export let teacherPairZeroAndOne = new TeacherAutomaton(
+export let teacherPairZeroAndOne = new TeacherAutomatonStr(
   "(00+11+(01+10)(00+11)*(01+10))*",
   `Automaton accepting L = {w in (0, 1)* | #(w_0) % 2 = 0 and #(w_1) % 2 = 0} <br/> → words with even nb of '0' and even nb of '1'`);
 
@@ -39,7 +39,7 @@ export let teacherPairZeroAndOne = new TeacherAutomaton(
  * of strings with an "a" in the third letter from end
  * (exemple abb, baab, bbabbaab)
  */
-export let teacherA3fromLast = new TeacherAutomaton(
+export let teacherA3fromLast = new TeacherAutomatonStr(
   "(a+b)*a(a+b)(a+b)",
   `Automaton accepting L = {w in (a, b)* | w[-3] = a} <br/>
     → words with an 'a' in the 3rd pos from end`,
@@ -48,7 +48,7 @@ export let teacherA3fromLast = new TeacherAutomaton(
  * a teacher accepting the language over {a, b}
  * of strings with any even number of "a" or at least three "b"
  */
-export let teacherEvenAandThreeB = new TeacherAutomaton(
+export let teacherEvenAandThreeB = new TeacherAutomatonStr(
   "b*a(b+ab*a)*+(a+b)*ba*ba*b(a+b)*",
   `Automaton accepting L = {w in (a, b)* | #(w_b) ≥ 3 or #(w_a) % 2 = 1}
   <br/> → words with at least 3 'b' or an odd nb of 'a'`
@@ -59,7 +59,7 @@ export let teacherEvenAandThreeB = new TeacherAutomaton(
  * of strings not having an a in a position multiple
  * of 4 
  */
-export let teacherNotAfourthPos = new TeacherAutomaton(
+export let teacherNotAfourthPos = new TeacherAutomatonStr(
   "((a+b)(a+b)(a+b)b)*(a+b+$)(a+b+$)(a+b+$)",
   `Automaton accepting L = {w ∈ (a,b)* and i ∈ 4ℕ | w[i] ≠ a and i ≤ len(w)} <br/>
   → words without an 'a' in a position multiple of 4`)
@@ -67,16 +67,16 @@ export let teacherNotAfourthPos = new TeacherAutomaton(
 /**
  * a teacher accepting the regex bb*a + a*b*
  */
-export let teacher_bStar_a_or_aStart_bStar = new TeacherNoAutomaton(
+export let teacher_bStar_a_or_aStart_bStar = new TeacherRegex(
   { alphabet: "ab", regex: "((bb*a)|(a*b*))", counter_examples: ["bba", "b", "aabb", "aba", "aa", "bbaa"] },
   `Automaton accepting L = regex((bb^*a) + (a^*b^*))`)
 
 /**
  * a teacher accepting the regex bb*($ + a(b(a+b))*)
  */
-export let teacher_b_bStar_a__b_aOrb_star = new TeacherAutomaton("bb*($+a(b(a+b))*)")
+export let teacher_b_bStar_a__b_aOrb_star = new TeacherAutomatonStr("bb*($+a(b(a+b))*)")
 
-export let binaryAddition = new TeacherNoAutomaton(
+export let binaryAddition = new TeacherRegex(
   {
     alphabet: "012345678",
     regex: sentence => {
@@ -101,7 +101,7 @@ export let binaryAddition = new TeacherNoAutomaton(
        * 1 = 001 (the 3rd col), 6 = 110 (the 4th col) 
        **/</pre> `)
 
-let t1 = new TeacherTakingAut({
+let t1 = new TeacherAutomaton({
   automaton: Automaton.strToAutomaton(`
 [0]
 a1,[14]->[9]

@@ -27,8 +27,8 @@
           \end{tabular}
         \end{minipage}\quad
         \begin{minipage}{0.6\textwidth}
-          $ab$ and $aa$ have been added in $SA$ to respect the condition where : $\forall x \in S, \forall y \in \Sigma, \exists z \in S_{ext} \text{ such that } x \cdot y = z $.\\
-          The table is closed ($\forall x \in SA, \exists s \in S | row(x) = row(s)$) and consistent (there are no two similar rows in $S$), the \textit{Learner} can send its conjecture.
+          $ab$ and $aa$ have been added in $SA$ to respect the condition where: $\forall x \in S, \forall y \in \Sigma, \exists z \in S_{ext} \text{ such that } x \cdot y = z $.\\
+          The table is closed ($\forall x \in SA, \exists s \in S \mid row(x) = row(s)$) and consistent (there are no two similar rows in $S$), the \textit{Learner} can send its conjecture.
         \end{minipage}
 
   \item \begin{minipage}{0.3\textwidth}
@@ -37,7 +37,7 @@
         \begin{minipage}{0.6\textwidth}
           This is the automaton sent.
           The states are $0$ and $1$ since there are two distinct rows in the upper part of the table, $1$ is the initial state since $row(\E) = 0$ and it is also accepting since $T(\E) = 1$.\\
-          Transitions are made as follow : \\
+          Transitions are made as follow: \\
           \begin{itemize}
             \item $\delta(1, a) = \delta(row(\E), a) = row(\E \cdot a) = 0$.
             \item $\delta(1, b) = \delta(row(\E), b) = row(\E \cdot b) =  1$.
@@ -65,7 +65,7 @@
         \end{minipage} \quad
         \begin{minipage}{0.5\textwidth}
           $aba$ as been added in $S$ as well as each of its prefixes. $abab, abaa \text{ and } abb$ have been added in $SA$ to keep the \OT complete. \\
-          This table is not consistent : $row(a) = row(aba)$ but taking $row(a \cdot a) \neq row(aba \cdot abaa)$. Column $a$ is going to be added because $T(a \cdot a \cdot \E) \neq row(aba \cdot a \cdot \E)$
+          This table is not consistent: $row(a) = row(aba)$ but taking $row(a \cdot a) \neq row(aba \cdot abaa)$. Column $a$ is going to be added because $T(a \cdot a \cdot \E) \neq row(aba \cdot a \cdot \E)$
         \end{minipage}
 
   \item \begin{minipage}{0.3\textwidth}
@@ -85,7 +85,7 @@
           \end{tabular}
         \end{minipage} \quad
         \begin{minipage}{0.5\textwidth}
-          $T_43$ is not closed : $row(b)$ is not present in $S$, so it will be promoted.
+          $T_43$ is not closed: $row(b)$ is not present in $S$, so it will be promoted.
         \end{minipage}
 
   \item \begin{minipage}{0.3\textwidth}

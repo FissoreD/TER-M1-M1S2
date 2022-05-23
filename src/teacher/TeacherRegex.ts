@@ -4,13 +4,13 @@ import { equivalenceFunction } from "./Equiv.js";
 import { Teacher } from "./Teacher.js";
 
 /** 
- * Teacher taking a js function to test the memebership of a word.
- * We must pass a list of counter-exemple to answer to equivalence queries.
+ * Teacher taking a js function to test the membership of a word.
+ * We must pass a list of counter-example to answer to equivalence queries.
  * If needed you can use the {@link allStringFromAlphabet} function to 
- * create all words on a given alphabet with lenght smaller or equal
+ * create all words on a given alphabet with length smaller or equal
  * to a given length
  */
-export class TeacherNoAutomaton implements Teacher {
+export class TeacherRegex implements Teacher {
   static counter = 0;
 
   check_function: myFunction<string, boolean>;
@@ -22,7 +22,7 @@ export class TeacherNoAutomaton implements Teacher {
   regex: string;
 
   constructor(params: {
-    regex: string | myFunction<string, boolean>, counter_examples: string[], alphabet:
+    regex: string | myFunction<string, boolean>, counter_examples?: string[], alphabet:
     string[] | string
   }, description?: string) {
 
@@ -38,7 +38,7 @@ export class TeacherNoAutomaton implements Teacher {
         s => s.match(new RegExp(`^(${params.regex})$`)) != undefined :
         params.regex as myFunction<string, boolean>;
 
-    this.counter_examples = params.counter_examples;
+    this.counter_examples = params.counter_examples || [];
   }
 
   member(sentence: string): string {

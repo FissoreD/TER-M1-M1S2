@@ -5,7 +5,7 @@ import { Automaton } from "./automaton/Automaton.js";
 import { L_star } from "./learners/L_star.js";
 import { NL_star } from "./learners/NL_star.js";
 import * as autFunction from "./automaton/automaton_type.js";
-import { TeacherAutomaton } from "./teacher/TeacherAutomaton.js";
+import { TeacherAutomatonStr } from "./teacher/TeacherAutomatonStr.js";
 import { TeacherUser } from "./teacher/TeacherUser.js";
 import { myLog } from "./tools/Utilities.js";
 
@@ -27,7 +27,7 @@ export function initiate_global_vars() {
   historyHTML.push([document.getElementById('centerDiv')!.cloneNode(true) as HTMLElement, undefined])
 
   $('#leftCol span')[0]!.onclick = goBackward
-  $('#rightCol span')[0]!.onclick = goForeward
+  $('#rightCol span')[0]!.onclick = goForward
 
   document.onkeydown = (key) => {
     switch (key.code) {
@@ -35,7 +35,7 @@ export function initiate_global_vars() {
         goBackward();
         break;
       case 'ArrowRight':
-        goForeward();
+        goForward();
         break;
     }
   }
@@ -92,7 +92,7 @@ export function initiate_global_vars() {
       newTeacherOption = regexAlreadyExists as HTMLOptionElement;
       currentTeacher = mapTeacherValue[teacherSelector.selectedOptions[0].value];
     } else {
-      currentTeacher = new TeacherAutomaton(
+      currentTeacher = new TeacherAutomatonStr(
         newRegex.value,
         `My automaton with regex = (${newRegex.value})`);
       newTeacherOption = createRadioTeacher(currentTeacher);
@@ -148,7 +148,7 @@ function clearHistory() {
   clear_automaton_HTML();
 }
 
-export function goForeward() {
+export function goForward() {
   let lengthHistory = historyHTML.length;
   if (historyPosition + 1 < lengthHistory) {
     historyPosition++;

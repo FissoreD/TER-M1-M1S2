@@ -3,7 +3,7 @@
 \begin{algorithm}[H]
   \caption{IsClosed Function}
   \KwData{$S, SA$}
-  \KwResult{True if OT is closed, else $w \in SA | row(w) \notin upper(OT)$}
+  \KwResult{True if OT is closed, else $\omega \in SA \mid row(\omega) \notin upper(OT)$}
   \For{$\forall x \in SA$}{
     \If{$\nexists s \in S \text{ such that } row[x] = row[s]$}{
       \Return $\{isClosed = False, rowToPromote = x\}$;

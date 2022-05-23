@@ -28,7 +28,7 @@ export class NL_star extends LearnerBase {
   /**
    * Given two rows, {@link row1} and {@link row2} 
    * it return the union of them, that is the logic 
-   * or of them, for exemple : row_union(0101, 0110) 
+   * or of them, for example : row_union(0101, 0110) 
    * returns 0111
    */
   row_union(row1: string, row2: string): string {
@@ -38,7 +38,7 @@ export class NL_star extends LearnerBase {
   /**
    * returns if {@link row1} is covered by {@link row2}
    * row1 is covered if every bit of is smaller then the 
-   * corresponding bit of row2. For exemple :
+   * corresponding bit of row2. For example :
    * 01100 is covered by 01110
    * 01101 is not covered by 01110 (due to last bit of r1)
    */
@@ -143,6 +143,6 @@ export class NL_star extends LearnerBase {
   }
 
   table_to_update_after_equiv(answer: string): void {
-    this.add_elt_in_S(answer, true);
+    this.add_elt_in_E(answer, true);
   }
 }

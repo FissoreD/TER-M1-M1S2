@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "fs";
 import { clearFile, csvHead, printCsvCompare, printInfo, writeToFile } from "./PrintFunction.js";
-import { TeacherTakingAut } from "../teacher/TeacherTakingAut.js";
+import { TeacherAutomaton } from "../teacher/TeacherAutomaton.js";
 import { L_star } from "../learners/L_star.js";
 import { NL_star } from "../learners/NL_star.js";
 import { Teacher } from "../teacher/Teacher.js";
@@ -30,7 +30,7 @@ for (const underFolder of files) {
     myLog({ a: ["Creating automaton of file", underFolder + "/" + file] });
     let content = readFileSync(newPath + file).toString();
     let automaton = Automaton.strToAutomaton(content);
-    let teacher = new TeacherTakingAut({ automaton: automaton, regex: underFolder + "/" + file })
+    let teacher = new TeacherAutomaton({ automaton: automaton, regex: underFolder + "/" + file })
     myLog({ a: ["State number is", "-".repeat(50), teacher.automaton.state_number()] })
     if (
       teacher.automaton.state_number() > minStateNb

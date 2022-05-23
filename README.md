@@ -12,40 +12,31 @@ to implement them and compare them.
 ## About the project
 This project has been realized in Spring 2022 with reference to the course "Travail Encadré de Recherche" within the Master 1 in *Computer Science* at the University *Côte d'Azur* in *Biot*.
 
-## Prject launch 
+## How to use it 
 
-### In the console
-The first time you want launch the project with node.js, 
-run the following commands `npm install` to download
-all needed dependencies
+$L^*$ and $NL^*$ are two learning algorithms which can understand an unknown regular language $U$ via membership and equivalence queries.
+
+Their implementation is available at [This Link](https://fissored.github.io/TER-M1-S2/) where you can enter your regular expression and pass it to the Learners.
+
+### Some useful command
+If you want to modify or reuse the typescript file, you need to launch `npm install` to download all required dependencies.
 
 Then you can run :
-- `npm run clean` to remove the dist folder (dist folder is where ts files are compiled in js)
+- `npm run clean` to remove the dist folder (dist folder is where ts compiled files are)
 - `npm run typecheck` to check statically if there are some typing errors
-- `npm run build` to clean and compile *ts* files in *js*
 - `npm run compile` to compile *ts* files in *js* and put them in *dist* folder
-- `npm run compilew` same as before command but in watch mode.
-
-### In the HTML page
-The project can be opened in the browser thanks the *index.html* file. 
-
-The html page works only if *ts* from *src* folder are compiled in *dist- folder (command ). By default, you don't need to compile them, since compiled files are already pushed in the GitHub repository.
-
-If you make changes in *ts* files, you must recompile them to see modification in the *html* page.  
-To run the *index.html* in browser, you should launch a local server from the project.  
-Suggestion : if you use VSCode, you can install the extension [*Live Server*](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer).
+- `npm run compilew` same as before command but in watch mode (useful if you have to compile frequently the source files).
 
 ## Compare L* and NL*
 To compare these two algorithms, you can launch the command 
-- `npm run wrostDFA` to compare them on regex of style (a+b)*a(a+b)^n
-- `npm run compare` to compare them on random regex
 
-Once you have done this, you can see the corresponding csv file in the statistic
-folder, you can plot this csv thanks to a mini-python program that can be run with the 
-command : `py statistics\pythonPlotter\csvToPlot.py`
+- `npm run worstDFA` to compare them on regex of style (a+b)*a(a+b)^n;
+- `npm run worstRFSA` to compare them on a recursive definition of a regular language where the *cRFSA* as the same number of state of the *mDFA*;
+- `npm run benchmark` to compare them on random regex taken from [this link](https://fissored.github.io/TER-M1-S2/)
 
-The resulting plots will be drawn in the *statistics/plots* folder.  
-(Depending on your machine, the *npm* commands that generates the *csv* may be slow, this is because of operation of determinisation and comparaison of automata, in this case you can interrupt the process with *CTRL-C* -> csv files will contain rows up to where the program arrived to write)
+After testing, you can see the corresponding csv file in the statistic folder and you can plot them with a mini-python program : command = `npm run plotter`
+
+The resulting plots will be drawn in the *statistics/plots* folder. 
 
 ## Author 
 Fissore Davide

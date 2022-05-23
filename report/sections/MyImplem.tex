@@ -1,210 +1,241 @@
 \section{My implementation of the L* and NL*}
-During this semester, I've implemented the two algorithms to better understand them and at the end to be able to compare their performances.
+While studying the two algorithms, I started to implement them because I thought that it was a good idea to see how they do concretely work.
+
+The programming language I used is \textit{TypeScript}, the typed version of \textit{Javascript}. I decided to use it because I like typed languages and also because, one compiled, \textit{JavaScript} can be run both on browsers and in terminal thanks to \textit{NodeJs} (a good \textit{Javascript} run time environment).
+
+I have started to organize my \textit{GitHub} repository and created these folders:
+\begin{itemize}
+  \item \textit{pdf\_src} which contains the main papers I studied during my \textit{TER};
+  \item \textit{report} with the \LaTeX{} source files to build this report;
+  \item \textit{src} containing the \textit{TypeScript} source files;
+  \item \textit{public} where I put the public \textit{JavaScript} libraries to render \textit{Automata} (the \textit{d3-graphviz.js} file) and to make operations between \textit{Automata} (the \textit{noam.js} file);
+  \item \textit{dist} which is the folder where the \textit{TypeScript} compiler creates the compiled \textit{JavaScript} files;
+  \item \textit{statistics} containing the results of my comparisons of performances between \textit{L*} and \textit{NL*};
+\end{itemize}
 
 \subsection{About the Teacher}
-In this report I have barely explained what a \textit{Teacher} is. As said in the Introduction, a \textit{Teacher} is an entity knowing the language and answering to membership and equivalence queries. It is easy to see how a membership query can be answered: if the \textit{Teacher} knows the language, it can only submit the received word to the language and check if the word is in it.
 
-However it is less evident how the \textit{Teacher} should verify if a conjecture is valid or if not to send the counter-example.
+A major problem that I soon had to overcome was represent the interactions between Learner and Teacher, (see \cref{eq:interactions}). That's why  I did not only have to implement the Learner, but also the Teacher.
+
+As said in the Introduction, a \textit{Teacher} is an entity knowing the language and answering to membership and equivalence queries. It is quite easy to see how a membership query can be answered: the Teacher can test if the received word belongs to its language.
+
+However it is less evident how the \textit{Teacher} could verify if a conjecture is valid or if not to send the counter-example.
+
 \begin{definition}
-  The \textit{Teacher} providing every time a counter-example of shortest length is called \textit{Minimal Adequate Teacher}.
+  In \cite{LPaper}, a \textit{Teacher} providing every time a counter-example of shortest length is called \textit{Minimal Adequate Teacher}.
 \end{definition}
 
-From this moment on let's suppose that the \textit{Teacher} is the \textit{Minimal Adequate Teacher} and that the language is represent by the \textit{Automaton} \automaton{}.
+Following this idea, I have decided to implement this king of Teacher because, since the complexity of the algorithms also depends on the length of the counter-examples, it would have been more interesting to reduce as much as possible the value of $m$ obtaining therefore a complexity of $O(n^3)$.
 
-When the \textit{Learner} sends the conjecture $\A'$, the \textit{Teacher} has to perform the symmetrical difference of $L(\A) \Delta L(\mathcal{A'})$ to find the counter-example of shortest length. This operation can be made in the following way :
+From this moment on, I will consider a Teacher to be the \textit{Minimal Adequate Teacher}.
+
+When the \textit{Learner} sends the conjecture $\A$, the \textit{Teacher} has to perform the symmetrical difference between $\U$ and $\LA$ to find the counter-example of shortest length. This operation can be made in the following way:
 
 \begin{algorithm}
-  \caption{Shortest counter-example in $L(\A) \Delta L(\mathcal{A'})$}
-  $A_1 \gets \A \cap \overline{\mathcal{A'}}$\;
-  $A_2 \gets \mathcal{A'} \cap \overline{\A}$\;
-  $w_1 \gets \text{ the shortest word accepted by } A_1$\;
-  $w_2 \gets \text{ the shortest word accepted by } A_2$\;
+  \caption{Shortest counter-example in $U \Delta \LA$}
+  $\A_1 \gets \LA \cap \overline{\U}$\;
+  $\A_2 \gets \overline{\LA} \cap \U$\;
+  $w_1 \gets \text{ the shortest word accepted by } \A_1$\;
+  $w_2 \gets \text{ the shortest word accepted by } \A_2$\;
   \Return shortest($w_1, w_2$)\;
 \end{algorithm}
 
-Note that the complementation of a \textit{Automaton} \automaton{} works if \automaton{} is determinized (one of the most expensive operation over \textit{Automata}) and the final states become non-final and vice-versa. The intersection is done thanks to the cartesian product of the two \textit{Automata} and the shortest word accepted by an automaton can be done with a \textit{BFS} algorithm over the automaton.
+The first two lines of this code are in fact those who are the most expensive in time complexity in my project.
 
-In this way we are guaranteed that the \textit{Teacher} is the \textit{Minimal Adequate Teacher} but we can also see that it is preferable to have a \textit{Learner} which send more membership queries instead of equivalence queries to decomplexify the learning phase.
+But first, before executing this algorithm, I had to find a way to correctly represents the Learner's conjecture and the Teacher's language to operate in a second moment the intersection and the complementation.
+
+\subsection{Learner's Conjecture and Teacher's Language representation}
+
+The best way I found to represent the Teacher's Language was to think about the way the Learner's conjecture is naturally given by the two algorithms: an automaton. That's why I decided to also represent the Teacher's Language on the form of an automaton.
+
+Therefore, I implemented the Automaton class which has some key attributes to identify the main characteristics of an automaton but before, after some reflection, I also decided to create a \textit{State} class representing the states of the \textit{Automaton} where I added the information of successors (and predecessors) as attributes attached to the instancies of the class.
+
+Finally I had:
+
+
+\begin{lstlisting}[caption=State class]
+class State {
+  isAccepting: boolean;
+  isInitial: boolean;
+  alphabet: string[];
+  outTransitions: Map<string, State[]>;
+  inTransitions: Map<string, State[]>;
+  successors: Set<State>;
+  predecessor: Set<State>;
+  name: string;
+
+  ... 
+
+  addTransition(symbol: string, state: State): void;
+  getSuccessor(symbol: string): State;
+  getPredecessor(symbol: string): State;
+}
+\end{lstlisting}
+
+This implementation exploit a lot the \textit{Map} data-structure which is a fast way in \textit{JavaScript} to get a value from a given key. Since the Automaton can be not deterministic \textit{outTransition} associates a list of \textit{State}s to every symbol of the alphabet.
+
+Moreover a \textit{State} ``knows'' if it is initial an accepting.
+
+Now I had the representation of a state and the class Automaton could be represented as:
+
+\begin{lstlisting}[caption = Automaton class]
+class Automaton {
+  states: Map<string, State>;
+  initialStates: State[];
+  acceptingStates: State[];
+  allStates: State[];
+  alphabet: string[];
+
+  ... 
+
+  accept_word_nfa(word: string): boolean;
+  minimize(): Automaton;
+\end{lstlisting}
+
+We can see that all the fundamental element of the automaton are represented, there is the list of states, followed by the list of accepting and initial states. The alphabet is a list of string.
+
+The transition function $\delta$ is a bit more difficult to see. But it can deduced thanks the \textit{outTransition} attributes of a \textit{State}.
+
+After the \textit{State} and the \textit{Automaton} class I needed a way to make the union, intersection, complementation on two automata.
+
+To do that I used the \textit{noam.js} library which contains some these useful method. The next thing that I had to do was therefore to create an \textit{Adapter} to transform my representation of an \textit{Automaton} to his representation and vice-versa.
+
+Having these ingredients, $\LA \cap \overline{\U}$ and $\overline{\LA} \cap \U$ could be easily calculated. I only want to point out that the complementation of an automaton takes linear time if the automaton is deterministic we modify the final states in $F' = \Q - F$ but if the automaton is not deterministic, that's the case for the \textit{NL*} algorithm, the only way we know to make the complementation is to determinize before the automaton which is a computationally difficult task.
+
+\subsection{Teacher shortest counter-example}
+To find the \textit{shortest} counter-example, in a first time I minimize the automaton with the Hopcroft's algorithm implemented in the \textit{Automaton} class. This algorithm has a complexity $O(n \log n)$. Then, I perform a \textit{BFS} search from the initial states\footnote{The initial states can be multiple in the NL*, that's why a use the plural.} to find the word of shortest length accepted by the Automaton.
+
+I want to underline that if two automata, $\A_1$ and $\A_2$ are equivalent then $\A_1 \Delta \A_2$ gives a new automaton $\A_3$ which recognizes the emptyset $\varnothing$. If $\mathcal{\A}_1 \neq \mathcal{\A}_2$ then it exists at least a word which is accepted by $\A_1$ and not by $\A_2$ or vice-versa. When I launch the \textit{BFS} in $\A_3$, if no word is found, I return $\varnothing$ (I symbolize it with a string of length 0 in \textit{JavaScript}) or the counter-example in the other case.
+
+\subsection{The Observation Table}
+The Observation Table is implemented like this.
+
+\begin{lstlisting}[caption = Observation\_table class]
+  class Observation_table {
+    private rows: string[];
+    private columns: string[];
+    private matrix: boolean[][];
+  
+    add_column(column_name: string): void;
+    set_value(row_name: string, column_name: string, bool: boolean): void;
+    add_row(row_name: string): void;
+    get_value(row_name: string, column_name: string): boolean;
+    get_row(row_name: string): boolean[];
+  }
+  \end{lstlisting}
+
+It is a matrix of boolean with two dimensions indexed by rows (the $S$ and $SA$ sets) and columns (the $E$ set).
+
+If the Learner wants to set to $b$ to value of the cell corresponding to the concatenation of the words $\omega_1$ and $\omega_2$ then
+\[matrix[rows.indexOf(\omega_1)][columns.indexOf(\omega_2)] = b;\]
+
+A little precision: the \textit{matrix} is initialized in this way $matrix = [[]]$. When we add an element $e$ at position $(x, y)$ with $x > len(matrix)$ and $y > len(matrix[0])$, $JavaScript$ won't raise the error \textit{OutOfBound} such as other programming languages, but instead it will automatically allocated the needed memory and affect the $matrix[x][y]$ to $e$.
+
+\subsection{The Learners implementation}
+
+In this section I want to talk about how I have been able to represent the two Learners.
+
+First of all, I realized that L* and NL* have in common some definitions. That's why I created a common abstract class which implements the shared methods and attributes of the algorithms.
+
+\begin{lstlisting}[caption = LearnerBase class]
+abstract class LearnerBase {
+  alphabet: string[];
+  S: string[];
+  E: string[];
+  observation_table: ObservationTable;
+  SA: string[];
+  teacher: Teacher;
+
+  ...
+
+  update_observation_table(key: string, value: string): void;
+  make_member(pref: string, suff: string): string;
+  make_equiv(a: Automaton): string;
+  add_elt_in_S(new_elt: string): void;
+  add_elt_in_E(new_elt: string): void;
+  move_from_SA_to_S(elt: string): void;
+
+  abstract table_to_update_after_equiv(answer: string): void;
+  abstract make_automaton(): Automaton;
+  abstract is_close(): string | undefined;
+  abstract is_consistent(): string[] | undefined;
+}
+\end{lstlisting}
+
+The two methods \textit{make\_member} and \textit{make\_equiv} reproduce the interaction with the Teacher. In the two cases the Learner returns a string that is:
+
+\begin{itemize}
+  \item ``1'' or ``0'' for membership queries, if the word is accepted or not by the Teacher\footnote{In Javascript there does not exist the type \textit{char}};
+  \item a word $\omega$ which represents the counter-example. If $len(\omega) = 0$ then the Learner has understood the language.
+\end{itemize}
+
+\textit{add\_elt\_in\_S} and \textit{add\_elt\_in\_E} respectively modify the content of the observation table while adding respectively a row to $S$ as well as all of its prefixes or a column with all its suffixes.
+
+The method \textit{move\_from\_SA\_to\_S} has the same behavior as the \textit{add\_elt\_in\_S} plus it removes the the row moved from SA.
+
+We can see that the abstract methods [Line 20 to 23] correspond to the closedness and consistence properties and to the automaton creation. I also want to underline the \textit{table\_to\_update\_after\_equiv} which modifies the set $S$ if the Learner is L*, the set $E$ otherwise. Both L* and NL* start have a dedicated class extending the \textit{LearnerBase} class.
+
+The NL* algorithm has in addition the \textit{prime\_lines} attribute storing the list of prime rows. It is constantly updated when the \textit{Observation Table} is modified thanks to some useful methods:
+
+\begin{lstlisting}
+class NL_start extends LearnerBase {
+  prime_rows: string[];
+
+  ... 
+
+  is_prime(row_key: string): boolean;
+  row_union(row1: string, row2: string): string;
+  is_covered(row1: string, row2: string): boolean;
+  check_prime_lines(): void;
+}
+\end{lstlisting}
+
+These methods are implemented intuitively following the definition explained in \cref{def:row-covering} and \cref{def:row-union}.
 
 \subsection{About the HTML implementation}
 
-I've decided to use TypeScript as programming language to be able to easily display the execution of these algorithms thanks to a dedicated HTML page.
+All these classes are meant to implement the essential bricks to make the learning algorithms work. However I wanted to display these interactions graphically via the \textit{HTML} language.
 
-The page is available at \url{https://fissored.github.io/TER-M1-S2/} and allows to choose both to run the \textit{L*} and the \textit{NL*} algorithms. Some preloaded Teachers have been upload to let the uses test immediately them but it is also possible to enter a chosen regular expression to build the Teacher and pass it to the Learner.
+To do so, I have created some dedicated classes to manage the web page and display the observation table, the construction of the automata together with the message linked to the closedness and consistence properties.
 
-The regular expression should be encoded with the following grammar :
-\[ R = symbol \; | \; R + R \; | \; RR \; | \;R^* \; | \;(R) \]
-where symbol can be every alpha-numeric character. The empty string $\E$ is encoded with the $\$$ symbol.
+I have spent some time to find the good library for displaying the Automata. It was not as easy as I thought, at first I have found the \textit{Mermaid} library. The automata displayed were nice, but when they started to have a huge number of state and transitions the drawing started to become less intelligible.
+
+After some further research, I found a way to represent \textit{Dot} files with the \textit{Graphviz} library, which I personally prefer.
+
+\begin{figure}[!htb]
+  \centering
+  \begin{subfigure}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{img/aut_mermaid.png}
+    \caption{Automaton in Mermaid}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{img/aut_graphviz.png}
+    \caption{Automaton with Graphviz}
+    \label{fig:graphviz-aut}
+  \end{subfigure}
+  \caption{Mermaid vs Graphviz}
+  \label{fig:mermaidGraphviz}
+\end{figure}
+
+
+In \cref{fig:mermaidGraphviz} we see an example of the two automata representation. The initial and final states are not clearly indicated in the \textit{Mermaid} plot and that the transitions are less clear to understand.
+
+Once I have finished to implement all of this, I have been able to publish my \textit{HTML} page at the url \url{https://fissored.github.io/TER-M1-S2/}.
+
+This page allows you to choose both to run the \textit{L*} and the \textit{NL*} algorithms. Some preloaded Teachers are proposed, but it is also possible to create a custom Teacher by entering a \textit{Regular Expression}.
+
+The regular expression should be encoded with the following grammar:
+\[ R = symbol \mid R + R \mid RR \mid R^* \mid(R) \]
+The alphabet is composed by every alpha-numeric character and the empty string $\E$ is encoded with $\$$.
 
 \begin{example}
   \[(a + b)+\$+ab^*+(ab)^*\] indicates the language containing $\{\E,a, b,  ab, abb, abbb\dots, ab, abab, ababab\dots\}$.
 \end{example}
 
-Once the Teacher created, the user can run step by step or the entire algorithm and every phase of the execution will be displayed. The \textit{Message} section contains information about the \textit{closedness} and the \textit{consistence} of the $O.T$. Once these two properties are satisfied, the automaton corresponding to the conjecture is displayed (thanks the \textit{d3-graphviz.js} library).
+Once the Teacher created, the user can run step by step or the entire algorithm and every phase of the execution will be displayed.
 
-You can see test word membership with the buttons next to the automaton.
+In the \textit{HTML} page, the \textit{Message} section contains information about the \textit{closedness} and the \textit{consistence} of the $O.T$. Once these two properties are satisfied, the automaton corresponding to the conjecture is displayed (an example is given in \cref{fig:graphviz-aut}).
 
-If a counter-example is provided then it is written in the \textit{Message} section otherwise the automaton has been approved and the algorithm can stop.
+When an automaton is displayed, you are able to enter a word in the corresponding input section and test if it is accepted or not by the language recognized by the automaton. It can be useful for example to see immediately if the counter-example\footnotetext{The counter-example is also written in the \textit{Message} section.} proposed by the Teacher is accepted or not by the automaton.
 
-The history of the operations made by the \textit{Learner} is saved in memory and can be re-taken with the arrows on the side of the screen.
-
-\subsection{Script for testing}
-Once compiled in JavaScript, the source files which doesn't need a browser to work, can be run in terminal thanks to the NodeJs environment. \\
-This has allowed me to create some files to test the performances of the two algorithms in term of how many interaction are performed between the \textit{Learner} and \textit{Teacher}, the number of state of the final conjectures of the two algorithms and so on. \\
-All of this statistics are written in a CSV file and the transformed into plots with the \textit{mathplotlib} library of Python.\\
-The test of comparison aims to provide \textit{Teachers} to the two \textit{Learners} and then to find the limits of them. As said in \cref{sec:RFSA}, the number of state of a canonical \textit{RFSA} may be equal of exponentially smaller then a \textit{mDFA}. So it is interesting to compare \textit{L*} and \textit{NL*} on languages which touches the two bounds of the \textit{RFSA}.
-
-
-\subsubsection{Size(RFSA) is exponentially smaller then Size(mDFA)}
-Languages recognizing by the regular expression $U = regex((a+b)^*a(a+b)^n)$ for a fixed $n$ is known to build automaton whose number of states increase exponentially every time we increase the value of $n$. However $U$ can be represented by a \textit{mNFA} whose number of state is equal to $n+1$ and each of this states represent a prime residual. So we can intuitively understand that $U$ can be also represented by a canonical \textit{RFSA} which has the same number of the \textit{NFA}.
-
-\begin{figure}[!htb]
-  \centering
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/State nb in A.png}
-    \caption{Comparing State Number}
-    \label{fig:StateWrostDFACompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Equivalence queries.png}
-    \caption{Equivalence queries Number}
-    \label{fig:EquivWrostDFACompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Membership queries.png}
-    \caption{Membership queries Number}
-    \label{fig:MemberWrostDFACompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Closedness.png}
-    \caption{Closedness Problem Number}
-    \label{fig:ClosednessWrostDFACompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Consistence.png}
-    \caption{Consistence Problem Number}
-    \label{fig:ConsistenceWrostDFACompare}
-  \end{subfigure}
-  % \begin{subfigure}[b]{0.3\textwidth}
-  %   \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Transition nb in A.png}
-  %   \caption{Transition Number}
-  %   \label{fig:TransitionWrostDFACompare}
-  % \end{subfigure}
-  \caption{mDFA vs cRFSA on $U = regex((a+b)^*a(a+b)^n)$}
-  \label{fig:wrostDFA}
-\end{figure}
-
-From \cref{fig:wrostDFA}, we can see that the \textit{L*} is much more expensive thant \textit{NL*} we can see that as announced the number of states of the \textit{mDFA} is exponentially bigger then the \textit{cRFSA} but we can also see how the number of states really impact the number of membership queries and the number of times the table is found to be not closed.
-
-However we can also note that interestingly the number of equivalence queries is the same for the two algorithms since in fact if $n = 0$ the algorithms understand the language after only one equivalence query, after the first three three membership queries the table is learned and if $n > 1$ only two equivalence queries are sufficient because the first is sent as for the previous case after the first three membership queries. Then the \textit{Teacher} provides the counter-example which is enough to distinguish every new residual until the \textit{Observation Table} becomes closed and consistent and this time the second conjecture perfectly recognizes $U$.
-
-An other particular phenomenon we can see is the number of time the table is found not consistent, which grows linearly for the \textit{L*} instead of being exponentially as for the two other plots.
-
-Let's suppose that we are the \textit{Learner} then we send our first three membership queries we think that the language is the empty one since $\forall x \in{\E, a, b}, \text{ the Teacher answers that } x \notin U$. The first counter-example we receive is the shortest word belonging to $U$ which in this case is a word $w$ of length $n+1$ with a leading $a$ where $w \in U \text{ and } \forall x \in Pref(w) | x \neq w \rightarrow x \notin U$. Futhermore, for every prefix x and y different from w, x and y belong to two different residuals and all of them are exactly the prime residuals of $U$. From these prime residual \textit{L*} is capable to reconstruct the composed residual while adding column in $E$. On the other hand \textit{NL*} since it adds the first counter-example in $E$ it is able to find prime without having any consistence problem, since every new row will be prime and so the verification of closedness is enough to understand the language.
-
-\subsubsection{Size(RFSA) is exponentially bigger than Size(mNFA)}
-In this section we are going to show the behavior of the two algorithms on a particular class of regular expressions depending on a fixed parameter $n$ where \textit{cRFSA} has exactly the same size of the \textit{mDFA} but where the corresponding \textit{mNFA} is exponentially smaller.\\
-This automaton is built recursively and is proposed in Section 6 of \cite{RFSA}. The construction is done for an automaton $A_n = \langle \Sigma, Q, Q_I, F, \delta \rangle $ where :
-\begin{itemize}
-  \item $\Sigma = {a, b}$,
-  \item $Q = \{q_i | 0 \leq i < n-1 \}$,
-  \item $Q_I = \{q_i | 0 \leq i < n/2\}$,
-  \item $F = q_0$
-  \item $\delta(q_i,a) = q_i+1$for $0 \leq i< n - 1$, $\delta(q_{n-1},a) = q_0$, $\delta(q_0,b)=q_0$, $\delta(q_i,b) = q_{i-1}$ for $1<i<n$ and $\delta(q_1,b)=q_{n-1}$.
-\end{itemize}
-
-As proved in that paper, the number of state a \textit{mNFA} equals the parameter $n$ of the automaton, but the number of states of the \textit{cRFSA} is exponential with reference to $n$.\\
-The statistics of the execution of the two algorithms are shown in \cref{fig:wrostRFSA}.
-
-\begin{figure}[!htb]
-  \centering
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/State nb in A.png}
-    \caption{Comparing State Number}
-    \label{fig:StateWrostRFSACompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Equivalence queries.png}
-    \caption{Equivalence queries Number}
-    \label{fig:EquivWrostRFSACompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Membership queries.png}
-    \caption{Membership queries Number}
-    \label{fig:MemberWrostRFSACompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Closedness.png}
-    \caption{Closedness Problem Number}
-    \label{fig:ClosednessWrostRFSACompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Consistence.png}
-    \caption{Consistence Problem Number}
-    \label{fig:ConsistenceWrostRFSACompare}
-  \end{subfigure}
-  % \begin{subfigure}[b]{0.3\textwidth}
-  %   \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Transition nb in A.png}
-  %   \caption{Transition Number}
-  %   \label{fig:TransitionWrostRFSACompare}
-  % \end{subfigure}
-  \caption{mDFA vs cRFSA on $U = L(A_n)$}
-  \label{fig:wrostRFSA}
-\end{figure}
-
-We can see that the number of state are the same for the two class of Automata and that the number of Membership an Closedness problems are similar. What change is the number of equivalence queries which is particularly smaller for the \textit{NL*} algorithm as for the number of time where the \OT is found not consistent. This is because adding counter-examples in $E$ instead of $S$ is in general a good mean to be able to distinguish autonomously newer residuals. New residuals are also useful to reduce the number of Consistence problem increasing however the number of Closedness problem.
-
-\subsection{Results over random Teachers}
-
-The third type of comparison has been performed over a huge number of \textit{Teachers} on the form of automaton of size varying from $1$ to $100$. In this way we are able to see in average the performances of \textit{L} versus \textit{NL*}.
-
-This benchmark has been done taking the \textit{Automata} from the \textit{GitHub} repository \url{https://github.com/parof/buchi-automata-benchmark}. Every automaton is supposed to represent a \textit{Büchi Automaton} and I have reused them to create \textit{mDFA}: after making deterministic and minimal, I was able to get a lot of different \textit{mDFA} which I have sorted by number of states. Every \textit{Automaton} of the list has been transformed into a \textit{Teacher} and then, one by one, every \textit{Teacher} has been submitted to \textit{L*} and \textit{NL*} to get at the end the same statistics as before.
-
-\begin{figure}[!htb]
-  \centering
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/State nb in A.png}
-    \caption{Comparing State Number}
-    \label{fig:StateBenchMarkCompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Equivalence queries.png}
-    \caption{Equivalence queries Number}
-    \label{fig:EquivBenchMarkCompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Membership queries.png}
-    \caption{Membership queries Number}
-    \label{fig:MemberBenchMarkCompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Closedness.png}
-    \caption{Closedness Problem Number}
-    \label{fig:ClosednessBenchMarkCompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Consistence.png}
-    \caption{Consistence Problem Number}
-    \label{fig:ConsistenceBenchMarkCompare}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Transition nb in A.png}
-    \caption{Transition Number}
-    \label{fig:TransitionBenchMarkCompare}
-  \end{subfigure}
-  \caption{mDFA vs cRFSA on random Teachers}
-  \label{fig:benchmark}
-\end{figure}
-
-We see in \cref{fig:benchmark} that as expected the number of state of \textit{cRFSA} is in general exponentially smaller than the \textit{mDFA} and that the number of equivalence and membership queries is about every time the \textit{NL*} algorithm that outperform \textit{L*}. As expected the number of Consistence problem is won by the \textit{NL*} but curiously the Closedness comparison is taken by the \textit{NL*} only after about $50$ states. We can intuitively understand that before $50$ states the \textit{Automata} generated by \textit{L*} and \textit{NL*} are in general pretty similar and so it is clear that adding every counter-example in $E$ cause the \textit{NL*} algorithm to find a lot of time the table to be not Close. In \cref{fig:TransitionBenchMarkCompare} we see that the number of transitions of the \textit{mDFA} is linear to the number of its states, whereas the number of transitions in the \textit{cRFSA}, even if it's number of states is exponentially smaller in average then the \textit{mDFA}, is clearly bigger then the \textit{mDFA}. This is due to the fact that the \textit{cRFSA} tend to create a transition from a state $q_i$ to every state $q_i'$ if $L(q_i') \sqsubseteq L(q_i)$.
-
-\section{Conclusion}
-
-In this paper, we have seen some idea on how regular languages can be understood in different way. We can build finite state automata which can be deterministic and so easy to understand by humans but which can take a lot of space in memory or non-deterministic automata which are less intuitive especially if these automata have a lot of transition but which can be exponentially smaller than a \textit{mDFA}.
-
-Other studies have been done to seek other way to create automaton which can be smaller then \textit{cRFSA}, for example we can have automata that uses logical operators on transitions such as the \textit{Alternating Finite State Automata} or other automata using links between symbols of the alphabet.
-
-All of these algorithms are all an evolution of the \cite{LPaper} but works only on languages which are regular. It should be interesting to see if we are able to develop this concept of learning algorithms to languages belonging to grammars which my be context free, context sensitive and so on. But it is clear that the less limitation we add in our language, the more complicate will be to understand it.
-
-\subsection{Thanks}
-I would like to thanks Mme Di Giusto and Mr Lozes for their support during the development of this study, they have been really helpful to suggest me different approaches to analyze and different point of view to interpret the results I obtained.
+The history of the operations made by the \textit{Learner} is saved in memory and can be re-viewed by clicking on the arrows on the side of the screen.

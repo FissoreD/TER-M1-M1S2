@@ -3,7 +3,7 @@ import { L_star } from "../learners/L_star.js";
 import { teachers } from "../teacher/Teacher.js";
 import { clearFile, csvHead, printCsvCompare, printInfo, writeToFile } from "./PrintFunction.js";
 import { myLog } from "../tools/Utilities.js";
-import { TeacherTakingAut } from "../teacher/TeacherTakingAut.js";
+import { TeacherAutomaton } from "../teacher/TeacherAutomaton.js";
 import { readFileSync } from "fs";
 import { Automaton } from "../automaton/Automaton.js";
 
@@ -19,7 +19,7 @@ import { Automaton } from "../automaton/Automaton.js";
  */
 
 let fileName = "randomRegex", writeToFileB = false,
-  teachers1 = [...teachers, new TeacherTakingAut({ automaton: Automaton.strToAutomaton(readFileSync('./statistics/benchMark/2-0.1/A6.ba').toString()), regex: '2-0.1/A6.ba' })];
+  teachers1 = [...teachers, new TeacherAutomaton({ automaton: Automaton.strToAutomaton(readFileSync('./statistics/benchMark/2-0.1/A6.ba').toString()), regex: '2-0.1/A6.ba' })];
 
 if (writeToFileB) {
   clearFile(fileName)

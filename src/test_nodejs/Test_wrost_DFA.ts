@@ -2,7 +2,7 @@ import { LearnerBase } from "../learners/LearnerBase.js";
 import { clearFile, csvHead, printCsvCompare, writeToFile } from "./PrintFunction.js";
 import { L_star } from "../learners/L_star.js";
 import { NL_star } from "../learners/NL_star.js";
-import { TeacherNoAutomaton } from "../teacher/TeacherNoAutomaton.js";
+import { TeacherRegex } from "../teacher/TeacherRegex.js";
 import { myLog } from "../tools/Utilities.js";
 
 /**
@@ -45,7 +45,7 @@ let printInfo = (algo: LearnerBase, algoName: string) => {
 
 for (let index = 0; index < regexList.length; index++) {
   const [regex, counter_examples] = regexList[index]
-  let teacher1 = new TeacherNoAutomaton({
+  let teacher1 = new TeacherRegex({
     alphabet: "ab",
     regex: regex.replace(/\+/g, "|"),
     counter_examples: counter_examples,

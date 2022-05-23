@@ -1,5 +1,5 @@
 /**
- * This utilitary class aims
+ * This utility class aims
  * return prefix and suffix
  * of a string s
  */
@@ -15,14 +15,14 @@ export class MyString extends String {
 
   /**
    * creates all generate_prefix_list from the str passed in input :
-   * exemple for hello : ['', 'h', 'he', 'hel', 'hell', 'hello']
+   * example for hello : ['', 'h', 'he', 'hel', 'hell', 'hello']
    */
   static generate_prefix_list = (str: string) =>
     Array(str.length + 1).fill(0).map((_, i) => str.substring(0, i));
 
   /**
    * creates all suffix from the str passed in input :
-   * exemple for hello : ['hello', 'ello', 'llo', 'lo', 'o', '']
+   * example for hello : ['hello', 'ello', 'llo', 'lo', 'o', '']
    */
   static generate_suffix_list = (str: string) =>
     Array(str.length + 1).fill("").map((_, i) => str.substring(i, str.length + 1));

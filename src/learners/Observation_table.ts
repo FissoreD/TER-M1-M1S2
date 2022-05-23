@@ -1,40 +1,40 @@
 import { same_vector } from "../tools/Utilities.js";
 
 export class Observation_table {
-  private columns: any;
-  private rows: any;
+  private columns: string[];
+  private rows: string[];
   private matrix: boolean[][];
 
   constructor() {
-    this.columns = {}
-    this.rows = {}
+    this.columns = []
+    this.rows = []
     this.matrix = [[]];
   }
 
   add_column(column_name: string) {
-    this.columns[column_name] = Object.keys(this.columns).length;
+    this.columns.push(column_name);
   }
 
   add_row(row_name: string) {
-    this.rows[row_name] = Object.keys(this.rows).length;
+    this.rows.push(row_name);
   }
 
   set_value(row_name: string, column_name: string, bool: boolean) {
-    this.matrix[this.rows[row_name]][this.columns[column_name]] = bool;
+    this.matrix[this.rows.indexOf(row_name)][this.columns.indexOf(column_name)] = bool;
   }
 
   /**
    * @returns the value at row_name, column_name of the matrix
    */
   get_value(row_name: string, column_name: string) {
-    return this.matrix[this.rows[row_name]][this.columns[column_name]];
+    return this.matrix[this.rows.indexOf(row_name)][this.columns.indexOf(column_name)];
   }
 
   /**
    * @returns the list of boolean of row_name 
    */
   get_row(row_name: string) {
-    return this.matrix[this.rows[row_name]];
+    return this.matrix[this.rows.indexOf(row_name)];
   }
 
   /**

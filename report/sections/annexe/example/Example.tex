@@ -1,51 +1,53 @@
 \section{L* and NL* execution with example}
 
-This section aims to provide an example of the execution of the two algorithms taking the unknown language $U$ defined by $\E+(b+aa+abb)(a+b)^*$ % $+(b+aa+abb)(a+b)*
+This section aims to provide an example of the execution of the two algorithms taking the unknown language $\U$ defined by $\E+(b+aa+abb)(a+b)^*$ % $+(b+aa+abb)(a+b)*
 \input{sections/annexe/example/L_example.tex}
 \input{sections/annexe/example/NL_example.tex}
 
 \subsection{About residuals}
-In this section I would like to explain why the \textit{mDFA} has one state more the \textit{cRFSA}.
+In this section I would like to explain why the \textit{mDFA} of previous section has one state more of the \textit{cRFSA}.
+
+Let's start with the regular expression of $\U = \E+(b+aa+abb)(a+b)^*$. The residuals of this language can be found iteratively thanks \cref{algo:find_residuals}.
 
 
-
-\begin{algorithm}[H]Let's start with the regular expression of $U = regex(\E+(b+aa+abb)(a+b)^*)$. The residuals of this language can be found recursively with \cref{algo:find_residuals}.
-  \caption{Algo to find residuals of a language U}
+\begin{algorithm}[H]
+  \caption{Algo to find residuals of a language $\U$}
   \label{algo:find_residuals}
-  \KwData{$U$, $\Sigma$}
-  \KwResult{$\mathcal{R}$ = The set of residuals of $U$}
-  $\mathcal{R} \gets \{\}$ \tcp*{Initialisation of $\mathcal{R}$}
+  \KwIn{$\U$, $\Sigma$}
+  \KwOut{$\RE$ = The set of residuals of $\U$}
+  $\RE \gets \{\}$ \tcp*{Initialisation of $\RE$}
   $E \gets \{\E\}$\tcp*{The list of words to treat}
   \While{$E.length > 0$}{
     $current \gets E.pop()$\;
     $residual = (current)^{-1}L\footnote{This operation can be performed, for example, with the \textit{Brzozowski derivative} algorithm}$\;
-    \If{$residual \notin \mathcal{R}$}{
-      $\mathcal{R} \gets \mathcal{R} \cup \{residual\}$\;
+    \If{$residual \notin \RE$}{
+      $\RE \gets \RE \cup \{residual\}$\;
       \For{$sym \in \Sigma$}{
         $word \gets current \cdot sym$\;
         $E \gets E \cup \{word\}$\;
       }
     }
   }
-  \Return $\mathcal{R}$
+  \Return $\RE$
 \end{algorithm}
 
-Let's apply this algorithm over $U$.
+Let's apply this algorithm over $\U$.
 
+\newcommand{\EM}{\varnothing}
 
-\begin{tabular}{c|c|c|c|c}
-  $Iteration$ & current       & Operation                   & $\mathcal{R}$                                      & $E$                    \\
+\begin{tabular}{c|c|r|l|c|l}
+  $Iteration$   & current & Operation      & Result                  & $\RE$                  & $E$                        \\
   \hline\hline
-  1           & $\varnothing$ & $\varnothing$               & $\mathcal{R} = \{\}$                               & $\{\E\}$               \\
-  2           & $\E$          & $\E^{-1}U = U$              & $\mathcal{R} = \mathcal{R} \cup \{U\}$             & $\{a, b\}$             \\
-  3           & $a$           & $a^{-1}U = (a+bb)(a+b)^*$   & $\mathcal{R} = \mathcal{R} \cup \{(a+bb)(a+b)^*\}$ & $\{b, aa, ab\}$        \\
-  4           & $b$           & $b^{-1}U = (a+b)^*$         & $\mathcal{R} = \mathcal{R} \cup \{(a+b)^*\}$       & $\{aa, ab, ba, bb\}$   \\
-  5           & $aa$          & $(aa)^{-1}U = (a+b)^*$      & $-$                                                & $\{ab, ba, bb\}$       \\
-  6           & $ab$          & $(ab)^{-1}U = b(a+b)^*$     & $\mathcal{R} = \mathcal{R} \cup \{b(a+b)^*\}$      & $\{ba, bb, aba, abb\}$ \\
-  7           & $ba$          & $(ba)^{-1}U = (a+b)^*$      & $-$                                                & $\{bb, aba, abb\}$     \\
-  8           & $bb$          & $(bb)^{-1}U = (a+b)^*$      & $-$                                                & $\{aba, abb\}$         \\
-  9           & $aba$         & $(aba)^{-1}U = (a+b)^*$     & $-$                                                & $\{abb\}$              \\
-  10          & $abb$         & $(abb)^{-1}U = \varnothing$ & $\mathcal{R} = \mathcal{R} \cup {\varnothing}$     & $\varnothing$          \\
+  \textit{Init} & $-$     & $-$            & $-$                     & $\RE = \{\}$           & $E = \{\E\}$               \\
+  1             & $\E$    & $\E^{-1}\U$    & $\RE_1 = \U$            & $\RE = \RE \cup \RE_1$ & $E = \{a, b\}$             \\
+  2             & $a$     & $a^{-1}\U$     & $\RE_2 = (a+bb)(a+b)^*$ & $\RE = \RE \cup \RE_2$ & $E = \{b, aa, ab\}$        \\
+  3             & $b$     & $b^{-1}\U$     & $\RE_3 = (a+b)^*$       & $\RE = \RE \cup \RE_3$ & $E = \{aa, ab, ba, bb\}$   \\
+  4             & $aa$    & $(aa)^{-1}\U$  & $(a+b)^* = \RE_3$       & $-$                    & $E = \{ab, ba, bb\}$       \\
+  5             & $ab$    & $(ab)^{-1}\U$  & $\RE_4 = b(a+b)^*$      & $\RE = \RE \cup \RE_4$ & $E = \{ba, bb, aba, abb\}$ \\
+  6             & $ba$    & $(ba)^{-1}\U$  & $(a+b)^* = \RE_3$       & $-$                    & $E = \{bb, aba, abb\}$     \\
+  7             & $bb$    & $(bb)^{-1}\U$  & $(a+b)^* = \RE_3$       & $-$                    & $E = \{aba, abb\}$         \\
+  8             & $aba$   & $(aba)^{-1}\U$ & $(a+b)^* = \RE_3$       & $-$                    & $E = \{abb\}$              \\
+  9             & $abb$   & $(abb)^{-1}\U$ & $\RE_5 = \EM$           & $\RE = \RE \cup \RE_5$ & $E = \EM$                  \\
 \end{tabular}
 
-We see that the residuals of $U$ are exactly five, the same number of state of the \textit{mDFA} of the automaton learnt by \textit{L*}, but only four of them are \textit{prime} because the residual $(a+b)^* = U \cup (a+bb)(a+b)^* \cup b(a+b)^*$. That's why the $cRFSA$ has only four states.
+We see that the residuals of $\U$ are exactly five, the same number of state of the \textit{mDFA} returned by \textit{L*}, but only four of them are \textit{prime} because $\RE_3 = \RE_1 \cup \RE_2 \cup \RE_4$. That's why the \textit{cRFSA} has only four states.

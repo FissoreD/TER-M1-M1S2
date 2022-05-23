@@ -1,4 +1,5 @@
 \section{Introduction}
+\label{sec:intro}
 
 % \subsection{Learning from Teacher}
 
@@ -8,13 +9,13 @@
 
 Humans have the ability to learn. This is the ability to understand theoretical information or practical behaviors from different situations. This phase of learning is usually possible by performing some actions and then registering the consequence.
 
-A classic example may be the \textit{vending machine} in a foreign country. If you want to get a cup of coffee from that machine and you don't know its language, the normal way to get your cup is to press the keys randomly and every time you get an answer from the machine, you can understand if the sequence of actions you performed is correct. If not, you repeat the procedure from the beginning, without remaking the mistakes you made before.
+A classic example may be the \textit{vending machine} in a foreign country. If you want to get a cup of coffee from that machine and you don't know its language, the normal way to get your cup is to press the keys randomly and every time you get an answer from the machine, you can understand if the sequence of actions you performed are correct. If not, you repeat the procedure from the beginning, without remaking the mistakes you made before.
 
 Another example is a game you don't know the rules and little by little you understand it thanks to some attempt until the moment you know how to play it.
 
-In any case we see this interaction between a \textit{Learner} and an entity (the vending machine or the the game) called the \textit{Teacher}. It is interesting to replicate the behavior of the \textit{Learner} in our computers to simulate the learning process from the \textit{Teacher}. The goal of this report is to focus on two main algorithms that have been realized to understand regular languages in polynomial time (I'm referring in particular to the Dana Angluin's paper \cite{LPaper} and the Benedikt Bollig \textit{et al.}'s paper \cite{NLPaper}).
+In any case we, see this interaction between a \textit{Learner} and an entity (the vending machine or the the game) called the \textit{Teacher}. It is interesting to replicate the behavior of the \textit{Learner} in our computers to simulate the learning process from the \textit{Teacher}. The goal of this report is to focus on the \textit{L*} and the \textit{NL*} algorithms which are \textit{Learning} algorithms of regular languages and have been proposed respectively by Dana Angluin's (paper \cite{LPaper}) and Benedikt Bollig \textit{et al.} (paper \cite{NLPaper}).
 
-After some introduction about how these algorithms work, I will talk about my implementation of them and some results that I was able to get in term of their performances.
+After some introduction about how these algorithms work, I will talk about my implementation of them and some results obtained by their comparison.
 
 % TODO --------------------------------------------------------
 
@@ -23,7 +24,7 @@ After some introduction about how these algorithms work, I will talk about my im
 
 % The interactions between \learner{} and \teacher{} are various, for instance, \teacher{} may give information to the \learner{} without being solicited, or can provide not reliable or useless information and so on and mutually the \learner{} may not make well-formed questions or may not pay attention to the received answers.
 
-% In this project, we are going to reduce the uncountable ways of communication between these two entities and allow only two kind of interactions : membership queries where the \learner{} asks if a sentence belongs to the unknown language and the \teacher{} can answer \textit{yes} or \textit{no} and
+% In this project, we are going to reduce the uncountable ways of communication between these two entities and allow only two kind of interactions: membership queries where the \learner{} asks if a sentence belongs to the unknown language and the \teacher{} can answer \textit{yes} or \textit{no} and
 % equivalence queries where the \learner{} sends to the teacher the language learnt (in the form of an automaton) and the \teacher{} answers either \textit{yes} if if recognizes the good language, otherwise provides a counter-example.
 
 % % \subsection{Structure of this report}

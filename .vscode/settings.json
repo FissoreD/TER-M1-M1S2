@@ -1,3 +1,18 @@
 {
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "cSpell.words": [
+    "Angluin",
+    "Benedikt",
+    "Bollig",
+    "Brzozowski",
+    "Büchi",
+    "closedness",
+    "Giusto",
+    "graphviz",
+    "Lozes",
+    "mathplotlib",
+    "monoid",
+    "RFSA",
+    "Suff"
+  ]
 }

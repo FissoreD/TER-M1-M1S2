@@ -2,7 +2,7 @@ import { LearnerBase } from "../learners/LearnerBase.js";
 import { clearFile, csvHead, printCsvCompare, writeToFile } from "./PrintFunction.js";
 import { L_star } from "../learners/L_star.js";
 import { NL_star } from "../learners/NL_star.js";
-import { TeacherTakingAut } from "../teacher/TeacherTakingAut.js";
+import { TeacherAutomaton } from "../teacher/TeacherAutomaton.js";
 import { Automaton, State } from "../automaton/Automaton.js";
 import { minimizeAutomaton, MyAutomatonToHis } from "../automaton/automaton_type.js";
 import { allStringFromAlphabet, myLog } from "../tools/Utilities.js";
@@ -51,7 +51,7 @@ let printInfo = (algo: LearnerBase, algoName: string) => {
 
 for (let i = 0; i < automatonList.length; i++) {
   let automaton = automatonList[i]
-  let teacher = new TeacherTakingAut({
+  let teacher = new TeacherAutomaton({
     automaton: automaton,
     description: (N + i) + "",
     counter_examples: counter_examples

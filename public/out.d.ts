@@ -200,7 +200,13 @@ declare module "learners/LearnerBase" {
         move_from_SA_to_S(elt: string): void;
         make_next_query(): void;
         make_all_queries(): void;
-        abstract table_to_update_after_equiv(answer: string): void;
+        get_member_number(): number;
+        get_equiv_number(): number;
+        get_consistente_counter(): number;
+        get_closedness_counter(): number;
+        get_state_number(): number;
+        get_transition_number(): number;
+        abstract table_to_update_after_equiv(answer: string, after_equiv: boolean): void;
         abstract make_automaton(): Automaton;
         abstract is_close(): string | undefined;
         abstract is_consistent(): string[] | undefined;
@@ -242,7 +248,6 @@ declare module "html_interactions/HTML_LearnerBase" {
         send_automaton_action(): void;
         abstract close_message(close_rep: string): string;
         abstract consistent_message(s1: string, s2: string, new_col: string): string;
-        abstract table_to_update_after_equiv(answer: string): void;
         go_to_end(): Promise<void>;
         message(): HTMLElement;
     }
@@ -255,7 +260,6 @@ declare module "html_interactions/HTML_L_star" {
         constructor(teacher: Teacher);
         close_message(close_rep: string): string;
         consistent_message(s1: string, s2: string, new_col: string): string;
-        table_to_update_after_equiv(answer: string): void;
     }
 }
 declare module "learners/NL_star" {
@@ -269,7 +273,7 @@ declare module "learners/NL_star" {
         row_union(row1: string, row2: string): string;
         is_covered(row1: string, row2: string): boolean;
         check_prime_lines(): void;
-        add_elt_in_S(new_elt: string): void;
+        add_elt_in_S(new_elt: string, after_equiv?: boolean): void;
         add_elt_in_E(new_elt: string, after_equiv?: boolean): void;
         is_close(): string | undefined;
         is_consistent(): string[] | undefined;
@@ -286,7 +290,6 @@ declare module "html_interactions/HTML_NL_star" {
         add_row_html(parent: HTMLTableSectionElement, fst: string | undefined, head: string | undefined, row_elts: string[], colspan?: number, rowspan?: number): HTMLTableRowElement;
         close_message(close_rep: string): string;
         consistent_message(s1: string, s2: string, new_col: string): string;
-        table_to_update_after_equiv(answer: string): void;
     }
 }
 declare module "teacher/TeacherUser" {
