@@ -208,4 +208,8 @@ export abstract class HTML_LearnerBase<T extends LearnerBase> {
   message() {
     return document.getElementById('message')!
   }
+
+  replaceEpsilon(s: string): string {
+    return s ? s : "ε";
+  }
 }

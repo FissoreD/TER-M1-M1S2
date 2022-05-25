@@ -258,10 +258,16 @@ export class Automaton implements AutomatonJson {
       }
     }
 
-    txt = txt.concat(
-      this.allStates.map(e => `${e.name} [label="${this.get_state_rename(e.name)
-        }", shape=circle]`).join("\n"));
-    txt += '\n';
+    // State Rename
+    // txt = txt.concat(
+    //   this.allStates.map(e => `${e.name} [label="${this.get_state_rename(e.name)
+    //     }", shape=circle]`).join("\n"));
+    let shape = this.allStates[0].name.length > 0 ? "circle" : "box"
+
+    txt = txt.concat(`node [style=rounded, shape=${shape}]\n`)
+    // txt = txt.concat(
+    //   this.allStates.map(e => `${e.name} [shape=box]`).join("\n"));
+    // txt += '\n';
 
     txt = txt.concat(Object.keys(triples).map(x => {
       let [states, transition] = [x, triples[x].join(",")]
@@ -275,7 +281,7 @@ export class Automaton implements AutomatonJson {
     });
 
     this.acceptingStates.forEach(s => {
-      txt = txt.concat(`\n${s.name} [shape=doublecircle]`)
+      txt = txt.concat(`\n${s.name} [peripheries=2]`)
       myLog({ a: ["here"] });
 
     })
