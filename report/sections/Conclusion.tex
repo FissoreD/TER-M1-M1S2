@@ -1,14 +1,28 @@
 \section{Conclusion}
 
-In this paper, I have been able to talk about some ideas on how regular languages can be learnt in different way. We are able to represent them via both minimum deterministic finite state automata or canonical residual finite state automata. The first type of automaton is maybe more understandable for humans: it is easy check if a word is accepted by the automaton, but on the other side, it can be much expensive in space.
-
-Other studies have been done to seek other way to create automata which can be even smaller then \textit{cRFSA}s, for example we can have automata that uses logical operators on transitions such as the \textit{Alternating Finite State Automata} or other automata using links between symbols of the alphabet.
-
-All of these algorithms are an evolution of the L* algorithm and work on languages which are regular. It should be interesting to see if it is possible to conceive learning algorithms for not regular languages such as context free grammars. Of course this implementations would have to output more expressive classes of automata such as the automata working with an auxiliary stack. It is clear, however, that the more complicated the language is, the more powerful will be the returned data-structure representing it.
-
-This \textit{TER} has been really compelling. I like automata and the paper I studied allowed me to discover interesting way to build them from a regular expression. I have also been able to understand the class of \textit{cRFSA} automata that I didn't know before, and, even if it is inside the \textit{NFA} automata world, it is possible to define a unique \textit{canonical} representative for any regular language. Moreover, this \textit{TER} allowed me to see how a researcher works and how satisfying it is to be able to code and test the algorithms studied. I hope I could continue to work in this way in my future, because I think that the theory is a fundamental tool letting you understand how, and above all why, the practical applications of the computer science work.
+In this paper, I have been able to talk about some ideas on how regular languages can be learned in
+different way. We can represent them via both minimum deterministic finite state automata or
+canonical residual finite state automata. The first type of automaton is maybe more understandable for
+humans: it is easy to check if automaton accepts a word, but on the other side, it can be much
+expensive in space.
+Other studies have been done to seek other way to create automata which can be even smaller
+then \textit{cRFSAs}, for example, we can have automata that use logical operators on transitions such as the
+\textit{Alternating Finite State Automata} or other automata using links between symbols of the alphabet.
+All of these algorithms are an evolution of the \textit{L*} algorithm and work on languages which are regular.
+It should be interesting to see if it is possible to conceive learning algorithms for not regular languages
+such as context-free grammars. Of course, these implementations would have to output more expressive
+classes of automata such as the automata working with an auxiliary stack. It is clear, however, that the
+more complicated the language is, the more powerful will be the returned data-structure representing it.
+This \textit{TER} has been really compelling. I like automata and the paper I studied allowed me to discover
+intriguing way to build them from a regular expression. I have also been able to understand the class of
+\textit{cRFSA} automata that I didn’t know before, and, even if it is inside the \textit{NFA} automata world, it is possible
+to define a unique \textit{canonical} representative for any regular language. Moreover, this \textit{TER} allowed me to
+see how a researcher works and how satisfying it is to be able to code and test the algorithms studied. I
+hope I could continue to work in this way in my future, because I think that the theory is a fundamental
+tool letting you understand how, and above all why, the practical applications of the computer science
+work.
 
 % These algorithms
 
 \subsection{Thanks}
-I would like to thanks Ms. Di Giusto and M. Lozes for their support during the development of this study, they have been really helpful to suggest me different approaches to analyze and different point of view to interpret the results I obtained.
+I would like to thank Ms. Di Giusto and M. Lozes for their support during the development of this study, they have been really helpful to suggest me different approaches to analyze and different point of view to interpret the results I obtained.
