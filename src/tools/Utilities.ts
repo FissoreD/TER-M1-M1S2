@@ -6,14 +6,14 @@ export function same_vector(v1: any[], v2: any[]): boolean {
 
 /**
  * creates all generate_prefix_list from the str passed in input :
- * exemple for hello : ['', 'h', 'he', 'hel', 'hell', 'hello']
+ * example for hello : ['', 'h', 'he', 'hel', 'hell', 'hello']
  */
 export const generate_prefix_list = (str: string) =>
   Array(str.length + 1).fill(0).map((_, i) => str.substring(0, i)).reverse();
 
 /**
  * creates all suffix from the str passed in input :
- * exemple for hello : ['hello', 'ello', 'llo', 'lo', 'o', '']
+ * example for hello : ['hello', 'ello', 'llo', 'lo', 'o', '']
  */
 export const generate_suffix_list = (str: string) =>
   Array(str.length + 1).fill("").map((_, i) => str.substring(i, str.length + 1));
@@ -41,5 +41,5 @@ export function allStringFromAlphabet(params: { alphabet: string[] | string, max
 }
 
 export let myLog = ({ a, toLog = false }: { a: any[], toLog?: boolean }) => {
-  if (toLog) console.log(...a);
+  if (true || toLog) console.log(...a);
 }

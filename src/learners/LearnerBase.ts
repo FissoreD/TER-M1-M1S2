@@ -71,9 +71,9 @@ export abstract class LearnerBase {
    * Takes in parameter an {@link Automaton} and ask 
    * to the teacher if the automaton knows the language.
    * If so : the Learner has learnt the language
-   * Else : it appends the counter-exemple to {@link S}
+   * Else : it appends the counter-example to {@link S}
    * @param a an Automaton
-   * @returns undefined if {@link a} recognize the teacher's language, a counter-exemple (as a string) otherwise.
+   * @returns undefined if {@link a} recognize the teacher's language, a counter-example (as a string) otherwise.
    */
   make_equiv(a: Automaton) {
     let answer = this.teacher.equiv(a);
@@ -204,7 +204,7 @@ export abstract class LearnerBase {
     return this.equiv_number;
   }
 
-  get_consistente_counter() {
+  get_consistent_counter() {
     return this.consistence_counter;
   }
 

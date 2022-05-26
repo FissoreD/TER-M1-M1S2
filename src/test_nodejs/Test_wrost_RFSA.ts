@@ -1,5 +1,5 @@
 import { LearnerBase } from "../learners/LearnerBase.js";
-import { clearFile, csvHead, printCsvCompare, writeToFile } from "./PrintFunction.js";
+import { clearFile, csvHead, printCsvCompare, printInfo, writeToFile } from "./PrintFunction.js";
 import { L_star } from "../learners/L_star.js";
 import { NL_star } from "../learners/NL_star.js";
 import { TeacherAutomaton } from "../teacher/TeacherAutomaton.js";
@@ -20,15 +20,9 @@ import { allStringFromAlphabet, myLog } from "../tools/Utilities.js";
 
 let toWrite = true
 
-let fileName = "wrostRFSA";
-if (toWrite) {
-  clearFile(fileName)
-  writeToFile(fileName, csvHead)
-}
-
 let automatonList: Automaton[] = []
 let counter_examples = allStringFromAlphabet({ alphabet: "ab", maxLength: 14 })
-const N = 2, maxN = 11;
+const N = 12, maxN = 13;
 for (let n = N; n < maxN; n++) {
   myLog({ a: ["Creating test with", n, "power"] });
 
@@ -42,12 +36,17 @@ for (let n = N; n < maxN; n++) {
     states[i].addTransition('b', states[i - 1])
   states[1].addTransition('b', states[n - 1])
   automatonList.push(minimizeAutomaton(MyAutomatonToHis(new Automaton(new Set(states)))));
+  console.log(n, automatonList[automatonList.length - 1].allStates.length);
+
 }
 
 
-let printInfo = (algo: LearnerBase, algoName: string) => {
-  return `${algoName} : queries = ${algo.member_number}, equiv = ${algo.equiv_number}, states = ${algo.automaton?.state_number()}, transitions = ${algo.automaton?.transition_number()}`;
+let fileName = "wrostRFSA";
+if (toWrite) {
+  clearFile(fileName)
+  writeToFile(fileName, csvHead)
 }
+
 
 for (let i = 0; i < automatonList.length; i++) {
   let automaton = automatonList[i]
@@ -60,16 +59,16 @@ for (let i = 0; i < automatonList.length; i++) {
   let L = new L_star(teacher)
   let NL = new NL_star(teacher)
 
-  myLog({ a: ["=".repeat(100)] });
-  myLog({ a: ["Current n : ", N + i] });
+  myLog({ a: ["=".repeat(100)], toLog: true });
+  myLog({ a: ["Current n : ", N + i], toLog: true });
 
-  myLog({ a: ["In L*"] });
+  myLog({ a: ["In L*"], toLog: true });
   L.make_all_queries();
-  myLog({ a: [printInfo(L, "L*")] });
+  myLog({ a: [printInfo(L, "L*")], toLog: true });
 
-  myLog({ a: ["In NL*"] });
+  myLog({ a: ["In NL*"], toLog: true });
   NL.make_all_queries();
-  myLog({ a: [printInfo(NL, "NL*")] });
+  myLog({ a: [printInfo(NL, "NL*")], toLog: true });
 
   if (toWrite) writeToFile(fileName, printCsvCompare(L, NL))
 }

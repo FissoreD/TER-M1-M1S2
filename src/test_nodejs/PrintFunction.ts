@@ -12,7 +12,7 @@ export let printInfo = (algo: LearnerBase, algoName: string) => {
 export let printCsvCompare = (L: L_star, NL: NL_star) => {
   strict(L.teacher == NL.teacher)
   let printProperty = (propery: () => number) => `${propery.call(L)},${propery.call(NL)}`
-  return `${L.teacher.regex}, ${L.teacher.alphabet.length}, ${L.teacher.description.split(",")[0]}, ${printProperty(LearnerBase.prototype.get_member_number)}, ${printProperty(LearnerBase.prototype.get_equiv_number)}, ${printProperty(LearnerBase.prototype.get_state_number)}, ${printProperty(LearnerBase.prototype.get_transition_number)}, ${printProperty(LearnerBase.prototype.get_closedness_counter)}, ${printProperty(LearnerBase.prototype.get_consistente_counter)}`;
+  return `${L.teacher.regex}, ${L.teacher.alphabet.length}, ${L.teacher.description.split(",")[0]}, ${printProperty(LearnerBase.prototype.get_member_number)}, ${printProperty(LearnerBase.prototype.get_equiv_number)}, ${printProperty(LearnerBase.prototype.get_state_number)}, ${printProperty(LearnerBase.prototype.get_transition_number)}, ${printProperty(LearnerBase.prototype.get_closedness_counter)}, ${printProperty(LearnerBase.prototype.get_consistent_counter)}`;
 }
 
 export let csvHead = "Regex,Length alphabet,Description,L Membership queries,NL Membership queries,L Equivalence queries,NL Equivalence queries,L State nb in A,NL State nb in A,L Transition nb in A,NL Transition nb in A,L Closedness,NL Closedness,L Consistence,NL Consistence"

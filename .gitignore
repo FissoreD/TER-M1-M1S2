@@ -10,3 +10,4 @@ test
 .vscode/settings.json
 public/out.js
 public/out.d.ts
+statistics/removeMe.py
