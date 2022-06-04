@@ -16,5 +16,6 @@
     "monoid",
     "noam",
     "RFSA"
-  ]
+  ],
+  "cSpell.enabled": true
 }

@@ -18,11 +18,11 @@ The NL* algorithm, described by Benedikt Bollig \textit{et al.} in \cite{NLPaper
 
 \begin{example}
   \label{example:residual}
-  Let $L = (aa)^*$ and $\Sigma = \{a\}$. $L$ has only two residuals $L_1 = (aa)^*$ and $L_2 = a(aa)^*$\footnotetext{A procedure to find residual of a language is proposed in \cref{algo:find_residuals} }. We can see that there does not exist any other residual because if we pose $E_{ven} = {\omega \in \Sigma^* \mid len(\omega) \equiv 0 \mod 2}$ and $O_{dd} = {\omega \in \Sigma^* \mid len(\omega) \equiv 1 \mod 2}$, we have $E_{ven} \cup O_{dd} = \Sigma^*$ and $E_{eve}^{-1}L = L_1$ and $O_{dd}^{-1}L = L_2$. No other residual are possible since there exists no other word in $\Sigma^* / \{E_{ven} \cup O_{dd}\} = \varnothing$ which can creates a new residual.
+  Let $L = (aa)^*$ and $\Sigma = \{a\}$. $L$ has only two residuals $L_1 = (aa)^*$ and $L_2 = a(aa)^*$\footnotetext{A procedure to find residual of a language is proposed in \cref{algo:find_residuals} }. We can see that there does not exist any other residual because if we pose $E_{ven} = {\omega \in \Sigma^* \mid len(\omega) \equiv 0 \mod 2}$ and $O_{dd} = {\omega \in \Sigma^* \mid len(\omega) \equiv 1 \mod 2}$, we have $E_{ven} \cup O_{dd} = \Sigma^*$ and $E_{eve}^{-1}L = L_1$ and $O_{dd}^{-1}L = L_2$. No other residual is possible since there exists no other word in $\Sigma^* / \{E_{ven} \cup O_{dd}\} = \varnothing$ which can create a new residual.
 \end{example}
 
 \begin{remark}
-  The set of word $\W$ over an alphabet $\Sigma$ is called syntactic monoid if for every $\omega \in \W$, $\omega^{-1}L$ gives the same residual. Moreover, each residual has a corresponding syntactic monoid.
+  The set of word $\W$ over an alphabet $\Sigma$ is a syntactic monoid if for every $\omega \in \W$, $\omega^{-1}L$ gives the same residual. Moreover, each residual has a corresponding syntactic monoid.
 \end{remark}
 
 \begin{example}
@@ -68,7 +68,7 @@ Let $\RE$ be the set of residual of $L$. A \textit{canonical RFSA (cRFSA)} $\A =
 \begin{itemize}
   \item $\Q = \{\RE_i \subseteq  \RE \mid \RE_i \text{ is prime}\}$;
   \item $\delta = \{(\RE_i, \alpha) = \RE_j. \forall \RE_i, \RE_j \in \RE \text{ and } \forall \alpha \in \Sigma \text{ if } L(\RE_i) \subseteq \alpha^{-1}L(\RE_j)\}$;
-  \item $Q_I = \{\RE_i \in \RE \mid \RE_i \subseteq L\}$\footnote{The initial state may not be unique, so it is marked with a $\Q$ in upper-case};
+  \item $Q_I = \{\RE_i \in \RE \mid \RE_i \subseteq L\}$\footnote{The initial state may not be unique, it is denoted an upper-case $\Q$};
   \item $F = \{\RE_i \in \RE \mid \E \in \RE_i\}$.
 \end{itemize}
 
@@ -76,9 +76,9 @@ Let $\RE$ be the set of residual of $L$. A \textit{canonical RFSA (cRFSA)} $\A =
   A \textit{cRFSA} can be exponentially smaller then a \textit{mDFA}.
 \end{theorem}
 
-\subsection{Closedness and Consistence in NL*}
+\subsection{Closedness and Consistency in NL*}
 
-The NL* algorithm has similar properties with L* since the \OT, the sets $S$, $E$, $SA$ and $S_{ext}$ and the mapping $T$ are defined as in L*. However, the closedness and the consistence properties are defined in a different way.
+The NL* algorithm has similar properties as L* since the \OT, the sets $S$, $E$, $SA$ and $S_{ext}$ and the mapping $T$ are defined as in L*. However, the closedness and consistency properties are defined in a different way.
 
 \begin{definition}[Row Covering]
   \label{def:row-covering}
@@ -91,7 +91,7 @@ The NL* algorithm has similar properties with L* since the \OT, the sets $S$, $E
 
 \begin{definition}[Row Union]
   \label{def:row-union}
-  The union ($\sqcup$) of two rows $r_1, r_2$ gives a new row $r_3$ where each bit $b_i$ is obtained by the max of the $i^{th}$ bit of $r_1$ and the $i^th$ bit of $r_2$
+  The union ($\sqcup$) of two rows $r_1, r_2$ gives a new row $r_3$ where each bit $b_i$ is obtained as the max of the $i^{th}$ bit of $r_1$ and the $i^{th}$ bit of $r_2$
 \end{definition}
 
 \begin{example}
@@ -99,7 +99,7 @@ The NL* algorithm has similar properties with L* since the \OT, the sets $S$, $E
 \end{example}
 
 \begin{definition}[Composed and Prime Rows]
-  A row $r$ of the \OT is composed if it exists a subset of rows $R'$ not including $r$ such that $r = \bigsqcup\limits_{r \in R'}r$
+  A row $r$ of the \OT is composed if it exists a subset of rows $R'$ not including $r$ such that $r = \bigsqcup\limits_{i \in R'}i$
 \end{definition}
 
 \begin{notation}
@@ -113,7 +113,7 @@ The NL* algorithm has similar properties with L* since the \OT, the sets $S$, $E
 
 To make the \OT close, the row $\omega$ is promoted and then the \OT is completed.
 
-\begin{definition}[Consistence]
+\begin{definition}[Consistency]
   The \OT is consistent if
   \[
     \forall \omega_1, \omega_2 \in S,
@@ -123,13 +123,13 @@ To make the \OT close, the row $\omega$ is promoted and then the \OT is complete
   \]
 \end{definition}
 
-If the table is not consistent, $\exists \omega_1, \omega_2 \in S \mid row(\omega_1) \sqsubseteq row(\omega_2)$ and $row(\omega_1 \cdot \alpha) \not\sqsubseteq row(\omega_2 \cdot \alpha) \text{ for an } \alpha \in \Sigma$. We can restore the consistence by making $\omega_1$ and $\omega_2$ no more RFSA-similar: we find an $e \in E$ such that $T(\omega_1 \cdot \alpha \cdot e) \sqsupset T(\omega_2 \cdot \alpha \cdot e)$ and we add $\alpha \cdot e$ in $E$.
+If the table is not consistent, $\exists \omega_1, \omega_2 \in S \text{ such that } row(\omega_1) \sqsubseteq row(\omega_2)$ and $row(\omega_1 \cdot \alpha) \not\sqsubseteq row(\omega_2 \cdot \alpha) \text{ for an } \alpha \in \Sigma$. We can restore the consistency by making $\omega_1$ and $\omega_2$ no more RFSA-similar: we find an $e \in E$ such that $T(\omega_1 \cdot \alpha \cdot e) \sqsupset T(\omega_2 \cdot \alpha \cdot e)$ and we add $\alpha \cdot e$ in $E$.
 
 \subsection{NL*: Automaton creation}
 
-When the observation table is closed and consistent, the Learner can send to the Teacher a conjecture of the language the it has understood so far.
+When the \OT is closed and consistent, the Learner can send to the Teacher a conjecture of the language that it has understood so far.
 
-The conjecture is made as following:
+The conjecture is the automaton where:
 \begin{itemize}
   \item $Q = \{row(\omega), \forall \omega \in S \text{ and } Prime(\omega) \}$;
   \item $\delta = \{ \delta(row(\omega), \alpha) = row(\omega'), \forall \omega \in S, \alpha \in \Sigma, \omega' \in S_{ext} \mid Prime(\omega) \text{ and } row(\omega') \sqsubseteq row(\omega \cdot \alpha)\}$;
@@ -137,17 +137,17 @@ The conjecture is made as following:
   \item $F = \{row(\omega) \mid \omega \in S \text{ and } T(\omega) = 1 \}$.
 \end{itemize}
 
-After the sending of the conjecture, if the Teacher answers \textit{Yes} the algorithm stops, otherwise a counter-example $\omega$ is provided. $\omega$ is added to the $E$ set and if needed $E$ is completed to remains suffix-closed.
+After sending of the conjecture, if the Teacher answers \textit{Yes} the algorithm stops, otherwise a counter-example $\omega$ is provided. $\omega$ is added to the $E$ set and if needed $E$ is completed to remain suffix-closed.
 
 \begin{remark}
-  L* adds the counter-example in $S$ while NL* adds it in $E$.
+  Notice that L* adds the counter-example in $S$ while NL* adds it in $E$.
 \end{remark}
 
 \begin{lemma}
   Let $q_I \in Q_I$ be an initial state of $\A$ and $\omega \in S_{ext}$ then $\delta(q_I, \omega) \sqsubseteq row(\omega)$.
 \end{lemma}
 
-The proof is similar to the proof of \cref{lemma:L_trans_from_QI} considering that now we do not use the equality relation between states, but the covering ($\sqsubseteq$) one defined in \cref{def:row-covering}.
+The proof is similar to the one of \cref{lemma:L_trans_from_QI} considering that now we do not use the equality relation between states, but the covering ($\sqsubseteq$) one defined in \cref{def:row-covering}.
 
 The word acceptance of \textit{NL*} can be proved similarly to \cref{lemma:L_acceptance}.
 
@@ -156,7 +156,7 @@ We can also note that:
   \item the automaton created is no necessarily deterministic, since the transition function allows multiple successors for a given state and a given symbol;
   \item the automaton may have multiple initial states: all states whose row is covered by $row(\E)$;
   \item $row(\E)$ may not be in $Q_I$ if it is a composed row;
-  \item the automaton created is the \textit{cRFSA} since the represented states are only those whose corresponding to a prime row.
+  \item the automaton created is the \textit{cRFSA} since the represented states are only those corresponding to a prime row.
 \end{itemize}
 
 
@@ -164,10 +164,10 @@ We can also note that:
 \subsubsection{Correcteness}
 As for the L* algorithm, NL* is correct since the solution must be approved by the Teacher before stopping.
 
-\subsubsection{Terminaison}
+\subsubsection{Halting}
 As for the L* algorithm, NL* terminates because the number of residual of the language is finite and if the conjecture is not accepted, the counter-example, will allow the Learner to find a new residual until all \textit{prime} residuals are found.
 
-A little precision of why NL* adds the counter-example $\omega$ in $E$ and not in $S$. In general, the given counter-example belongs to a residual that is not correctly represented by the sent automaton. However, while constructing the \OT we only have partial information on the residuals, because $|E|$ may be not enough big to distinguish the residuals. It may happen that the partial row associated to $\omega$ is not prime and therefore it will not be considered by the algorithm when testing the consistence and the closedness. On the other hand, adding $\omega$ into $E$ is a correct way find directly new information on residuals. This allows NL* to terminate and, therefore, to find the correct conjecture.
+A little precision of why NL* adds the counter-example $\omega$ to $E$ instead of $S$. In general, the given counter-example belongs to a residual that is not correctly represented by the sent automaton. However, while constructing the \OT we only have partial information on the residuals, because $|E|$ may not be big enough to distinguish the between residuals. It may happen that the partial row associated to $\omega$ is not prime and therefore it will not be considered by the algorithm when testing the consistency and the closedness. On the other hand, adding $\omega$ into $E$ is a correct way find directly new information on residuals. This allows NL* to terminate and, therefore, to find the correct conjecture.
 
 \subsubsection{Time complexity}
 In the worst case, the \textit{cRFSA} has the same number of state of the \textit{mDFA} and therefore the \OT will have the same size of the \OT of L*. Again the complexity depends on the length of the Teacher's counter-example. At the end we can conclude that the time complexity is in the worst case $O(n^2 \times m)$.

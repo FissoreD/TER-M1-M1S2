@@ -3,18 +3,16 @@
 
 The \textit{L*} algorithm, described by Dana Angluin in \cite{LPaper}, is a learning algorithm whose goal is to build a \textit{mDFA} recognizing an unknown language $\U$ thanks to membership and equivalence queries. This operation can be done through some important bricks that are partially reused by the \textit{NL*} algorithm.
 
-\subsection{The observation table (O.T.)}
-In the previous section, I have talked about how the \textit{Learner} and the \textit{Teacher} interact, but it is also important that the \textit{Learner} stores the received answers in its memory.
+\subsection{The observation table}
+In the previous section, we have talked about how the \textit{Learner} and the \textit{Teacher} interact, next we show how the \textit{Learner} stores the received answers in its memory, called \textit{observation table (O.T).}
+
+$T: \omega \rightarrow \{0, 1\}$ is a mapping allowing to know if the \textit{Teacher} has accepted the word $\omega$.
 
 \begin{definition}[Observation Table]
-  The observation table is the memory of the \textit{Learner}. It is a matrix of booleans whose rows are indexed by the elements of a non-empty set of words called $S$ and whose columns are indexed by the elements of another non-empty set of words called $E$. The mapping $T: \omega \rightarrow \{0, 1\}$ allows to know if the \textit{Teacher} has accepted the word $\omega$.
+  The observation table is a matrix of booleans whose rows are indexed by the elements of a non-empty set of words called $S$ and whose columns are indexed by the elements of another non-empty set of words called $E$. And where the content of cell $c_{i,j}$ is $T(S[i] \cdot E[j])$\footnote{$S[i]$ (resp. $E[j]$) indicates the $i^{th}$ (resp $j^{th}$) element of $S$ (resp. $E$). Even if sets are meant not  to have the notion of order, we consider for simplicity that the $i^{th}$ element of the set is the $i^{th}$ element added in it}.
 \end{definition}
 
-\begin{example}
-  The content of the cell $c_{i,j}$ of the \OT can be obtained thanks  $T(S[i] \cdot E[j])$\footnote{$S[i]$ (resp. $E[j]$) indicates the $i^{th}$ (resp $j^{th}$) element of $S$ (resp. $E$). Even if sets are meant not  to have the notion of order, I consider for simplicity that the $i^{th}$ element of the set is the $i^{th}$ element added in it}.
-\end{example}
-
-$S$ and $E$ are respectively \textit{prefix-closed} and \textit{suffix-closed}).
+$S$ and $E$ are respectively \textit{prefix-closed} and \textit{suffix-closed}.
 
 \begin{definition}[Prefix (resp. Suffix)]
   A prefix (resp. suffix) of a word $\omega$, noted $Pref(\omega)$ (resp. $Suff(\omega)$), is a word $\omega_1 \in \Sigma^*$ such that $\exists \omega_2 \in \Sigma^*$ where $\omega_1 \cdot \omega_2 = \omega$ (resp. $\omega_2 \cdot \omega_1 = \omega$).
@@ -28,9 +26,9 @@ $S$ and $E$ are respectively \textit{prefix-closed} and \textit{suffix-closed}).
   In both cases, $X$ should contain $\E$.
 \end{definition}
 
-The \OT table must be completed by all word on the form $\omega \cdot \alpha$ for $\forall \omega \in S$ and $\forall \alpha \in \Sigma$ if $\omega \cdot \alpha \notin S$. This set of new words are added to the rows of the \OT and stored in a set called $SA$.
+The \OT must be completed by all words of the form $\omega \cdot \alpha$ for $\forall \omega \in S$ and $\forall \alpha \in \Sigma$ if $\omega \cdot \alpha \notin S$. This set of new words is added to the rows of the \OT and stored in a set called $SA$.
 \[SA = \{\forall s \in S, \forall c \in \Sigma: s \cdot c \mid s \cdot c \notin S \} \]
-I will note $S_{ext}$ to be $S_{ext} = S \cup SA$.
+Let $S_{ext}$ to be $S_{ext} = S \cup SA$.
 
 \begin{definition}[Completeness]
   The \OT is complete if $\forall s \in S, \forall c \in \Sigma, \exists s' \in \Sigma \mid s \cdot c = s'$
@@ -45,26 +43,26 @@ I will note $S_{ext}$ to be $S_{ext} = S \cup SA$.
   \end{align*}
 \end{example}
 
-\footnotetext{$b$ is in $SA$ since it is the concatenation of $\E \in S$ and $b \in Sigma$}
+\footnotetext{$b$ is in $SA$ since it is the concatenation of $\E \in S$ and $b \in \Sigma$}
 
 \begin{notation}[The row function]
-  For every $\omega$ in $S_{ext}$, $row(\omega)$ is the bit-vector made buy the concatenation of all $T(\omega \cdot \omega')$ for $\forall \omega' \in E$.
+  For every $\omega$ in $S_{ext}$, $row(\omega)$ is the bit-vector made by the concatenation of all $T(\omega \cdot \omega')$ for $\omega' \in E$.
 \end{notation}
 
 \begin{remark}
-  Adding a word $\omega$ in $S_{ext}$ means that a membership query is sent for every word in $\{\forall e \in E \mid \omega \cdot e\}$. Similarly, adding a word $\omega'$ means that a membership query is sent for all word in $\{\forall s \in S_{ext} \mid s \cdot \omega'\}$.
+  Adding a word $\omega$ in $S_{ext}$ means that a membership query is sent for every word in $\{\forall e \in E \mid \omega \cdot e\}$. Similarly, adding a word $\omega'$ means that a membership query is sent for all words in $\{\forall s \in S_{ext} \mid s \cdot \omega'\}$.
 \end{remark}
 
-\subsection{Closedness and Consistence in L*}
+\subsection{Closedness and Consistency in L*}
 
-In both algorithms, the \OT should respect the closedness and the consistence properties, but keep attention that their definition varies from the two algorithms. In this section, I am going to define these two properties for the L* algorithm.
+In both algorithms, the \OT should respect the closedness and the consistency properties. Notice that their definitions vary for the two algorithms. In this section, we define these two properties for the L* algorithm.
 
 \begin{definition}[Closedness]
   The \OT is closed if
   \[\forall \omega \in SA, \exists \omega' \in S: row(\omega) = row(\omega')\]
 \end{definition}
 
-\begin{definition}[Row Similarity] Two rows $r_1, r_2$ are similar if they have same corresponding bit-vector.
+\begin{definition}[Row Similarity] Two rows $r_1, r_2$ are similar if they have the same corresponding bit-vector.
 \end{definition}
 
 \begin{definition}[Row Promotion]
@@ -85,12 +83,12 @@ In both algorithms, the \OT should respect the closedness and the consistence pr
 
 If the table is not closed then $\exists \omega \in SA$ such that $\forall \omega' \in S \mid row(\omega) \neq row(\omega')$. To make the \OT closed we promote $row(\omega)$ and then, as said in \cref{def:rowProm}, we complete again the \OT
 
-\begin{definition}[Consistence]
+\begin{definition}[Consistency]
   The \OT is consistent if
   \[\forall \omega_1,\omega_2 \in S, \forall \alpha \in \Sigma:  row(\omega_1) = row(\omega_2) \rightarrow row(\omega_1 \cdot \alpha) = row(\omega_2 \cdot \alpha)\]
 \end{definition}
 
-If the table is not consistent, then it exists $row(\omega_1) = row(\omega_2)$ and $row(\omega_1 \cdot \alpha) \neq row(\omega_2 \cdot \alpha)$ for some $\alpha \in \Sigma \text{ and some }\omega_1, \omega_2 \in S$. We can restore the consistence property by making $\omega_1$ and $\omega_2$ no more similar. To do this, we have to add a new column in the \OT such that the new bit $b_1$ appended to $\omega_1$ is different to the bit $n_2$ appended to $\omega_2$. We look, therefore, for an $\alpha \in \Sigma \text{ and an } e \in E$ such that $T(\omega_1 \cdot \alpha \cdot e) \neq T(\omega_2 \cdot \alpha \cdot e)$ and we add $\alpha \cdot e$ in $E$. In this way we are sure that $b_1 = T(\omega_1 \cdot \alpha \cdot e)$ will be different from $b_2 = T(\omega_2 \cdot \alpha \cdot e)$.
+If the table is not consistent, then there exists $row(\omega_1) = row(\omega_2)$ and $row(\omega_1 \cdot \alpha) \neq row(\omega_2 \cdot \alpha)$ for some $\alpha \in \Sigma \text{ and some }\omega_1, \omega_2 \in S$. We can restore the consistency property by making $\omega_1$ and $\omega_2$ no more similar. To do this, we have to add a new column in the \OT such that the new bit $b_1$ appended to $\omega_1$ is different to the bit $n_2$ appended to $\omega_2$. We look, therefore, for an $\alpha \in \Sigma \text{ and an } e \in E$ such that $T(\omega_1 \cdot \alpha \cdot e) \neq T(\omega_2 \cdot \alpha \cdot e)$ and we add $\alpha \cdot e$ in $E$. In this way we are sure that $b_1 = T(\omega_1 \cdot \alpha \cdot e)$ will be different from $b_2 = T(\omega_2 \cdot \alpha \cdot e)$.
 
 We can now see the utility of the set $SA$. When we look for $T(\omega \cdot \alpha \cdot e)$ where $\omega \in S$, we are guaranteed that $\omega' = \omega \cdot \alpha$ exists in $S_{ext}$ since the table is complete. Therefore, $T(\omega \cdot \alpha \cdot e) = T(\omega' \cdot e)$ exists.
 
@@ -98,13 +96,13 @@ We can now see the utility of the set $SA$. When we look for $T(\omega \cdot \al
   If we add a word $\omega = \alpha \cdot e$ where $\alpha \in \Sigma \text{ and } e \in E$ then $E$ remains \textit{suffix-closed}.
 \end{lemma}
 
-The proof is analogue to the proof of \cref{lemmaPromoteLinePrefixClosedness}.
+The proof is analogous to the one of \cref{lemmaPromoteLinePrefixClosedness}.
 
 \subsection{L*: Automaton creation}
 
 When the observation table is closed and consistent, the Learner can send to Teacher a conjecture of the language learnt so far.
 
-The conjecture is made on the form of an automaton where:
+The conjecture is an automaton where:
 \begin{itemize}
   \item $Q = \{row(\omega), \forall \omega \in S\}$;
   \item $\delta(row(\omega), \alpha) = row(\omega \cdot \alpha, \forall \omega \in S, \alpha \in \Sigma$\footnote{Again we know that $\omega' = \omega\cdot\alpha$ exists in $S_{ext}$ since the table is complete };
@@ -112,7 +110,9 @@ The conjecture is made on the form of an automaton where:
   \item $F = \{row(\omega) \mid \omega \in S \text{ and } T(\omega) = 1 \}$.
 \end{itemize}
 
-After the sending of the conjecture, if the Teacher answers \textit{Yes} the algorithm stops, otherwise the counter-example $\omega$ and all of its prefixes are added in $S$. The \OT is completed and the algorithm restart.
+After sending the conjecture, if the Teacher answers \textit{Yes} the algorithm stops, otherwise the counter-example $\omega$ and all of its prefixes are added to $S$. The \OT is completed and the algorithm restart.
+
+The following lemmas are a reformulation of those given in \cite{LPaper}.
 
 \begin{lemma}
   \label{lemma:L_trans_from_QI}
@@ -121,11 +121,11 @@ After the sending of the conjecture, if the Teacher answers \textit{Yes} the alg
 
 \begin{proof}
   We prove this by induction.
-  Let's take a word $\omega \in S_{ext}$ and let $q_I$ be the initial state.
+  Take a word $\omega \in S_{ext}$ and let $q_I$ be the initial state.
   If $length(\omega) = 0$, then $\delta(q_I, \omega) = \delta(q_I, \E) = \delta(row(\E), \E) =  row(\E \cdot \E) = row(\E) = q_I$ that is true by definition.
-  Let's suppose this property true for every word $\omega_n \in S_{ext}$ of length $n$, we want to prove that $\delta(q_I, \omega) = row(\omega)$ for a word $\omega \in S_{ext}$ of length $n+1$.
+  Suppose this property is true for every word $\omega_n \in S_{ext}$ of length $n$, we want to prove that $\delta(q_I, \omega) = row(\omega)$ for a word $\omega \in S_{ext}$ of length $n+1$.
   Let $\omega$ be a word of length $n+1$ and let $\omega = \omega_n \cdot \alpha$ where $\alpha \in \Sigma$ and $\omega_n$ is the prefix of $\omega$ with length $n$. Since $S_{ext}$ is prefix closed, then $\omega_n$ should exists.
-  We have $\delta(q_I, \omega) = \delta(q_I, \omega_n \cdot \alpha) = \delta(\delta(q_I, \omega_n), \alpha)$. By the induction hypothesis, $\delta(q_I, \omega_n)$ exists since $length(\omega_n) = n$ and is equal to $row(\omega_n)$, therefore $\delta(\delta(q_I, \omega_n), \alpha) = \delta(row(\omega_n), \alpha)$.
+  We have $\delta(q_I, \omega) = \delta(q_I, \omega_n \cdot \alpha) = \delta(\delta(q_I, \omega_n), \alpha)$. By inductive hypothesis, $\delta(q_I, \omega_n)$ exists since $length(\omega_n) = n$ and is equal to $row(\omega_n)$, therefore $\delta(\delta(q_I, \omega_n), \alpha) = \delta(row(\omega_n), \alpha)$.
   The \OT is closed so $\exists s \in S$ such that $row(\omega_n) = row(s)$ and so $\delta(row(\omega_n), \alpha) = \delta(row(s), \alpha)$.
   By definition of the transition function, $\delta(row(s), \alpha) = row(s \cdot \alpha)$ and by construction of the $O.T$, for every $s \in S$ there exists an $s' \in S_{ext}$ such that $s' = s \cdot \alpha$.
   We can conclude that for every $\omega \in S_{ext}$ there exist a state represented by $row(\omega)$ such that $\delta(q_I, \omega) = row(\omega)$.
@@ -139,11 +139,11 @@ After the sending of the conjecture, if the Teacher answers \textit{Yes} the alg
 \begin{proof}
   As previous lemma, we prove this by induction on the length of the word $e$.
   If $length(e) = 0$, then $e = \E$ and by definition, $row(\omega \cdot \E) = row(\omega)$ is acceptant if $T(\omega) = 1$.
-  Let's suppose this property true for every word $e_n$ of length $n$.
+  Suppose this property is true for every word $e_n$ of length $n$.
   Let $e_{n+1} \in E$ be a word of length $n + 1$, $e_n \in E$ the suffix of $e_{n+1}$ of length $n$ and $\alpha \in \Sigma$ such that $\alpha \cdot e_n = e_{n+1}$. Since $E$ is suffix close, we know that $e_n$ should exist in $E$.
   We have that $\delta(q_I, \omega \cdot e_{n+1}) = \delta(q_I, \omega \cdot \alpha \cdot e_n) = \delta(\delta(q_I, \omega), \alpha \cdot e_n) = \delta(row(\omega), \alpha \cdot e_n) = \delta(\delta(row(\omega), \alpha), e_n)$.
-  Since the table is closed, $\exists \omega' \in S$ such that $row(\omega) = row(\omega')$, and so $\delta(row(\omega), \alpha) = \delta(row(\omega'), \alpha) = row(\omega' \cdot \alpha)$ thanks the preceding lemma. Again, since the table is closed, $\exists \omega'' \in S$ such that $row(\omega' \cdot \alpha) = row(\omega'')$.
-  We have now that $\delta(q_I, \omega \cdot e_{n+1}) = \delta(row(\omega''), e_n) = \delta(\delta(q_I, \omega''), e_n) = \delta(q_I, \omega'' \cdot e_n)$ and since the length of $e$ is $n$ then, by the induction hypothesis, $\delta(q_I, \omega'' \cdot e_n)$ leads to an accepting state if $T(\omega'' \cdot e_n) = 1$.
+  Since the table is closed, $\exists \omega' \in S$ such that $row(\omega) = row(\omega')$, and so $\delta(row(\omega), \alpha) = \delta(row(\omega'), \alpha) = row(\omega' \cdot \alpha)$ thanks to the preceding lemma. Again, since the table is closed, $\exists \omega'' \in S$ such that $row(\omega' \cdot \alpha) = row(\omega'')$.
+  We have now that $\delta(q_I, \omega \cdot e_{n+1}) = \delta(row(\omega''), e_n) = \delta(\delta(q_I, \omega''), e_n) = \delta(q_I, \omega'' \cdot e_n)$ and since the length of $e$ is $n$ then, by inductive hypothesis, $\delta(q_I, \omega'' \cdot e_n)$ leads to an accepting state if $T(\omega'' \cdot e_n) = 1$.
   We can conclude that $\delta(q_I, \omega \cdot e_{n+1})$ leads in an accepting state if $T(\omega \cdot e_{n+1}) = 1$.
 \end{proof}
 
@@ -161,34 +161,34 @@ After the sending of the conjecture, if the Teacher answers \textit{Yes} the alg
 \end{lemma}
 
 \begin{proof}
-  We can prove this lemma by contradiction. Let's suppose that $\A$ is not minimal, then it is possible to merge \footnote{Two states can be merged if they recognize the same language or, because of the automaton is deterministic, they have same outgoing arrows} at least to states $q_i, q_j$ to reduce its number of states.
+  We proceed by contradiction. Suppose that $\A$ is not minimal, then it is possible to merge\footnote{Two states can be merged if they recognize the same language or, because of the automaton is deterministic, they have same outgoing arrows} at least two states $q_i, q_j$ to reduce the number of states.
   By construction, $q_i$ and $q_j$ are linked to two different rows $r_i, r_j$ of the observation table. Let $\omega_1 \in S, \omega_2 \in S \mid row(\omega_1) = r_1 \text{ and } row(\omega_2) = r_2$. Since $r_1 \neq r_2 \text{ then } \exists e \in E \mid T(\omega_1 \cdot e) \neq T(\omega_2 \cdot e)$. Let $\A_1$ be the automaton $\A$ where $row(\omega_1)$ is the initial state and $\A_2$ be the automaton $\A$ where $row(\omega_2)$ is the initial state. The word $e$ will only be accepted by one of the two automata, so since they do not recognize the same language, we can't merge them in $\A$.
   This contradict the initial hypothesis and so $\A$ is minimum.
 \end{proof}
 
 \subsection{L* analysis}
 \subsubsection{Correcteness}
-The goal of the algorithm is to find an automaton recognizing the language of the teacher. The final conjecture found by the Learner is correct since it has been accepted by the Teacher.
+The goal of the algorithm is to find an automaton recognizing the language of the Teacher. The final conjecture found by the Learner is correct since it has been accepted by the Teacher.
 
-\subsubsection{Terminaison}
-The algorithm terminates only if the Teacher answers $Yes$ to a \textit{equivalence query} of the Learner, but does the Learner is able to find this final \textit{equivalence query} ?
+\subsubsection{Halting}
+The algorithm terminates only if the Teacher answers $Yes$ to an \textit{equivalence query} of the Learner, but is the Learner able to find this final \textit{equivalence query} ?
 
 We know, by definition, that the unknown language $\U$ is regular. It means that there exists an automaton $\A$ recognizing it with a \underline{finite} number $n$ of states.
 
-If in a certain moment we have $n' < n$ different rows and the \OT is closed and consistent, the Learner make its conjecture. This conjecture cannot be the good one, since, from \cref{lemma:mDFA}, the automaton $\A'$ of the conjecture cannot be have less states then $\A$. The Teacher must returns a counter-example allowing to separate two similar rows. The Learner repeats the algorithm, and after every \textit{equivalence query}, $n'$ will increase by one. When $n' = n$ the conjecture will have $n$ states, the same of $\A$, and therefore, the teacher will answer $Yes$ to the last conjecture allowing the algorithm to stop.
+If in a certain moment we have $n' < n$ different rows and the \OT is closed and consistent, the Learner make its conjecture. This conjecture cannot be the good one, since, from \cref{lemma:mDFA}, the automaton $\A'$ of the conjecture cannot have less states then $\A$. The Teacher must returns a counter-example allowing to separate two similar rows. The Learner repeats the algorithm, and after every \textit{equivalence query}, $n'$ will increase by one. When $n' = n$ the conjecture will have $n$ states, the same of $\A$, and therefore, the Teacher will answer $Yes$ to the last conjecture allowing the algorithm to stop.
 
 \begin{remark}
   Note that \cref{lemma:L_trans_from_QI} and \cref{lemma:L_acceptance} say that the automaton $\A$ created from a closed and consistent table recognizes correctly the language understood so far and since the \textit{mDFA} is unique (see \cref{lemma:minimalAut}) then the conjecture is the correct one.
 \end{remark}
 
 \subsubsection{Time complexity}
-Let suppose that the L* algorithm (implemented in \cref{L_star_algo}) takes constant time to make the conjecture, to complete the \OT, to promote rows and to check if the table is consistent and closed.
+Suppose that the L* algorithm (implemented in \cref{L_star_algo}) takes constant time to make the conjecture, to complete the \OT, to promote rows and to check if the table is consistent and closed.
 
-Then time complexity should be measured then on the size of the \OT or equivalently to the number of cell composing it.
+Then time complexity should be measured on the size of the \OT or equivalently on the number of cell composing it.
 
 In the worst case, the number of columns $n$ (that is the cardinal of $E$) equals the number of states $\A$.
 
-The size of $S$ depends on the length $m$ of the counter-example provided by the Teacher. At least $S$ has $n$ rows, one per number of column, but considering the length of $m$ then $|S|$\footnote{The cardinal of S} will have $O(n \times m)$ rows.
+The size of $S$ depends on the length $m$ of the counter-example provided by the Teacher. At least $S$ has $n$ rows, one per number of columns, but considering the length of $m$ then $|S|$\footnote{The cardinal of S} will have $O(n \times m)$ rows.
 
 The size of $SA$ is at most $O(|\Sigma| \times |S|)$ since for every word in $|S|$ we can potentially have $|\Sigma|$ successors to add in $SA$.
 
@@ -198,4 +198,5 @@ In conclusion we have a matrix with a number of cells equal to
                         & = O(2 \cdot |\Sigma| \times |E| \times |S|) \\
                         & = O(n^2 \times m)
 \end{align*}
-The time complexity is so polynomial on the size of the automaton and the larger counter-example given by the teacher.
+
+Hence, the time complexity is polynomial on the size of the automaton and the larger counter-example given by the Teacher.

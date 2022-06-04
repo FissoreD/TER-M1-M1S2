@@ -157,8 +157,8 @@ sorting=ynt
 
 \begin{abstract}
     Angluin's L* algorithm \cite{LPaper} is a famous algorithm for learning deterministic finite state automata from membership and equivalence queries.
-    Bollig et al NL* \cite{NLPaper} algorithm is a variant of this algorithm, where the automaton that is learned may be non deterministic, and therefore exponentially more succinct.
-    The goal of this TERD is to understand the theory behind these two algorithms, and if the time permits, to implement them and compare them.
+    Bollig et al NL* \cite{NLPaper} algorithm is a variant of this algorithm, where the automaton that is learned may be non deterministic, and therefore exponentially smaller.
+    The goal of this TERD is to understand the theory behind these two algorithms, to implement and compare them.
 \end{abstract}
 
 % If you don't want a supervisor, uncomment the two lines below and remove the section above

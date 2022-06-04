@@ -1,69 +1,69 @@
-\section{Some Statistics}
+\section{The comparison}
 
-Once compiled in JavaScript it is possible to run with \textit{NodeJs} in the terminal. I have therefore exploited this possibility to launch the algorithms over some chosen \textit{Regular Expression} to test the Learners' performances. Some statistics between the two algorithms are proposed in paper \cite{NLPaper}: Bollig \textit{et al.} counts the number of states of the final automata given by the Learners and accepted by the Teacher along with the number of membership and equivalence queries. I added some personal criteria of comparison in order to also see how many time the \textit{Observation Table} is found not close or not consistent (I will call them closedness and consistence problems) and the number of transition of the automata.
+Once compiled in JavaScript it is possible to run both algorithms, with \textit{NodeJs} in the terminal. We have therefore exploited this possibility to launch the algorithms over some chosen \textit{Regular Expression} to test the Learners' performances. A comparison between the two algorithms is proposed in paper \cite{NLPaper}: Bollig \textit{et al.} count the number of states of the final automata given by the Learners and accepted by the Teacher along with the number of membership and equivalence queries. We added some personal criteria of comparison in order to also see how many time the \OT is found not close or not consistent (We will call them closedness and consistency problems) and the number of transitions of the automata.
 
-All of these statistics can be obtained by executing the files into the \textit{test\_nodejs} folder. The script creates a CSV file in which all the comparison values are stored and then a \textit{Python} file can parse the CSV to finally transform the resulting CSV into plots\footnotetext{To display plots I used the \textit{matplotlib} library}.
+All of these statistics can be obtained by executing the files into the \textit{test\_nodejs} folder. The script creates a CSV file in which all the comparison values are stored and then a \textit{Python} file can parse the CSV to finally transform the resulting CSV into plots\footnotetext{To display plots we used the \textit{matplotlib} library \cite{Matplotlib}}.
 
-The statistics aim to see the strength and the weaknesses of the to Learners, therefore I have tested them over specific \textit{Regular Expressions (RegEx)}. These \textit{RegEx} take into account the size of the \textit{cRFSA}: since it \textit{can} be exponentially smaller than the size of the \textit{mDFA}.
+The statistics aim to see the strength and the weaknesses of the to Learners, therefore we have tested them over specific \textit{Regular Expressions (RegEx)}. These \textit{RegEx} take into account the size of the \textit{cRFSA}: since it \textit{can} be exponentially smaller than the size of the \textit{mDFA}.
 
 \subsection{The cRFSA is exponentially smaller then the mDFA}
-Languages recognized by the \textit{RegEx} $\U = (a+b)^*a(a+b)^n$ for a fixed $n$ are known to build \textit{mDFA} whose number of states increase exponentially every time we increase $n$. It is also known that these same \textit{RegEx} can be represented by \textit{non-deterministic} automata (\textit{NFA}) whose number of state grows linearly with $n$.
+Languages recognized by the \textit{RegEx} $\U = (a+b)^*a(a+b)^n$ for a fixed $n$ are known to build \textit{mDFA} whose number of states increase exponentially every time we increase $n$. It is also known that these same \textit{RegEx} can be represented by \textit{non-deterministic} automata (\textit{NFA}) whose number of states grows linearly with $n$.
 
-If we calculate the \textit{prime} residuals of $\U$ we can see that their number equals $n+1$. We can intuitively understand that $\U$ can be represented by a \textit{cRFSA} with the same number of states as the \textit{NFA}.
+If we calculate the \textit{prime} residuals of $\U$ we can see that their number equals to $n+1$. We can intuitively understand that $\U$ can be represented by a \textit{cRFSA} with the same number of states as the \textit{NFA}.
 
 \begin{figure}[!htb]
   \centering
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/State nb in A.png}
     \caption{Comparing State Number}
     \label{fig:StateWrostDFACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Membership queries.png}
     \caption{Membership queries Number}
     \label{fig:MemberWrostDFACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Equivalence queries.png}
     \caption{Equivalence queries Number}
     \label{fig:EquivWrostDFACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Transition nb in A.png}
     \caption{Transition Number}
     \label{fig:TransitionWrostDFACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Closedness.png}
     \caption{Closedness Problem Number}
     \label{fig:ClosednessWrostDFACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostDFA/Consistence.png}
-    \caption{Consistence Problem Number}
+    \caption{Consistency Problem Number}
     \label{fig:ConsistenceWrostDFACompare}
   \end{subfigure}
   \caption{mDFA vs cRFSA on $U = (a+b)^*a(a+b)^n)$}
   \label{fig:wrostDFA}
 \end{figure}
 
-From \cref{fig:wrostDFA}, we can see that \textit{L*} is much more expensive than \textit{NL*}. As announced the number of states of the \textit{mDFA}'s curve is exponential compared to $n$ and that this also impact the number of transitions, membership queries and closedness problems.
+As expected the number of states of the \textit{mDFA}'s curve is exponential compared to $n$ and this also impacts the number of transitions, membership queries and closedness problems.
 
-In \cref{fig:ConsistenceWrostDFACompare}, we see that the number of Consistence Problems grows linearly for \textit{L*} and equals zero for \textit{NL*}.
+In \cref{fig:ConsistenceWrostDFACompare}, we see that the number of Consistency Problems grows linearly for \textit{L*} and it is close to zero for \textit{NL*}.
 
 Let's analyze at first L*.
 
-Let $\U = (a+b)^*a(a+b)^n$. \textit{L*} sends the three membership queries for $\E, a$ and $b$. After that the table is closed and consistent and the first conjecture is an automaton $\A$ such that $\LA = \varnothing$. This is not the good automaton and the Teacher gives back a counter-example $\omega =  a^{n+1}$ of the shortest length\footnote{The Teacher is supposed to be the \textit{Minimal Adequate Teacher}}. All prefix $p$ of $\omega$ is added in $\U$ and $p \notin \U$. We have that the table is not consistent: $row(\E) = row(a^n)$ but $row(\E \cdot a) \neq row(a^n \cdot a)$. So \textit{L*} adds the new column $a$. This new column will make $row(\E) = row(a^{n-1})$ but $row(\E \cdot a) \neq row(a^{n-1} \cdot a)$. We continue in this way $n$ times until $E = \{\E, a, \dots, a^n\}$. This will stop the table to be not consistent since there will be no more similar row in $S$. Since the automaton associated to $\U$ has precisely $2^{n+1}$ states therefore $S$ will have to contain $2^{n+1}$ different rows. We know that after the first counter-example $\omega$, $|S| = n + 2$\footnote{$\E$ plus the $n+1$ prefixes of $\omega$} will have to find $2^{n+1}-(n+1)$ closedness problems to promote the necessary number of rows from $SA$ to $S$.
+Let $\U = (a+b)^*a(a+b)^n$. \textit{L*} sends the three membership queries for $\E, a$ and $b$. After that the table is closed and consistent and the first conjecture is an automaton $\A$ such that $\LA = \varnothing$. This is not the good automaton and the Teacher gives back a counter-example $\omega =  a^{n+1}$ of the shortest length\footnote{The Teacher is supposed to be the \textit{Minimal Adequate Teacher}}. All prefixes $p$ of $\omega$ are added in $\U$ and $p \notin \U$. We have that the table is not consistent: $row(\E) = row(a^n)$ but $row(\E \cdot a) \neq row(a^n \cdot a)$. So \textit{L*} adds the new column $a$. This new column will make $row(\E) = row(a^{n-1})$ but $row(\E \cdot a) \neq row(a^{n-1} \cdot a)$. We continue in this way $n$ times until $E = \{\E, a, \dots, a^n\}$. This will stop the table to be not consistent since there will be no more similar rows in $S$. Since the automaton associated to $\U$ has precisely $2^{n+1}$ states therefore $S$ will have to contain $2^{n+1}$ different rows. We know that after the first counter-example $\omega$, $|S| = n + 2$\footnote{$\E$ plus the $n+1$ prefixes of $\omega$} will have to find $2^{n+1}-(n+1)$ closedness problems to promote the necessary number of rows from $SA$ to $S$.
 
 Let's now analyze the NL* behavior.
 
-This algorithm, as said in \cref{section:NL}, tries to find all prime residuals of $\U$. After the first conjecture, that, as for the L* is supposed to accept the language $\U = \varepsilon$, the Learner receives the counter-example $\omega = a^n$. Since \textit{NL} adds the counter-example to $E$ and so it will directly make $E = \{\E, a, \dots, a^n\}$. This coincides with the number of residuals of $\U$. In this case the  algorithms only has to promote $n$ rows, one for each residual and this is possible since the promotion of a rows will create new rows in $SA$ to respect make the \OT complete.
+This algorithm, as said in \cref{section:NL}, tries to find all prime residuals of $\U$. After the first conjecture, that, as for the L* is supposed to accept the language $\U = \varepsilon$, the Learner receives the counter-example $\omega = a^n$. Since \textit{NL} adds the counter-example to $E$ and so it will directly make $E = \{\E, a, \dots, a^n\}$. This coincides with the number of residuals of $\U$. In this case the  algorithms only has to promote $n$ rows, one for each residual and this is possible since the promotion of a rows will create new rows in $SA$ to make the \OT complete.
 
 We can finally note that the number of equivalence queries is the same for the two algorithms since:
 \begin{itemize}
-  \item if $n = 0$, then $\U = (a+b)^*a$ and the first equivalence query is immediately accepted, without any consistence problem;
+  \item if $n = 0$, then $\U = (a+b)^*a$ and the first equivalence query is immediately accepted, without any consistency problem;
 
-  \item else: the two Learners only need two equivalence queries to understand $\U$\footnote{Note that in \cref{fig:EquivWrostDFACompare} the curve of NL* and L* are superposed}. After the first equivalence query, L* and NL* receive the first counter-example and thanks to the consistence and closedness check, both algorithms will be able to send a second conjecture $\A$ where $\LA = \U$.
+  \item else: the two Learners only need two equivalence queries to understand $\U$\footnote{Note that in \cref{fig:EquivWrostDFACompare} the curve of NL* and L* are superposed}. After the first equivalence query, L* and NL* receive the first counter-example and thanks to the consistency and closedness check, both algorithms will be able to send a second conjecture $\A$ where $\LA = \U$.
 \end{itemize}
 
 We can conclude that when the \textit{cRFSA} is exponentially smaller than the \textit{mDFA} it is better to apply the \textit{NL*} algorithm.
@@ -81,99 +81,99 @@ This automaton is proposed in Section 6 of \cite{RFSA}. The construction is done
   \item $\delta(q_i,a) = q_i+1$for $0 \leq i< n - 1$, $\delta(q_{n-1},a) = q_0$, $\delta(q_0,b)=q_0$, $\delta(q_i,b) = q_{i-1}$ for $1<i<n$ and $\delta(q_1,b)=q_{n-1}$.
 \end{itemize}
 
-As proved in that paper, the number of state a minimal \textit{NFA} equals $n$, but the number of states of the \textit{cRFSA} is exponential with reference to $n$.
+As proved in that paper, the number of states of a minimal \textit{NFA} equals $n$, but the number of states of the \textit{cRFSA} is exponential with respect to $n$.
 The statistics of the execution of the two algorithms are shown in \cref{fig:wrostRFSA}.
 
 \begin{figure}[!htb]
   \centering
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/State nb in A.png}
     \caption{Comparing State Number}
     \label{fig:StateWrostRFSACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Membership queries.png}
     \caption{Membership queries Number}
     \label{fig:MemberWrostRFSACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Equivalence queries.png}
     \caption{Equivalence queries Number}
     \label{fig:EquivWrostRFSACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Transition nb in A.png}
     \caption{Transition Number}
     \label{fig:TransitionWrostRFSACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Closedness.png}
     \caption{Closedness Problem Number}
     \label{fig:ClosednessWrostRFSACompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/wrostRFSA/Consistence.png}
-    \caption{Consistence Problem Number}
+    \caption{Consistency Problem Number}
     \label{fig:ConsistenceWrostRFSACompare}
   \end{subfigure}
   \caption{mDFA vs cRFSA on $\U = L(A_n)$}
   \label{fig:wrostRFSA}
 \end{figure}
 
-We can see that the number of state of the two automata generated by \textit{NL*} and \textit{L*} are the same and that the number of closedness problems and membership queries are similar. What change is the number of equivalence queries which is particularly smaller for the \textit{NL*} algorithm as for the number of time where the \OT is found not consistent. This is because adding counter-examples in $E$ instead of $S$ is in general a good mean to be able to distinguish faster newer residuals. We are able to reduce therefore the number of Consistence problem and so the number of Equivalence queries.
+We can see that the number of state of the two automata generated by \textit{NL*} and \textit{L*} are the same and that the number of closedness problems and membership queries are similar. What changes, is the number of equivalence queries which is particularly smaller for the \textit{NL*} algorithm as for the number of time where the \OT is found not consistent. This is because adding counter-examples in $E$ instead of $S$ is in general a good mean to be able to distinguish faster newer residuals. We are able to reduce therefore the number of Consistency problems and so the number of Equivalence queries.
 
 \begin{remark}
-  It is better to have a Learner that pose the less Equivalence queries as possible, because it is more expensive to test it than to answer to Membership queries.
+  It is better to have a Learner that poses the least Equivalence queries as possible, because it is more expensive to test it than to answer to Membership queries.
 \end{remark}
 
-I would also point out that the curve of the Membership queries of the NL* in \cref{fig:MemberWrostRFSACompare} is slightly bigger then the number of L*. In fact, we can see that the number $n$ of state of the \textit{mDFA} equals the number of states of the \textit{cRFSA}, so every state of the \textit{mDFA} is a \textit{Prime} residual. Let $n$ be the size of the \textit{mDFA} ($=$ size of the $\textit{cRFSA}$). The Learners have to put in $S$ at least $n$ different rows and at least $\log_2(n)$ columns to find the good conjecture. \textit{NL*} has to make more membership queries because every time it receives a counter-example from the Teacher, it has to add it and all its suffixes in $E$, and since $|S|$ can be big, it may be necessary to make a lot of membership queries to complete every cell of the new-added column. That's why also in \cref{fig:ClosednessWrostRFSACompare} the curve of \textit{NL*} is slightly worst than the \textit{L*} curve.
+We would also point out that the curve of the Membership queries of NL* in \cref{fig:MemberWrostRFSACompare} is slightly bigger then the number of L*. In fact, we can see that the number $n$ of states of the \textit{mDFA} equals the number of states of the \textit{cRFSA}, so every state of the \textit{mDFA} is a \textit{Prime} residual. Let $n$ be the size of the \textit{mDFA} ($=$ size of the $\textit{cRFSA}$). The Learners have to put in $S$ at least $n$ different rows and at least $\log_2(n)$ columns to find the good conjecture. \textit{NL*} has to make more membership queries because every time it receives a counter-example from the Teacher, it has to add it together with all its suffixes in $E$, and since $|S|$ can be big, it may be necessary to make a lot of membership queries to complete every cell of the new-added column. That's why also in \cref{fig:ClosednessWrostRFSACompare} the curve of \textit{NL*} is slightly worst than the \textit{L*} curve.
 
-Finally, it is interesting to see that the number of transition of the \textit{cRFSA} is exactly the same as the number of transitions in the \textit{mDFA}. But in general, and I will try to show it in the next section, the number of transitions in a \textit{cRFSA} is bigger then the number of transitions in the \textit{mDFA}.
+Finally, it is interesting to see that the number of transition of the \textit{cRFSA} is exactly the same as the number of transitions in the \textit{mDFA}. But in general, and we will try to show it in the next section, the number of transitions in a \textit{cRFSA} is bigger then the number of transitions in the \textit{mDFA}.
 
 \subsection{Results over random Teachers}
 
 The third type of comparison has been performed over a huge number of \textit{Teachers} on the form of \textit{mDFA} of size varying from $1$ to $100$ states. In this way we are able to see in average the performances of \textit{L} versus \textit{NL*}.
 
-This benchmark has been done taking the \textit{Automata} from the \textit{GitHub} repository \url{https://github.com/parof/buchi-automata-benchmark}. Every automaton (it is sample of about $2000$ element) is supposed to represent a \textit{Büchi Automaton} over a binary alphabet and I have reused them to create \textit{mDFA}. I have transformed then every \textit{Automaton} of the list into a \textit{Teacher} and, one by one, every \textit{Teacher} has been submitted to \textit{L*} and \textit{NL*} to get at the end some statistics that I could compare to those proposed by Bollig \textit{et al.} in \cite{NLPaper}.
+This benchmark has been done taking the \textit{Automata} from the \textit{GitHub} repository \url{https://github.com/parof/buchi-automata-benchmark} which samples around $2000$ examples. Every automaton is supposed to represent a \textit{Büchi Automaton} over a binary alphabet and we have reused them to create \textit{mDFA}. We have transformed then every \textit{Automaton} of the list into a \textit{Teacher} and, one by one, every \textit{Teacher} has been submitted to \textit{L*} and \textit{NL*} to get at the end some statistics that we could compare to those proposed by Bollig \textit{et al.} in \cite{NLPaper}.
 
 \begin{figure}[!htb]
   \centering
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/State nb in A.png}
     \caption{Comparing State Number}
     \label{fig:StateBenchMarkCompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Membership queries.png}
     \caption{Membership queries Number}
     \label{fig:MemberBenchMarkCompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Equivalence queries.png}
     \caption{Equivalence queries Number}
     \label{fig:EquivBenchMarkCompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Transition nb in A.png}
     \caption{Transition Number}
     \label{fig:TransitionBenchMarkCompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Closedness.png}
     \caption{Closedness Problem Number}
     \label{fig:ClosednessBenchMarkCompare}
   \end{subfigure}
-  \begin{subfigure}[b]{0.3\textwidth}
+  \begin{subfigure}[b]{0.25\textwidth}
     \includegraphics[width=\textwidth]{../statistics/plots/BenchMark/Consistence.png}
-    \caption{Consistence Problem Number}
+    \caption{Consistency Problem Number}
     \label{fig:ConsistenceBenchMarkCompare}
   \end{subfigure}
   \caption{mDFA vs cRFSA on random Teachers}
   \label{fig:benchmark}
 \end{figure}
 
-We see in \cref{fig:benchmark} that the number of states of the \textit{cRFSA} is in general exponentially smaller than the \textit{mDFA} and that, the number of equivalence and membership queries is in general taken by the \textit{NL*}. As expected the number of Consistence problems is won by the \textit{NL*} but curiously the Closedness comparison is taken by the \textit{NL*} only after about $50$ states.
+We see in \cref{fig:benchmark} that the number of states of the \textit{cRFSA} is in general exponentially smaller than the \textit{mDFA} and that, the number of equivalence and membership queries is in general taken by \textit{NL*}. As expected the number of Consistency problems is won by \textit{NL*} but curiously the Closedness comparison is taken by \textit{NL*} only after about $50$ states.
 
-Looking \cref{fig:MemberBenchMarkCompare} and \cref{fig:EquivBenchMarkCompare}, I can see that the gap between the \textit{NL*} and the \textit{L*} curves is not really big. Again, as for the previous section, when dealing with Teacher which demands a similar number of Membership and Equivalence queries for both \textit{NL*} and \textit{L*}, it is the \textit{NL*} algorithm which will have more Closedness problems. This is due to the fact that \textit{NL*} have to find all the \textit{Prime} residuals and so it will have to promote more rows, thing that is more efficiently done by \textit{L*} which adds the counter-example in $S$.
+Looking \cref{fig:MemberBenchMarkCompare} and \cref{fig:EquivBenchMarkCompare}, we can see that the gap between \textit{NL*} and \textit{L*} curves is not really big. Again, as for the previous section, when dealing with Teacher which demands a similar number of Membership and Equivalence queries for both \textit{NL*} and \textit{L*}, it is \textit{NL*} which will have more Closedness problems. This is due to the fact that \textit{NL*} have to find all the \textit{Prime} residuals and so it will have to promote more rows, thing that is more efficiently done by \textit{L*} which adds the counter-example in $S$.
 
-In \cref{fig:TransitionBenchMarkCompare} we see that the number of transitions of the \textit{mDFA} grows linearly to the number of its states\footnote{Number of transitions $= |Sigma| \times$ number of states of the Automaton}, but the number of transitions in the \textit{cRFSA} is very often bigger. This is due to the fact that the \textit{cRFSA} tends to create a lot of transitions, sometimes redundant, from a state $q_i$ to every state $q_i'$ where $L(q_i') \subseteq L(q_i)$.
+In \cref{fig:TransitionBenchMarkCompare} we see that the number of transitions of the \textit{mDFA} grows linearly with respect to the number of its states\footnote{Number of transitions $= |\Sigma| \times$ number of states of the Automaton}, but the number of transitions in the \textit{cRFSA} is often bigger. This is due to the fact that the \textit{cRFSA} tends to create a lot of transitions, sometimes redundant, from a state $q_i$ to every state $q_i'$ where $L(q_i') \subseteq L(q_i)$.

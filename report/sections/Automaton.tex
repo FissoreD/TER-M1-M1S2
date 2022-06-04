@@ -1,7 +1,7 @@
 \section{Regular Languages and Finite State Automata}
 
 % \subsection{Description}
-In this section I would like to introduce the definition of \textit{Regular Language} and \textit{Automaton} over an alphabet $\Sigma$ since this notions are crucial to understand in a second moment the two algorithms L* and NL*.
+In this section we will introduce the definitions of \textit{Regular Language} and \textit{Automaton} over an alphabet $\Sigma$ since these notions are crucial to understand the two algorithms L* and NL*.
 % An automaton $\A$ is a computing device used in abstract computer science to understand regular languages seen as a set of words formed with the concatenation of zero or more letters \letter{} belonging to an alphabet noted \alphabet{}. We note $\Sigma^*$ as the set of all words over the alphabet $\Sigma$, including $\E$: the word of length 0.
 
 \begin{theorem}[Kleene's theorem]
@@ -19,12 +19,12 @@ where:
   \item $\E$ is the word of length 0;
   \item $\alpha$ is a symbol belonging to the alphabet $\Sigma$;
   \item $L_1 \cup L_2 = \{\omega \in \Sigma^* \mid \omega \in L_1 \vee \omega \in L_2\}$, which is the union of $L_1$ and $L_2$ ;
-  \item $L_1 \cdot L_2 = \{\omega \in \Sigma \mid \exists w_1 \in L_1, \exists w_2 \in L_2 \text{ and } w_1 \cdot w_2 = \omega\footnote{Note $ w_1 \cdot w_2$ is the concatenation of the word $w_1$ followed by the word $w_2$}\}$, which is the concatenation of all word in $L_1$ with all word in $L_2$;
+  \item $L_1 \cdot L_2 = \{\omega \in \Sigma \mid \exists w_1 \in L_1, \exists w_2 \in L_2 \text{ and } w_1 \cdot w_2 = \omega\footnote{Note $ w_1 \cdot w_2$ is the concatenation of the word $w_1$ followed by the word $w_2$}\}$, which is the concatenation of all words in $L_1$ with all words in $L_2$;
   \item $\overline{L} = \{\omega \in \Sigma^* \mid \omega \notin L\}$, called the complement of the language $L$;
-  \item To define $L^*$ let $V^0 = {\E}$, $V^1 = V$ and $V^{i+1} = V^i \cdot V$, then $L^* = \bigcup\limits_{i=0}^{\infty} L_{i}$. This operation is called the \textit{Kleene's star}
+  \item To define $L^*$ let $L^0 = {\E}$, $L^1 = L$ and $L^{i+1} = L^i \cdot L$, then $L^* = \bigcup\limits_{i=0}^{\infty} L_{i}$. This operation is called the \textit{Kleene's star}
 \end{itemize}
 
-Some properties are not listed since they can be derived from the previous definition, for example the intersection of the languages ($L_1 \cap L_2 = \overline{\overline{L_1} \cup \overline{L_2}}$).
+Some properties are not listed since they can be derived from the previous definition, for example the intersection betweem languages ($L_1 \cap L_2 = \overline{\overline{L_1} \cup \overline{L_2}}$).
 
 \begin{definition}[Automaton]
   An automaton $\A$ is represented by a 5-tuple $\left\langle \Sigma, \Q, \delta, q_I, F\right\rangle $ where \alphabet{} is the alphabet, \states{} is the set of states composing the automaton, $\delta$ is the set of transition, \qzero{} $\in \statesN{}$ is the initial state and $F \subseteq \Q$ is the set of accepting states. A transition $\delta$ is a mapping $Q \times \Sigma \rightarrow Q$.
@@ -45,12 +45,12 @@ Following the construction of the automaton $\A$, and especially focusing on its
 We can define a \textit{DFA} also with a logic formula:
 \[\forall q_i \in \Q, \forall \alpha \in \Sigma \text{ if } \exists \delta_1, \delta_2 \in \delta \text{ such that } \delta_1(q_i, \alpha) = q_j' \text{ and } \delta_2(q_i, \alpha) = q_j'' \text{ then } q_j' = q_j'' \]
 
-Since every regular language can be represented by an automaton, be it deterministic or not, the operations like intersection, union and complementation are also available on automata. Among these properties, the most difficult to compute is the complementation if the automaton is non-deterministic because it asks to make the \textit{NFA} deterministic \footnote{This operation is called determinisation} and the determinisation is a \textit{PSPACE-complete} problem.
+Since every regular language can be represented by an automaton, be it deterministic or not, the operations like intersection, union and complementation are also available on automata. Among these properties, the most difficult to compute is the complementation when the automaton is non-deterministic as it asks first to make the \textit{NFA} deterministic \footnote{This operation is called determinisation} which is a \textit{PSPACE-complete} problem.
 
 However, \textit{NFA}s have a big advantage since they can be exponentially smaller than the corresponding \textit{DFA} and this may be interesting mainly if we care about space resources.
 
 \begin{remark}
-  \textit{NFA} and \textit{DFA} have same expressiveness meaning that \[\bigcup NFA = \bigcup DFA = \bigcup RegularLanguages\]
+  \textit{NFA} and \textit{DFA} have the same expressive power meaning that \[\bigcup NFA = \bigcup DFA = \bigcup RegularLanguages\]
 \end{remark}
 
 \begin{definition}[Minimal automaton]
@@ -58,12 +58,12 @@ However, \textit{NFA}s have a big advantage since they can be exponentially smal
   An automaton $\A$ is minimal if it is not possible to construct a smaller automaton $\A'$ for the same language having less states than $\A$. Moreover, a minimal \textit{DFA} (noted \textit{mDFA}), for a given regular language, is \textit{unique}. However there may exists several minimal \textit{NFA}, noted \textit{mNFA}, for a regular language $\U$.
 \end{definition}
 
-We define, finally, Regular Expressions (or \textit{RegEx}) with the following grammar:
+Finally, we define, Regular Expressions (or \textit{RegEx}) with the following grammar:
 \[R = \omega \mid R + R \mid R \cdot R \mid R^* \mid (R)\]
 where $\omega$ is a word belonging to $\Sigma^*$, the ``$+$'' symbol indicates the union operator, ``$\cdot$'' is the concatenation of two regular expression, the ``$*$'' is defined as for regular languages and finally parentheses allows to introduce priority over the other operators.
 
 \begin{example}[DFA vs NFA]
-  In \cref{fig:nfa_vs_dfa} an example of two minimal automata for the language $L = (a+b)^*a(a+b)$ where we can see that the NFA needs less states then the corresponding minimal DFA.
+  In \cref{fig:nfa_vs_dfa} we have an example of two minimal automata for the language $L = (a+b)^*a(a+b)$ where we can see that the NFA needs less states then the corresponding minimal DFA.
   \begin{figure}[h]
     \centering
     \begin{subfigure}{0.45\textwidth}
@@ -101,10 +101,10 @@ where $\omega$ is a word belonging to $\Sigma^*$, the ``$+$'' symbol indicates t
       \caption{DFA}
       \label{subfig:dfa_x_star_ax}
     \end{subfigure}
-    \caption{NFA vs DFA}
+    \caption{Minimal NFA vs minimal DFA}
     \label{fig:nfa_vs_dfa}
   \end{figure}
 \end{example}
 
 \subsection{Some notation}
-I will note an automaton $\A$, $L = \LA$ means that the regular language recognized by the automaton $\A$ is $L$. An expression of type $L = (a+b)$ indicates that $L$ is recognized by the regular expression $(a+b)$. If not specified I suppose $\Sigma$ to be equal to ${a, b}$ and $\omega$ be a word over $\Sigma^*$.
+We will note an automaton $\A$, $L = \LA$ means that the regular language recognized by the automaton $\A$ is $L$. An expression of type $L = (a+b)$ indicates that $L$ is recognized by the regular expression $(a+b)$. If not specified we suppose $\Sigma$ to be equal to ${a, b}$ and $\omega$ be a word over $\Sigma^*$.

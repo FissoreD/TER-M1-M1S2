@@ -1,20 +1,10 @@
 \section{Before Learning}
-As said in \cref{sec:intro}, the goal of \textit{L*} and \textit{NL*} is to understand a regular an unknown language $\U$ and output a conjecture which, when accepted, will be an automaton $\A$ recognizing $\U$.
+As said in \cref{sec:intro}, the goal of \textit{L*} and \textit{NL*} is to ``learn'' a regular unknown language $\U$ and output a conjecture which, when accepted, will be an automaton $\A$ recognizing $\U$.
 
-Both algorithms work on the idea that a \textit{Learner} interacts with a \textit{Teacher} which knows $\U$ via two kinds of communication.
+Both algorithms work on the idea that a \textit{Learner} interacts with a \textit{Teacher} knowing $\U$ via two kinds of queries: \textit{membership} and \textit{equivalence} queries.
 
-\begin{definition}[Membership query]
-  A \textit{membership query} is a query where the \textit{Learner} asks the \textit{Teacher} if a word $\omega$ belongs to $\U$.
-\end{definition}
+In a \textit{membership query} the \textit{Learner} asks the \textit{Teacher} if a word $\omega$ belongs to $\U$.
 
-\begin{definition}[Equivalence query]
-  An \textit{equivalence query} is a query where the \textit{Learner} sends an Automaton (representing a conjecture) to the \textit{Teacher} which can answer \textit{Yes} if $\LA = \U$, otherwise a word $\omega$ belonging to $\U$ but not to $\LA$ or vice versa. In this case, $\omega$ is called \textit{counter-example}.
-\end{definition}
-
-A counter-example can also be defined as a word $\omega$ belonging to the symmetrical difference between ($\Delta$) $\LA$ and $\U$.
-\[\LA \Delta \U \equiv (\LA \cap \overline{\U}) \cup (\overline{\LA} \cap \U)\]
-
-Mathematically:
 \begin{equation}
   \begin{aligned}
     \label{eq:interactions}
@@ -23,11 +13,21 @@ Mathematically:
       \text{True}  & \quad  \text{if } \omega \in \U \\
       \text{False} & \quad   \text{otherwise}
     \end{cases}
-    \\
-    equiv(\A)      & =
+  \end{aligned}
+\end{equation}
+
+
+In an \textit{equivalence query} the \textit{Learner} sends an Automaton (representing a conjecture) to the \textit{Teacher} which can answer \textit{Yes} if $\LA = \U$, or a word $\omega$ belonging to $\U$ but not to $\LA$ or the other way round. In this case, $\omega$ is called a \textit{counter-example}.
+
+A counter-example can also be defined as a word $\omega$ belonging to the symmetrical difference (noted $\Delta$) between $\LA$ and $\U$.
+
+\begin{equation}
+  \begin{aligned}
+    equiv(\A) & =
     \begin{cases}
       \text{Yes}               & \quad \text{if } \LA = \U \\
       \omega \in \U \Delta \LA & \quad \text{otherwise}
     \end{cases}
   \end{aligned}
 \end{equation}
+
