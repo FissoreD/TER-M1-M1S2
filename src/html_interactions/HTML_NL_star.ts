@@ -20,7 +20,7 @@ export class HTML_NL_star extends HTML_LearnerBase<NL_star> {
 
   close_message(close_rep: string) {
     let row = this.learner.observation_table[close_rep];
-    return `The table is not closed since row(${close_rep}) is Prime and is not present is S.
+    return `The table is not closed since row(${close_rep}) is Prime and is not present in S.
     "${close_rep}" will be moved from SA to S.`;
     // `The table is not closed since there is row(${close_rep}) = "${row}" where "${close_rep}" is in SA and there is no row s in S such that s ⊑ ${row}.
     // "${close_rep}" will be moved from SA to S.`;
