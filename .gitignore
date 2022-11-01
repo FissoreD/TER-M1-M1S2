@@ -1,7 +1,7 @@
 node_modules
 # dist
 test_model
-.aux
+
 index-hidden.html
 TODO
 test
@@ -11,3 +11,7 @@ test
 public/out.js
 public/out.d.ts
 statistics/removeMe.py
+
+
+**/.aux/*
+!**/.aux/main.pdf
